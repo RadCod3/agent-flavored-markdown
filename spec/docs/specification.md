@@ -157,22 +157,22 @@ Each field serves a specific purpose in defining and organizing the agent:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| [`name`](#field-name) | `string` | No | Identifies the agent in human-readable form.<br>Default: inferred from the filename of the AFM file.<br>AFM implementations **SHALL** use this field to display the agent's name in user interfaces. |
-| [`description`](#field-description) | `string` | No | Provides a concise summary of what the agent does.<br>Default: inferred from the markdown body `# Role` section.<br>AFM implementations **SHALL** use this field to display the agent's description in user interfaces. |
-| [`version`](#field-version) | `string` | No | [Semantic version](https://semver.org/) of the agent definition (MAJOR.MINOR.PATCH).<br>Default: "0.0.0".<br>AFM implementations **SHALL** use this field to display the agent's version in user interfaces. |
-| [`namespace`](#field-namespace) | `string` | No | Logical grouping category for the agent.<br>Default: "default".<br>AFM implementations **SHALL** use this field to organize agents into logical groups or categories. |
-| [`author`](#field-author) | `string` | No | Single author in format `Name <Email>`.<br>Credits the creator of the agent definition. If both `author` and `authors` fields are provided, `authors` takes precedence. |
-| [`authors`](#field-authors) | `string[]` | No | Multiple authors, each in format `Name <Email>`.<br>Credits the creators of the agent definition. Takes precedence over `author` if both exist. |
-| [`iconUrl`](#field-iconurl) | `string` | No | URL to an icon representing the agent.<br>This is **OPTIONAL** but recommended for visual representation in user interfaces.<br>AFM implementations **SHALL** use this field to display the agent's icon in user interfaces. |
-| [`provider`](#field-provider) | `object` | No | Information about the organization providing the agent.<br>This is **OPTIONAL** but recommended for attribution.<br>See the [Provider Object](#provider-object) below for details. |
-| [`license`](#field-license) | `string` | No | License under which the agent definition is released.<br>This is **OPTIONAL** but recommended for clarity. |
+| <a id="field-name"></a>[`name`](#field-name) | `string` | No | Identifies the agent in human-readable form.<br>Default: inferred from the filename of the AFM file.<br>AFM implementations **SHALL** use this field to display the agent's name in user interfaces. |
+| <a id="field-description"></a>[`description`](#field-description) | `string` | No | Provides a concise summary of what the agent does.<br>Default: inferred from the markdown body `# Role` section.<br>AFM implementations **SHALL** use this field to display the agent's description in user interfaces. |
+| <a id="field-version"></a>[`version`](#field-version) | `string` | No | [Semantic version](https://semver.org/) of the agent definition (MAJOR.MINOR.PATCH).<br>Default: "0.0.0".<br>AFM implementations **SHALL** use this field to display the agent's version in user interfaces. |
+| <a id="field-namespace"></a>[`namespace`](#field-namespace) | `string` | No | Logical grouping category for the agent.<br>Default: "default".<br>AFM implementations **SHALL** use this field to organize agents into logical groups or categories. |
+| <a id="field-author"></a>[`author`](#field-author) | `string` | No | Single author in format `Name <Email>`.<br>Credits the creator of the agent definition. If both `author` and `authors` fields are provided, `authors` takes precedence. |
+| <a id="field-authors"></a>[`authors`](#field-authors) | `string[]` | No | Multiple authors, each in format `Name <Email>`.<br>Credits the creators of the agent definition. Takes precedence over `author` if both exist. |
+| <a id="field-iconurl"></a>[`iconUrl`](#field-iconurl) | `string` | No | URL to an icon representing the agent.<br>This is **OPTIONAL** but recommended for visual representation in user interfaces.<br>AFM implementations **SHALL** use this field to display the agent's icon in user interfaces. |
+| <a id="field-provider"></a>[`provider`](#field-provider) | `object` | No | Information about the organization providing the agent.<br>This is **OPTIONAL** but recommended for attribution.<br>See the [Provider Object](#provider-object) below for details. |
+| <a id="field-license"></a>[`license`](#field-license) | `string` | No | License under which the agent definition is released.<br>This is **OPTIONAL** but recommended for clarity. |
 
 **<a id="provider-object"></a>Provider Object:**
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| [`provider.organization`](#field-provider-organization) | `string` | No | Name of the organization providing the agent. |
-| [`provider.url`](#field-provider-url) | `string` | No | URL to the organization's website. |
+| <a id="field-provider-organization"></a>[`provider.organization`](#field-provider-organization) | `string` | No | Name of the organization providing the agent. |
+| <a id="field-provider-url"></a>[`provider.url`](#field-provider-url) | `string` | No | URL to the organization's website. |
 
 #### 5.1.3. Example Usage
 
@@ -253,7 +253,7 @@ Contains configurations for `service` agents.
 | Field  | Type     | Required | Description                                                          |
 |--------|----------|----------|----------------------------------------------------------------------|
 | `http` | `object` | No | Defines how to expose the agent via a standard HTTP endpoint.        |
-| `a2a`  | `object` | No | Defines how the agent is exposed and discovered within an A2A network. See [Section 6.3](#63-agent-card-schema) for Agent Card details. |
+| `a2a`  | `object` | No | Defines how the agent is exposed and discovered within an A2A network. See [Section 6.3](#63-agent-to-agent-a2a-agent-card) for Agent Card details. |
 
 !!! warning "WIP"
     Work in progress: There are more details to be added for `http` and `a2a` exposure configurations. Also there are more other exposure types planned for future versions of AFM.
@@ -325,7 +325,7 @@ connections:
 |-------|------|----------|-------------|
 | `connections` | `object` | No | Container for protocol-specific connection configurations. |
 | `connections.mcp` | `object` | No | Configuration for Model Context Protocol. See [Section 6.1](#61-model-context-protocol-mcp) for details. |
-| `connections.a2a` | `object` | No | Configuration for Agent-to-Agent Protocol. See [Section 6.2](#62-agent-to-agent-protocol-a2a) for details. |
+| `connections.a2a` | `object` | No | Configuration for Agent-to-Agent Protocol. See [Section 6.2](#62-agent-to-agent-a2a-peers) for details. |
 
 **MCP Connection Object:**
 
@@ -338,7 +338,7 @@ connections:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `peers` | `array` | No | List of peer agents to connect to. See [Section 6.2](#62-agent-to-agent-protocol-a2a) for detailed schema. |
+| `peers` | `array` | No | List of peer agents to connect to. See [Section 6.2](#62-agent-to-agent-a2a-peers) for detailed schema. |
 
 #### 5.3.3. Example Usage
 
