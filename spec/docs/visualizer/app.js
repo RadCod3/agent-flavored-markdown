@@ -19,6 +19,7 @@ version: "1.0.0"
 namespace: "development-tools"
 author: "Sample Author <author@example.com>"
 interface:
+  type: service
   exposure:
     http:
       path: "/code-review"
@@ -190,10 +191,12 @@ function renderHubSpoke(metadata, markdownBody) {
     const a2aPeers = metadata.connections?.a2a?.peers || [];
     const hasInterface = metadata.interface?.exposure;
     const interfaceTypes = hasInterface ? Object.keys(metadata.interface.exposure).map(escapeHtml) : [];
+    const interfaceType = metadata.interface?.type || 'function';
 
     const escapedName = escapeHtml(metadata.name || 'Unnamed Agent');
     const escapedDescription = escapeHtml(metadata.description || 'No description');
     const escapedVersion = escapeHtml(metadata.version);
+    const escapedInterfaceType = escapeHtml(interfaceType);
     
     const sections = markdownBody ? parseMarkdownSections(markdownBody) : { role: '', instructions: '' };
     const escapedRole = escapeHtml(sections.role);
@@ -217,7 +220,10 @@ function renderHubSpoke(metadata, markdownBody) {
                 </div>
                 <div class="hub-title">${escapedName}</div>
                 <div class="hub-subtitle">${escapedDescription.substring(0, 85)}${escapedDescription.length > 85 ? '...' : ''}</div>
-                ${metadata.version ? `<div class="hub-version">v${escapedVersion}</div>` : ''}
+                <div class="hub-badges">
+                    ${metadata.version ? `<span class="hub-version">v${escapedVersion}</span>` : ''}
+                    <span class="hub-type hub-type-${escapedInterfaceType}">${escapedInterfaceType}</span>
+                </div>
                 ${markdownBody ? `
                     <div class="hub-instructions">
                         ${sections.role ? `
@@ -397,11 +403,18 @@ function showSpokeDetails(spokeType, spokeIndex) {
                             </div>
                         </div>
                         ` : ''}
-                        ${mcpServer.transport?.args ? `
+                        ${mcpServer.transport?.args && mcpServer.transport.args.length > 0 ? `
                         <div class="row mb-3">
                             <label class="col-sm-3 col-form-label fw-bold">Arguments</label>
                             <div class="col-sm-9">
-                                <textarea class="form-control" rows="3" readonly>${escapeHtml(mcpServer.transport.args.join('\n'))}</textarea>
+                                <div class="args-list">
+                                    ${mcpServer.transport.args.map((arg, idx) => `
+                                        <div class="arg-item">
+                                            <span class="arg-index">${idx}</span>
+                                            <code class="arg-value">${escapeHtml(arg)}</code>
+                                        </div>
+                                    `).join('')}
+                                </div>
                             </div>
                         </div>
                         ` : ''}
@@ -410,6 +423,17 @@ function showSpokeDetails(spokeType, spokeIndex) {
                             <label class="col-sm-3 col-form-label fw-bold">URL</label>
                             <div class="col-sm-9">
                                 <input type="text" class="form-control" value="${escapeHtml(mcpServer.transport.url)}" readonly>
+                            </div>
+                        </div>
+                        ` : ''}
+                        ${mcpServer.authentication ? `
+                        <div class="row mb-3">
+                            <label class="col-sm-3 col-form-label fw-bold">Authentication</label>
+                            <div class="col-sm-9">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
+                                    <input type="text" class="form-control" value="${escapeHtml(mcpServer.authentication.type || 'configured')}" readonly>
+                                </div>
                             </div>
                         </div>
                         ` : ''}
@@ -425,9 +449,81 @@ function showSpokeDetails(spokeType, spokeIndex) {
         case 'interface':
             title = '<i class="bi bi-broadcast me-2"></i>Agent Interface';
             const interfaceExposure = metadata.interface?.exposure || {};
+            const interfaceSignature = metadata.interface?.signature;
+            const interfaceTypeValue = metadata.interface?.type || 'function';
             html = `
                 <div class="detail-form">
-                    <h6 class="text-muted mb-3">Exposure Types</h6>
+                    <h6 class="text-muted mb-3">Interface Configuration</h6>
+                    <div class="row mb-3">
+                        <label class="col-sm-3 col-form-label fw-bold">Type</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" value="${escapeHtml(interfaceTypeValue)}" readonly>
+                        </div>
+                    </div>
+                    
+                    ${interfaceSignature ? `
+                        <hr class="my-4">
+                        <h6 class="text-muted mb-3">Signature</h6>
+                        
+                        ${interfaceSignature.input && interfaceSignature.input.length > 0 ? `
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Input Parameters</label>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Type</th>
+                                                <th>Required</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${interfaceSignature.input.map(param => `
+                                                <tr>
+                                                    <td><code>${escapeHtml(param.name)}</code></td>
+                                                    <td><span class="badge bg-secondary">${escapeHtml(param.type || 'string')}</span></td>
+                                                    <td>${param.required ? '<span class="badge bg-danger">Required</span>' : '<span class="badge bg-secondary">Optional</span>'}</td>
+                                                    <td>${escapeHtml(param.description || '-')}</td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        ${interfaceSignature.output && interfaceSignature.output.length > 0 ? `
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Output Parameters</label>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Type</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${interfaceSignature.output.map(param => `
+                                                <tr>
+                                                    <td><code>${escapeHtml(param.name)}</code></td>
+                                                    <td><span class="badge bg-secondary">${escapeHtml(param.type || 'string')}</span></td>
+                                                    <td>${escapeHtml(param.description || '-')}</td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        ` : ''}
+                    ` : ''}
+                    
+                    ${Object.keys(interfaceExposure).length > 0 ? `
+                        <hr class="my-4">
+                        <h6 class="text-muted mb-3">Exposure Types</h6>
+                    ` : ''}
                     ${Object.keys(interfaceExposure).map(type => {
                         const config = interfaceExposure[type];
                         if (type === 'http') {
@@ -452,6 +548,17 @@ function showSpokeDetails(spokeType, spokeIndex) {
                                         <label class="col-sm-3 col-form-label fw-bold">Port</label>
                                         <div class="col-sm-9">
                                             <input type="text" class="form-control" value="${escapeHtml(String(config.port))}" readonly>
+                                        </div>
+                                    </div>
+                                    ` : ''}
+                                    ${config.authentication ? `
+                                    <div class="row mb-3">
+                                        <label class="col-sm-3 col-form-label fw-bold">Authentication</label>
+                                        <div class="col-sm-9">
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
+                                                <input type="text" class="form-control" value="${escapeHtml(config.authentication.type || 'configured')}" readonly>
+                                            </div>
                                         </div>
                                     </div>
                                     ` : ''}
