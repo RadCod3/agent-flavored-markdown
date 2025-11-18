@@ -11,7 +11,7 @@ AFM (Agent Flavored Markdown) provides a structured, markdown-based format for d
 
 AFM is designed to be composable. It supports not only the definition of individual agents but also complex, multi-agent systems where agents can collaborate and delegate tasks to one another.
 
-This document details the AFM file format, its syntax, and the schema for defining an agent. For a more detailed implementation guide, refer to the [AFM Implementation Guide](topics/implementation-guide.md).
+This document details the AFM file format, its syntax, and the schema for defining an agent.
 
 <!-- The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [BCP 14](https://www.rfc-editor.org/info/bcp14) [[RFC2119](https://datatracker.ietf.org/doc/html/rfc2119)] [[RFC8174](https://datatracker.ietf.org/doc/html/rfc8174)] when, and only when, they appear in all capitals, as shown here. -->
 

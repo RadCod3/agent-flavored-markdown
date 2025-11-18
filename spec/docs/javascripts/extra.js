@@ -1,8 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('.hero').forEach(element => {
-    element.classList.add('animate-in');
-  });
-
   document.querySelectorAll('.md-clipboard').forEach(button => {
     const originalTitle = button.title;
     button.addEventListener('click', () => {
