@@ -1,5 +1,20 @@
 /* Custom styling for AFM docs */
 
+/* WSO2 Brand Colors */
+:root {
+  --wso2-orange: #ff7300;
+  --wso2-black: #000000;
+  --wso2-white: #ffffff;
+}
+
+/* Override Material theme colors to use WSO2 orange */
+[data-md-color-accent="deep-orange"] {
+  --md-accent-fg-color: #ff7300;
+  --md-accent-fg-color--transparent: rgba(255, 115, 0, 0.1);
+  --md-accent-bg-color: #ffffff;
+  --md-accent-bg-color--light: rgba(255, 115, 0, 0.1);
+}
+
 /* Enhance card appearance */
 .md-typeset .grid.cards > :is(ul, ol) > li,
 .md-typeset .grid > .card {

@@ -20,14 +20,14 @@ theme:
     - media: "(prefers-color-scheme: light)"
       scheme: default
       primary: black
-      accent: blue
+      accent: deep orange
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       primary: black
-      accent: blue
+      accent: deep orange
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
@@ -100,9 +100,6 @@ extra:
       as to measure the effectiveness of our documentation and whether users
       find what they're searching for. With your consent, you're helping us to
       make our documentation better.
-  version:
-    provider: mike
-    default: latest
 
 # Navigation structure
 nav:

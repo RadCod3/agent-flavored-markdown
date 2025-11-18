@@ -52,14 +52,15 @@ body {
     width: 320px;
     min-height: 350px;
     max-height: 450px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+    border: 3px solid #ff7300;
     border-radius: 30px;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: #1a1a1a;
     z-index: 10;
     transition: transform 0.3s ease;
     padding: 30px 20px;
@@ -95,18 +96,19 @@ body {
 
 .hub-version {
     font-size: 0.8rem;
-    opacity: 0.95;
+    opacity: 0.85;
     margin-top: 10px;
     padding: 4px 14px;
-    background-color: rgba(255, 255, 255, 0.25);
+    background-color: rgba(255, 115, 0, 0.15);
     border-radius: 12px;
     font-weight: 500;
+    color: #ff7300;
 }
 
 .hub-instructions {
     margin-top: 18px;
     padding-top: 18px;
-    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    border-top: 1px solid rgba(255, 115, 0, 0.3);
     width: 100%;
 }
 
@@ -120,17 +122,18 @@ body {
 
 .hub-section-label {
     font-size: 0.7rem;
-    opacity: 0.85;
+    opacity: 0.7;
     text-align: center;
     margin-bottom: 6px;
     text-transform: uppercase;
     letter-spacing: 0.8px;
     font-weight: 600;
+    color: #666;
 }
 
 .hub-section-content {
     font-size: 0.8rem;
-    opacity: 0.92;
+    opacity: 0.85;
     text-align: left;
     line-height: 1.5;
     padding: 0 20px;
@@ -140,6 +143,7 @@ body {
     white-space: pre-line;
     text-overflow: ellipsis;
     word-wrap: break-word;
+    color: #333;
 }
 
 /* Spokes */
@@ -234,12 +238,15 @@ body {
 }
 
 .spoke-interface {
-    border-color: #6f42c1;
+    border-color: #ff7300;
+    border-width: 2.5px;
+    background: white;
+    z-index: 3;
 }
 
 .spoke-interface:hover {
-    border-color: #5a32a3;
-    background-color: #f8f5fc;
+    border-color: #ff7300;
+    background-color: #fff9f5;
 }
 
 /* Responsive adjustments */

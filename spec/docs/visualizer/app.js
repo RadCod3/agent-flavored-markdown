@@ -1,7 +1,17 @@
-// AFM Visualizer Application
 let currentAfmData = null;
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-// Sample AFM content
+function escapeHtml(unsafe) {
+    if (unsafe === null || unsafe === undefined) {
+        return '';
+    }
+    return String(unsafe)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
 const sampleAFM = `---
 name: "Code Review Assistant"
 description: "An AI assistant that helps review code and suggests improvements"
@@ -44,32 +54,21 @@ You are a Code Review Assistant specializing in providing constructive feedback 
 5. Maintain a helpful and encouraging tone
 `;
 
-// Initialize app
 document.addEventListener('DOMContentLoaded', () => {
-    setupEventListeners();
-});
-
-function setupEventListeners() {
-    // File input
     const fileInput = document.getElementById('file-input');
-    fileInput.addEventListener('change', handleFileSelect);
-
-    // Drag and drop
     const dropZone = document.getElementById('drop-zone');
+    
+    fileInput.addEventListener('change', handleFileSelect);
     dropZone.addEventListener('dragover', handleDragOver);
     dropZone.addEventListener('drop', handleDrop);
     dropZone.addEventListener('dragleave', handleDragLeave);
-
-    // Sample button
+    
     document.getElementById('load-sample').addEventListener('click', () => {
         loadAfmContent(sampleAFM, 'Sample AFM');
     });
-
-    // Load new file button
-    document.getElementById('load-new').addEventListener('click', () => {
-        showUploadSection();
-    });
-}
+    
+    document.getElementById('load-new').addEventListener('click', showUploadSection);
+});
 
 function handleDragOver(e) {
     e.preventDefault();
@@ -102,11 +101,14 @@ function handleFileSelect(e) {
 }
 
 function readFile(file) {
+    if (file.size > MAX_FILE_SIZE) {
+        alert(`File is too large. Maximum size is ${MAX_FILE_SIZE / 1024 / 1024}MB.`);
+        return;
+    }
+    
     const reader = new FileReader();
-    reader.onload = (e) => {
-        const content = e.target.result;
-        loadAfmContent(content, file.name);
-    };
+    reader.onload = (e) => loadAfmContent(e.target.result, file.name);
+    reader.onerror = () => alert('Error reading file. Please try again.');
     reader.readAsText(file);
 }
 
@@ -123,25 +125,29 @@ function loadAfmContent(content, filename) {
 }
 
 function parseAfmFile(content) {
-    // Split frontmatter and markdown body
-    const parts = content.split(/^---\s*$/m);
+    if (content.length > MAX_FILE_SIZE) {
+        throw new Error('File content is too large');
+    }
     
+    const parts = content.split(/^---\s*$/m);
     if (parts.length < 3) {
         throw new Error('Invalid AFM format: Missing frontmatter');
     }
 
-    // Parse YAML frontmatter
-    const yamlContent = parts[1].trim();
-    const metadata = jsyaml.load(yamlContent) || {};
-    
-    // Get markdown body
-    const markdownBody = parts.slice(2).join('---').trim();
-    
-    return {
-        metadata,
-        markdownBody,
-        rawContent: content
-    };
+    try {
+        const metadata = jsyaml.load(parts[1].trim(), {
+            schema: jsyaml.JSON_SCHEMA,
+            json: true
+        }) || {};
+        
+        return {
+            metadata,
+            markdownBody: parts.slice(2).join('---').trim(),
+            rawContent: content
+        };
+    } catch (error) {
+        throw new Error('Failed to parse YAML: ' + error.message);
+    }
 }
 
 function showUploadSection() {
@@ -160,51 +166,43 @@ function renderVisualization() {
 
     const { metadata, markdownBody, rawContent } = currentAfmData;
 
-    // Update agent name
     document.getElementById('agent-name').textContent = metadata.name || 'Unnamed Agent';
-
-    // Render hub and spoke
-    renderHubSpoke(metadata, markdownBody);
-
-    // Render metadata details
-    renderMetadata(metadata);
-
-    // Show raw content
     document.getElementById('raw-content').textContent = rawContent;
+    
+    renderHubSpoke(metadata, markdownBody);
+    renderMetadata(metadata);
 }
 
 function parseMarkdownSections(markdown) {
-    const sections = { role: '', instructions: '' };
-    
-    // Split by headers
     const roleMatch = markdown.match(/#+\s*Role\s*\n([\s\S]*?)(?=\n#+\s*|$)/i);
     const instructionsMatch = markdown.match(/#+\s*Instructions?\s*\n([\s\S]*?)(?=\n#+\s*|$)/i);
     
-    if (roleMatch) {
-        sections.role = roleMatch[1].trim();
-    }
-    
-    if (instructionsMatch) {
-        sections.instructions = instructionsMatch[1].trim();
-    }
-    
-    return sections;
+    return {
+        role: roleMatch ? roleMatch[1].trim() : '',
+        instructions: instructionsMatch ? instructionsMatch[1].trim() : ''
+    };
 }
 
 function renderHubSpoke(metadata, markdownBody) {
     const container = document.getElementById('hub-spoke-container');
     
-    // Count connections and interface
     const mcpServers = metadata.connections?.mcp?.servers || [];
     const a2aPeers = metadata.connections?.a2a?.peers || [];
     const hasInterface = metadata.interface?.exposure;
-    const interfaceTypes = hasInterface ? Object.keys(metadata.interface.exposure) : [];
+    const interfaceTypes = hasInterface ? Object.keys(metadata.interface.exposure).map(escapeHtml) : [];
+
+    const escapedName = escapeHtml(metadata.name || 'Unnamed Agent');
+    const escapedDescription = escapeHtml(metadata.description || 'No description');
+    const escapedVersion = escapeHtml(metadata.version);
+    
+    const sections = markdownBody ? parseMarkdownSections(markdownBody) : { role: '', instructions: '' };
+    const escapedRole = escapeHtml(sections.role);
+    const escapedInstructions = escapeHtml(sections.instructions);
 
     const html = `
         <div class="hub-spoke-visual">
-            <!-- SVG for connection lines -->
             <svg class="connections-svg" viewBox="0 0 1200 900">
-                ${hasInterface ? '<line x1="600" y1="450" x2="1010" y2="180" stroke="#6f42c1" stroke-width="3" />' : ''}
+                ${hasInterface ? '<line x1="600" y1="450" x2="1010" y2="180" stroke="#ff7300" stroke-width="2.5" />' : ''}
                 ${mcpServers.map((_, idx) => 
                     `<line x1="600" y1="450" x2="190" y2="${300 + (idx * 160)}" stroke="#cbd5e0" stroke-width="2.5" />`
                 ).join('')}
@@ -213,17 +211,14 @@ function renderHubSpoke(metadata, markdownBody) {
                 ).join('')}
             </svg>
 
-            <!-- Central Hub (includes core agent identity and instructions) -->
             <div class="hub" data-spoke-type="hub">
                 <div class="hub-icon">
                     <i class="bi bi-robot"></i>
                 </div>
-                <div class="hub-title">${metadata.name || 'Unnamed Agent'}</div>
-                <div class="hub-subtitle">${(metadata.description || 'No description').substring(0, 85)}${(metadata.description || '').length > 85 ? '...' : ''}</div>
-                ${metadata.version ? `<div class="hub-version">v${metadata.version}</div>` : ''}
-                ${markdownBody ? (() => {
-                    const sections = parseMarkdownSections(markdownBody);
-                    return `
+                <div class="hub-title">${escapedName}</div>
+                <div class="hub-subtitle">${escapedDescription.substring(0, 85)}${escapedDescription.length > 85 ? '...' : ''}</div>
+                ${metadata.version ? `<div class="hub-version">v${escapedVersion}</div>` : ''}
+                ${markdownBody ? `
                     <div class="hub-instructions">
                         ${sections.role ? `
                         <div class="hub-section">
@@ -231,7 +226,7 @@ function renderHubSpoke(metadata, markdownBody) {
                                 <i class="bi bi-person-badge me-1"></i>
                                 Role
                             </div>
-                            <div class="hub-section-content">${sections.role.substring(0, 110)}${sections.role.length > 110 ? '...' : ''}</div>
+                            <div class="hub-section-content">${escapedRole.substring(0, 110)}${escapedRole.length > 110 ? '...' : ''}</div>
                         </div>
                         ` : ''}
                         ${sections.instructions ? `
@@ -240,18 +235,14 @@ function renderHubSpoke(metadata, markdownBody) {
                                 <i class="bi bi-list-check me-1"></i>
                                 Instructions
                             </div>
-                            <div class="hub-section-content">${sections.instructions.substring(0, 110)}${sections.instructions.length > 110 ? '...' : ''}</div>
+                            <div class="hub-section-content">${escapedInstructions.substring(0, 110)}${escapedInstructions.length > 110 ? '...' : ''}</div>
                         </div>
                         ` : ''}
                     </div>
-                    `;
-                })() : ''}
+                ` : ''}
             </div>
 
-            <!-- Spokes -->
             <div class="spokes-container">
-
-                <!-- Interface Spoke -->
                 ${hasInterface ? `
                 <div class="spoke-group-label" style="position: absolute; top: 30px; right: 30px;">Interface</div>
                 <div class="spoke spoke-interface" data-spoke-type="interface" style="position: absolute; top: 80px; right: 30px;">
@@ -262,32 +253,33 @@ function renderHubSpoke(metadata, markdownBody) {
                     <div class="spoke-subtitle">${interfaceTypes.join(', ')}</div>
                 </div>
                 ` : ''}
-
-                <!-- MCP Connections -->
                 ${mcpServers.length > 0 ? `
                 <div class="spoke-group-label" style="position: absolute; top: 140px; left: 30px;">MCP Connections</div>
-                ${mcpServers.map((server, idx) => `
+                ${mcpServers.map((server, idx) => {
+                    const escapedServerName = escapeHtml(server.name);
+                    const escapedTransportType = escapeHtml(server.transport?.type || 'stdio');
+                    return `
                     <div class="spoke spoke-mcp" data-spoke-type="mcp" data-spoke-index="${idx}" style="position: absolute; top: ${190 + (idx * 160)}px; left: 30px;">
                         <div class="spoke-icon">
-                            ${server.name.includes('github') ? '🔗' : 
-                              server.name.includes('filesystem') ? '📁' : '🔧'}
+                            ${server.name && server.name.includes('github') ? '🔗' : 
+                              server.name && server.name.includes('filesystem') ? '📁' : '🔧'}
                         </div>
-                        <div class="spoke-title">${server.name}</div>
-                        <div class="spoke-subtitle">${server.transport?.type || 'stdio'}</div>
+                        <div class="spoke-title">${escapedServerName}</div>
+                        <div class="spoke-subtitle">${escapedTransportType}</div>
                     </div>
-                `).join('')}
+                `}).join('')}
                 ` : ''}
-
-                <!-- A2A Peers -->
                 ${a2aPeers.length > 0 ? `
                 <div class="spoke-group-label" style="position: absolute; top: ${hasInterface ? '230' : '140'}px; right: 30px;">Peer Agents</div>
-                ${a2aPeers.map((peer, idx) => `
+                ${a2aPeers.map((peer, idx) => {
+                    const escapedPeerName = escapeHtml(peer.name);
+                    return `
                     <div class="spoke spoke-a2a" data-spoke-type="a2a" data-spoke-index="${idx}" style="position: absolute; top: ${(hasInterface ? 280 : 190) + (idx * 160)}px; right: 30px;">
                         <div class="spoke-icon">👥</div>
-                        <div class="spoke-title">${peer.name}</div>
+                        <div class="spoke-title">${escapedPeerName}</div>
                         <div class="spoke-subtitle">A2A Connection</div>
                     </div>
-                `).join('')}
+                `}).join('')}
                 ` : ''}
             </div>
         </div>
@@ -295,7 +287,6 @@ function renderHubSpoke(metadata, markdownBody) {
 
     container.innerHTML = html;
     
-    // Add click handlers to spokes
     setTimeout(() => {
         document.querySelectorAll('.hub, .spoke').forEach(element => {
             element.addEventListener('click', handleSpokeClick);
@@ -329,38 +320,38 @@ function showSpokeDetails(spokeType, spokeIndex) {
                     <div class="row mb-3">
                         <label class="col-sm-3 col-form-label fw-bold">Agent Name</label>
                         <div class="col-sm-9">
-                            <input type="text" class="form-control" value="${metadata.name || ''}" readonly>
+                            <input type="text" class="form-control" value="${escapeHtml(metadata.name || '')}" readonly>
                         </div>
                     </div>
                     <div class="row mb-3">
                         <label class="col-sm-3 col-form-label fw-bold">Description</label>
                         <div class="col-sm-9">
-                            <textarea class="form-control" rows="2" readonly>${metadata.description || ''}</textarea>
+                            <textarea class="form-control" rows="2" readonly>${escapeHtml(metadata.description || '')}</textarea>
                         </div>
                     </div>
                     <div class="row mb-3">
                         <label class="col-sm-3 col-form-label fw-bold">Version</label>
                         <div class="col-sm-9">
-                            <input type="text" class="form-control" value="${metadata.version || ''}" readonly>
+                            <input type="text" class="form-control" value="${escapeHtml(metadata.version || '')}" readonly>
                         </div>
                     </div>
                     <div class="row mb-3">
                         <label class="col-sm-3 col-form-label fw-bold">Namespace</label>
                         <div class="col-sm-9">
-                            <input type="text" class="form-control" value="${metadata.namespace || ''}" readonly>
+                            <input type="text" class="form-control" value="${escapeHtml(metadata.namespace || '')}" readonly>
                         </div>
                     </div>
                     <div class="row mb-3">
                         <label class="col-sm-3 col-form-label fw-bold">Author</label>
                         <div class="col-sm-9">
-                            <input type="text" class="form-control" value="${metadata.author || ''}" readonly>
+                            <input type="text" class="form-control" value="${escapeHtml(metadata.author || '')}" readonly>
                         </div>
                     </div>
                     ${metadata.license ? `
                     <div class="row mb-3">
                         <label class="col-sm-3 col-form-label fw-bold">License</label>
                         <div class="col-sm-9">
-                            <input type="text" class="form-control" value="${metadata.license}" readonly>
+                            <input type="text" class="form-control" value="${escapeHtml(metadata.license)}" readonly>
                         </div>
                     </div>
                     ` : ''}
@@ -370,7 +361,7 @@ function showSpokeDetails(spokeType, spokeIndex) {
                     <h6 class="text-muted mb-3">Role & Instructions</h6>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Markdown Content</label>
-                        <textarea class="form-control" rows="12" readonly>${markdownBody}</textarea>
+                        <textarea class="form-control" rows="12" readonly>${escapeHtml(markdownBody)}</textarea>
                     </div>
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle me-2"></i>
@@ -379,30 +370,30 @@ function showSpokeDetails(spokeType, spokeIndex) {
                 </div>
             `;
             break;
-            
+        
         case 'mcp':
             const mcpServer = metadata.connections?.mcp?.servers?.[spokeIndex];
             if (mcpServer) {
-                title = `<i class="bi bi-diagram-3 me-2"></i>MCP Server: ${mcpServer.name}`;
+                title = `<i class="bi bi-diagram-3 me-2"></i>MCP Server: ${escapeHtml(mcpServer.name)}`;
                 html = `
                     <div class="detail-form">
                         <div class="row mb-3">
                             <label class="col-sm-3 col-form-label fw-bold">Server Name</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" value="${mcpServer.name}" readonly>
+                                <input type="text" class="form-control" value="${escapeHtml(mcpServer.name)}" readonly>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <label class="col-sm-3 col-form-label fw-bold">Transport Type</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" value="${mcpServer.transport?.type || 'stdio'}" readonly>
+                                <input type="text" class="form-control" value="${escapeHtml(mcpServer.transport?.type || 'stdio')}" readonly>
                             </div>
                         </div>
                         ${mcpServer.transport?.command ? `
                         <div class="row mb-3">
                             <label class="col-sm-3 col-form-label fw-bold">Command</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" value="${mcpServer.transport.command}" readonly>
+                                <input type="text" class="form-control" value="${escapeHtml(mcpServer.transport.command)}" readonly>
                             </div>
                         </div>
                         ` : ''}
@@ -410,7 +401,7 @@ function showSpokeDetails(spokeType, spokeIndex) {
                         <div class="row mb-3">
                             <label class="col-sm-3 col-form-label fw-bold">Arguments</label>
                             <div class="col-sm-9">
-                                <textarea class="form-control" rows="3" readonly>${mcpServer.transport.args.join('\n')}</textarea>
+                                <textarea class="form-control" rows="3" readonly>${escapeHtml(mcpServer.transport.args.join('\n'))}</textarea>
                             </div>
                         </div>
                         ` : ''}
@@ -418,7 +409,7 @@ function showSpokeDetails(spokeType, spokeIndex) {
                         <div class="row mb-3">
                             <label class="col-sm-3 col-form-label fw-bold">URL</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" value="${mcpServer.transport.url}" readonly>
+                                <input type="text" class="form-control" value="${escapeHtml(mcpServer.transport.url)}" readonly>
                             </div>
                         </div>
                         ` : ''}
@@ -430,7 +421,7 @@ function showSpokeDetails(spokeType, spokeIndex) {
                 `;
             }
             break;
-            
+        
         case 'interface':
             title = '<i class="bi bi-broadcast me-2"></i>Agent Interface';
             const interfaceExposure = metadata.interface?.exposure || {};
@@ -452,7 +443,7 @@ function showSpokeDetails(spokeType, spokeIndex) {
                                     <div class="row mb-3">
                                         <label class="col-sm-3 col-form-label fw-bold">Path</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" value="${config.path}" readonly>
+                                            <input type="text" class="form-control" value="${escapeHtml(config.path)}" readonly>
                                         </div>
                                     </div>
                                     ` : ''}
@@ -460,7 +451,7 @@ function showSpokeDetails(spokeType, spokeIndex) {
                                     <div class="row mb-3">
                                         <label class="col-sm-3 col-form-label fw-bold">Port</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" value="${config.port}" readonly>
+                                            <input type="text" class="form-control" value="${escapeHtml(String(config.port))}" readonly>
                                         </div>
                                     </div>
                                     ` : ''}
@@ -479,7 +470,7 @@ function showSpokeDetails(spokeType, spokeIndex) {
                                     <div class="row mb-3">
                                         <label class="col-sm-3 col-form-label fw-bold">Endpoint</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" value="${config.endpoint}" readonly>
+                                            <input type="text" class="form-control" value="${escapeHtml(config.endpoint)}" readonly>
                                         </div>
                                     </div>
                                     ` : ''}
@@ -491,13 +482,13 @@ function showSpokeDetails(spokeType, spokeIndex) {
                                     <div class="row mb-3">
                                         <label class="col-sm-3 col-form-label fw-bold">Type</label>
                                         <div class="col-sm-9">
-                                            <input type="text" class="form-control" value="${type.toUpperCase()}" readonly>
+                                            <input type="text" class="form-control" value="${escapeHtml(type.toUpperCase())}" readonly>
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                         <label class="col-sm-3 col-form-label fw-bold">Configuration</label>
                                         <div class="col-sm-9">
-                                            <textarea class="form-control" rows="4" readonly>${JSON.stringify(config, null, 2)}</textarea>
+                                            <textarea class="form-control" rows="4" readonly>${escapeHtml(JSON.stringify(config, null, 2))}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -511,23 +502,23 @@ function showSpokeDetails(spokeType, spokeIndex) {
                 </div>
             `;
             break;
-            
+        
         case 'a2a':
             const a2aPeer = metadata.connections?.a2a?.peers?.[spokeIndex];
             if (a2aPeer) {
-                title = `<i class="bi bi-people me-2"></i>Peer Agent: ${a2aPeer.name}`;
+                title = `<i class="bi bi-people me-2"></i>Peer Agent: ${escapeHtml(a2aPeer.name)}`;
                 html = `
                     <div class="detail-form">
                         <div class="row mb-3">
                             <label class="col-sm-3 col-form-label fw-bold">Peer Name</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" value="${a2aPeer.name}" readonly>
+                                <input type="text" class="form-control" value="${escapeHtml(a2aPeer.name)}" readonly>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <label class="col-sm-3 col-form-label fw-bold">Endpoint</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" value="${a2aPeer.endpoint}" readonly>
+                                <input type="text" class="form-control" value="${escapeHtml(a2aPeer.endpoint)}" readonly>
                             </div>
                         </div>
                         <div class="alert alert-info">
@@ -569,8 +560,8 @@ function renderMetadata(metadata) {
             <tbody>
                 ${fields.filter(f => f.value).map(f => `
                     <tr>
-                        <th style="width: 30%;">${f.label}</th>
-                        <td>${f.value}</td>
+                        <th style="width: 30%;">${escapeHtml(f.label)}</th>
+                        <td>${escapeHtml(f.value)}</td>
                     </tr>
                 `).join('')}
                 ${connections.length > 0 ? `

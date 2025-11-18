@@ -93,4 +93,27 @@ The process is designed to be straightforward. Agents are defined in natural lan
     text-align: center;
     margin-top: 1.5rem;
   }
+  
+  /* Override button colors to use WSO2 branding */
+  .button-container .md-button--primary {
+    background-color: #000000 !important;
+    border-color: #000000 !important;
+    color: #ffffff !important;
+  }
+  
+  .button-container .md-button--primary:hover {
+    background-color: #1a1a1a !important;
+    border-color: #1a1a1a !important;
+  }
+  
+  .button-container .md-button:not(.md-button--primary) {
+    border: 2px solid #ff7300 !important;
+    color: #ff7300 !important;
+    background-color: transparent !important;
+  }
+  
+  .button-container .md-button:not(.md-button--primary):hover {
+    background-color: #ff7300 !important;
+    color: #ffffff !important;
+  }
 </style>
