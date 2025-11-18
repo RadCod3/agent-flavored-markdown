@@ -330,7 +330,6 @@ tools:
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `servers` | `array` | Yes | List of MCP servers to connect to. See [Section 6.1](#61-model-context-protocol-mcp) for detailed schema. |
-| `tool_filter` | `object` | No | Filter configuration for tools. See [Section 6.1](#61-model-context-protocol-mcp) for details. |
 
 #### 5.3.3. Example Usage
 
@@ -376,9 +375,9 @@ mcp:
         command: string      # Shell command (for stdio)
       authentication:        # Optional
         type: string         # Authentication scheme (oauth2, api_key, etc.)
-  tool_filter:               # Optional
-    allow: [string]          # Whitelist of tools in "server_name/tool_name" format
-    deny: [string]           # Blacklist of tools in "server_name/tool_name" format
+      tool_filter:           # Optional
+        allow: [string]      # Whitelist of tools in "tool_name" format
+        deny: [string]       # Blacklist of tools in "tool_name" format
 ```
 
 #### 6.1.2. Field Definitions
@@ -386,7 +385,6 @@ mcp:
 | Key | Type | Required | Description |
 |-----|------|----------|-------------|
 | `servers` | Array | Yes | Specifies the MCP servers that the agent can connect to. Each server entry must have a unique `name` that identifies the connection. |
-| `tool_filter` | Object | No | Allows for fine-grained control over which tools from the connected servers are exposed to the agent. |
 
 **Server Object:**
 
@@ -395,6 +393,7 @@ mcp:
 | `name`           | String | Yes      | A unique, human-readable identifier for the connection.                                                            |
 | `transport`      | Object | Yes      | An object defining the communication mechanism. See [Transport Object](#transport-object) below.                   |
 | `authentication` | Object | No       | An object declaring the required authentication scheme. See [Authentication Object](#authentication-object) below. |
+| `tool_filter`    | Object | No       | Filter configuration for tools from this server. See [Tool Filter Object](#tool-filter-object) below.              |
 
 **<a id="transport-object"></a>Transport Object:**
 
@@ -410,16 +409,16 @@ mcp:
 | ------ | ------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `type` | String | Yes      | Authentication scheme (e.g., `oauth2`, `api_key`).<br>The agent's host environment is responsible for managing the actual credentials and authentication flow. |
 
-**Tool Filter Object:**
+**<a id="tool-filter-object"></a>Tool Filter Object:**
 
 | Key     | Type         | Required | Description                                                        |
 | ------- | ------------ | -------- | ------------------------------------------------------------------ |
-| `allow` | String Array | No       | A whitelist of tools to expose, in `server_name/tool_name` format. |
-| `deny`  | String Array | No       | A blacklist of tools to hide, in `server_name/tool_name` format.   |
+| `allow` | String Array | No       | A whitelist of tools to expose from this server, using just the tool name (e.g., `create_issue`, `read_file`). |
+| `deny`  | String Array | No       | A blacklist of tools to hide from this server, using just the tool name (e.g., `write_file`). |
 
 #### 6.1.3. Example Implementation
 
-This example defines tool connections to a remote GitHub MCP server (requiring OAuth 2.0) and a local filesystem server. It then filters the available tools.
+This example defines tool connections to a remote GitHub MCP server (requiring OAuth 2.0) and a local filesystem server. Each server has its own tool filter configuration.
 
 ```yaml
 tools:
@@ -431,19 +430,20 @@ tools:
           url: "https://mcp.github.com/api"
         authentication:
           type: oauth2
+        tool_filter:
+          allow:
+            - "create_issue"
+            - "list_repositories"
 
       - name: local_filesystem_server
         transport:
           type: stdio
           command: "npx -y @modelcontextprotocol/server-filesystem"
-
-    tool_filter:
-      allow:
-        - "github_mcp_server/create_issue"
-        - "github_mcp_server/list_repositories"
-        - "local_filesystem_server/read_file"
-      deny:
-        - "local_filesystem_server/write_file"
+        tool_filter:
+          allow:
+            - "read_file"
+          deny:
+            - "write_file"
 ```
 
 ### 6.2. Agent-to-Agent (A2A)
