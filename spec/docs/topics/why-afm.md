@@ -68,7 +68,7 @@ This is why **Markdown** emerges as the ideal candidate.
 ### AFM Structure
 
 **Front Matter (Structured Metadata):**
-The YAML front matter provides a structured, machine-readable section for defining the agent's configuration (its name, tools, connections, etc.).
+The YAML front matter provides a structured, machine-readable section for defining the agent's configuration (its name, interface, tool connections, etc.).
 
 **Markdown Body (Semi-structured Document):**
 The body of the document provides a human- and AI-first authoring experience for the agent's detailed system prompt.

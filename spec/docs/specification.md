@@ -253,7 +253,7 @@ Contains configurations for `service` agents.
 | Field  | Type     | Required | Description                                                          |
 |--------|----------|----------|----------------------------------------------------------------------|
 | `http` | `object` | No | Defines how to expose the agent via a standard HTTP endpoint.        |
-| `a2a`  | `object` | No | Defines how the agent is exposed and discovered within an A2A network. See [Section 6.3](#63-agent-to-agent-a2a-agent-card) for Agent Card details. |
+| `a2a`  | `object` | No | Defines how the agent is exposed and discovered within an A2A network. See [Section 6.2](#62-agent-to-agent-a2a) for Agent Card details. |
 
 !!! warning "WIP"
     Work in progress: There are more details to be added for `http` and `a2a` exposure configurations. Also there are more other exposure types planned for future versions of AFM.
@@ -307,7 +307,7 @@ interface:
 
 ### 5.3. Connections
 
-This section defines the schema for an agent's **outbound connections** to external tools and other agents. It enables agents to consume external resources.
+This section defines the schema for an agent's **outbound connections** to external tools and other agents. It enables agents to consume external resources and collaborate with peer agents.
 
 #### 5.3.1. Schema Overview
 
@@ -316,7 +316,7 @@ The connections fields are specified in the YAML frontmatter of an AFM file:
 ```yaml
 connections:
   mcp: object         # Configuration for connecting to MCP tools.
-  a2a: object         # Configuration for connecting to Peer Agents.
+  a2a: object         # Configuration for connecting to peer agents (coming soon).
 ```
 
 #### 5.3.2. Field Definitions
@@ -325,7 +325,7 @@ connections:
 |-------|------|----------|-------------|
 | `connections` | `object` | No | Container for protocol-specific connection configurations. |
 | `connections.mcp` | `object` | No | Configuration for Model Context Protocol. See [Section 6.1](#61-model-context-protocol-mcp) for details. |
-| `connections.a2a` | `object` | No | Configuration for Agent-to-Agent Protocol. See [Section 6.2](#62-agent-to-agent-a2a-peers) for details. |
+| `connections.a2a` | `object` | No | Configuration for Agent-to-Agent Protocol. **(Coming soon)** |
 
 **MCP Connection Object:**
 
@@ -336,9 +336,8 @@ connections:
 
 **A2A Connection Object:**
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `peers` | `array` | No | List of peer agents to connect to. See [Section 6.2](#62-agent-to-agent-a2a-peers) for detailed schema. |
+!!! warning "Coming Soon"
+    The A2A connection configuration for outbound peer agent connections is under development and will be available in a future version of the AFM specification.
 
 #### 5.3.3. Example Usage
 
@@ -352,10 +351,6 @@ connections:
         transport:
           type: "http_sse"
           url: "https://mcp.github.com/api"
-  a2a:
-    peers:
-      - name: "research_assistant"
-        endpoint: "https://agents.example.com/research-assistant"
 ```
 
 ### 5.4. Agent Resources
@@ -458,51 +453,11 @@ connections:
         - "local_filesystem_server/write_file"
 ```
 
-### 6.2. Agent-to-Agent (A2A) - Peers
+### 6.2. Agent-to-Agent (A2A)
 
-The Agent-to-Agent Protocol (A2A) enables agents to collaborate with other agents, forming a multi-agent system where tasks can be delegated and information can be shared.
+The Agent-to-Agent Protocol (A2A) enables agents to expose themselves as services that other agents can discover and call, forming a multi-agent system where tasks can be delegated and information can be shared.
 
 #### 6.2.1. Schema Overview
-
-```yaml
-connections:
-  a2a:
-    peers:
-      - name: string      # A local alias for the peer agent.
-        endpoint: string  # The network address of the peer agent.
-        # Future fields could include discovery mechanisms, etc.
-```
-
-#### 6.2.2. Field Definitions
-
-| Key | Type | Required | Description |
-|-----|------|----------|-------------|
-| `peers` | Array | No | List of peer agents that this agent can connect to and call. |
-
-**Peer Object:**
-
-| Key        | Type   | Required | Description                                                                       |
-| ---------- | ------ | -------- | --------------------------------------------------------------------------------- |
-| `name`     | String | Yes      | A local alias for the peer agent, used to reference it within this agent's logic. |
-| `endpoint` | String | Yes      | The network address or URL where the peer agent service is accessible.            |
-
-#### 6.2.3. Example Implementation
-
-```yaml
-connections:
-  a2a:
-    peers:
-      - name: "research_assistant"
-        endpoint: "https://agents.example.com/research-assistant"
-      - name: "data_analyzer"
-        endpoint: "https://internal.company.com/agents/data-analyzer"
-```
-
-### 6.3. Agent-to-Agent (A2A) - Agent Card
-
-The Agent Card provides metadata for service discovery and display when agents expose themselves as services through the A2A protocol.
-
-#### 6.3.1. Schema Overview
 
 ```yaml
 interface:
@@ -532,9 +487,9 @@ interface:
 | `description` | String | No | Brief description of what services the agent provides. Default: Uses the agent's description from its metadata. |
 | `icon` | String | No | URL to an icon representing the agent service. Default: Uses the agent's iconUrl from its metadata. |
 
-#### 6.3.3. Example Implementation
+#### 6.2.3. Example Implementation
 
-This example defines an agent that exposes itself as a discoverable service with custom agent card information:
+This example defines an agent that exposes itself as a discoverable A2A service with custom agent card information:
 
 ```yaml
 interface:

@@ -36,10 +36,6 @@ connections:
           type: "stdio"
           command: "npx"
           args: ["-y", "@modelcontextprotocol/server-filesystem"]
-  a2a:
-    peers:
-      - name: "documentation_expert"
-        endpoint: "https://agents.example.com/docs-expert"
 ---
 
 # Role
@@ -188,7 +184,6 @@ function renderHubSpoke(metadata, markdownBody) {
     const container = document.getElementById('hub-spoke-container');
     
     const mcpServers = metadata.connections?.mcp?.servers || [];
-    const a2aPeers = metadata.connections?.a2a?.peers || [];
     const hasInterface = metadata.interface?.exposure;
     const interfaceTypes = hasInterface ? Object.keys(metadata.interface.exposure).map(escapeHtml) : [];
     const interfaceType = metadata.interface?.type || 'function';
@@ -208,9 +203,6 @@ function renderHubSpoke(metadata, markdownBody) {
                 ${hasInterface ? '<line x1="600" y1="450" x2="1010" y2="180" stroke="#ff7300" stroke-width="2.5" />' : ''}
                 ${mcpServers.map((_, idx) => 
                     `<line x1="600" y1="450" x2="190" y2="${300 + (idx * 160)}" stroke="#cbd5e0" stroke-width="2.5" />`
-                ).join('')}
-                ${a2aPeers.map((_, idx) => 
-                    `<line x1="600" y1="450" x2="1010" y2="${(hasInterface ? 380 : 300) + (idx * 160)}" stroke="#cbd5e0" stroke-width="2.5" />`
                 ).join('')}
             </svg>
 
@@ -272,18 +264,6 @@ function renderHubSpoke(metadata, markdownBody) {
                         </div>
                         <div class="spoke-title">${escapedServerName}</div>
                         <div class="spoke-subtitle">${escapedTransportType}</div>
-                    </div>
-                `}).join('')}
-                ` : ''}
-                ${a2aPeers.length > 0 ? `
-                <div class="spoke-group-label" style="position: absolute; top: ${hasInterface ? '230' : '140'}px; right: 30px;">Peer Agents</div>
-                ${a2aPeers.map((peer, idx) => {
-                    const escapedPeerName = escapeHtml(peer.name);
-                    return `
-                    <div class="spoke spoke-a2a" data-spoke-type="a2a" data-spoke-index="${idx}" style="position: absolute; top: ${(hasInterface ? 280 : 190) + (idx * 160)}px; right: 30px;">
-                        <div class="spoke-icon">👥</div>
-                        <div class="spoke-title">${escapedPeerName}</div>
-                        <div class="spoke-subtitle">A2A Connection</div>
                     </div>
                 `}).join('')}
                 ` : ''}
@@ -609,33 +589,6 @@ function showSpokeDetails(spokeType, spokeIndex) {
                 </div>
             `;
             break;
-        
-        case 'a2a':
-            const a2aPeer = metadata.connections?.a2a?.peers?.[spokeIndex];
-            if (a2aPeer) {
-                title = `<i class="bi bi-people me-2"></i>Peer Agent: ${escapeHtml(a2aPeer.name)}`;
-                html = `
-                    <div class="detail-form">
-                        <div class="row mb-3">
-                            <label class="col-sm-3 col-form-label fw-bold">Peer Name</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control" value="${escapeHtml(a2aPeer.name)}" readonly>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <label class="col-sm-3 col-form-label fw-bold">Endpoint</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control" value="${escapeHtml(a2aPeer.endpoint)}" readonly>
-                            </div>
-                        </div>
-                        <div class="alert alert-info">
-                            <i class="bi bi-info-circle me-2"></i>
-                            This agent can collaborate with this peer agent through the A2A protocol.
-                        </div>
-                    </div>
-                `;
-            }
-            break;
     }
     
     detailsTitle.innerHTML = title;
@@ -657,9 +610,6 @@ function renderMetadata(metadata) {
     const connections = [];
     if (metadata.connections?.mcp?.servers) {
         connections.push(`MCP Servers: ${metadata.connections.mcp.servers.length}`);
-    }
-    if (metadata.connections?.a2a?.peers) {
-        connections.push(`A2A Peers: ${metadata.connections.a2a.peers.length}`);
     }
 
     const html = `
