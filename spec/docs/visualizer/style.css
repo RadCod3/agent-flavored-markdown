@@ -199,6 +199,10 @@ body {
     text-align: center;
     color: #212529;
     padding: 0 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
 }
 
 .spoke-subtitle {
@@ -207,6 +211,10 @@ body {
     text-align: center;
     padding: 0 8px;
     margin-top: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
 }
 
 /* Spoke Type Specific Colors */
