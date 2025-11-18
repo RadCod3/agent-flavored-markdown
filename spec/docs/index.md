@@ -57,7 +57,7 @@ The process is designed to be straightforward. Agents are defined in natural lan
 
 <div class="button-container">
     <a href="specification" class="md-button md-button--primary">Read the Spec</a>
-    <!-- <a href="../try-it/" class="md-button">Try It Out</a> -->
+    <a href="visualizer/" class="md-button">Visualizer</a>
     <a href="topics/" class="md-button">Learn More</a>
 </div>
 

@@ -111,9 +111,8 @@ nav:
       - Introduction: topics/index.md
       - Why AFM?: topics/why-afm.md
       - Connected Agents: topics/afm-connected-agent.md
-      # - Rich Editor Experience: topics/rich-editor-experience.md
   - Specification: specification.md
-  # - 'Try It!': /try-it/
+  - Visualizer: visualizer/index.html
 
 # Include images in documentation
 docs_dir: docs

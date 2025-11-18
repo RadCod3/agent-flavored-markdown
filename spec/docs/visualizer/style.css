@@ -1,0 +1,334 @@
+/* AFM Visualizer Styles */
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Upload Area */
+.upload-area {
+    border: 3px dashed #dee2e6;
+    border-radius: 10px;
+    padding: 60px 20px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.upload-area:hover {
+    border-color: #0d6efd;
+    background-color: #f8f9ff;
+}
+
+.upload-area.drag-over {
+    border-color: #0d6efd;
+    background-color: #e7f1ff;
+    transform: scale(1.02);
+}
+
+/* Hub and Spoke Visualization */
+.hub-spoke-visual {
+    position: relative;
+    min-height: 850px;
+    width: 100%;
+    padding: 40px;
+}
+
+.connections-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Central Hub */
+.hub {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 320px;
+    min-height: 350px;
+    max-height: 450px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 30px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    z-index: 10;
+    transition: transform 0.3s ease;
+    padding: 30px 20px;
+    overflow: hidden;
+}
+
+.hub:hover {
+    transform: translate(-50%, -50%) scale(1.03);
+}
+
+.hub-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
+}
+
+.hub-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-align: center;
+    padding: 0 15px;
+    line-height: 1.4;
+}
+
+.hub-subtitle {
+    font-size: 0.95rem;
+    opacity: 0.95;
+    text-align: center;
+    padding: 0 15px;
+    margin-top: 8px;
+    line-height: 1.5;
+    overflow: hidden;
+}
+
+.hub-version {
+    font-size: 0.8rem;
+    opacity: 0.95;
+    margin-top: 10px;
+    padding: 4px 14px;
+    background-color: rgba(255, 255, 255, 0.25);
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+.hub-instructions {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    width: 100%;
+}
+
+.hub-section {
+    margin-bottom: 14px;
+}
+
+.hub-section:last-child {
+    margin-bottom: 0;
+}
+
+.hub-section-label {
+    font-size: 0.7rem;
+    opacity: 0.85;
+    text-align: center;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 600;
+}
+
+.hub-section-content {
+    font-size: 0.8rem;
+    opacity: 0.92;
+    text-align: left;
+    line-height: 1.5;
+    padding: 0 20px;
+    font-style: italic;
+    max-height: 75px;
+    overflow: hidden;
+    white-space: pre-line;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+}
+
+/* Spokes */
+.spokes-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.spoke-group {
+    position: absolute;
+}
+
+.spoke-group-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #6c757d;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.spoke {
+    width: 140px;
+    height: 120px;
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 5;
+    cursor: pointer;
+}
+
+.spoke:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    border-color: #0d6efd;
+}
+
+.spoke-icon {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.spoke-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    color: #212529;
+    padding: 0 8px;
+}
+
+.spoke-subtitle {
+    font-size: 0.7rem;
+    color: #6c757d;
+    text-align: center;
+    padding: 0 8px;
+    margin-top: 4px;
+}
+
+/* Spoke Type Specific Colors */
+.spoke-instructions {
+    border-color: #ffc107;
+}
+
+.spoke-instructions:hover {
+    border-color: #ff9800;
+    background-color: #fffbf0;
+}
+
+.spoke-mcp {
+    border-color: #17a2b8;
+}
+
+.spoke-mcp:hover {
+    border-color: #138496;
+    background-color: #f0f9fb;
+}
+
+.spoke-a2a {
+    border-color: #28a745;
+}
+
+.spoke-a2a:hover {
+    border-color: #218838;
+    background-color: #f0f9f3;
+}
+
+.spoke-interface {
+    border-color: #6f42c1;
+}
+
+.spoke-interface:hover {
+    border-color: #5a32a3;
+    background-color: #f8f5fc;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .hub-spoke-visual {
+        min-height: 500px;
+        padding: 20px;
+    }
+
+    .hub {
+        width: 150px;
+        height: 120px;
+    }
+
+    .hub-icon {
+        font-size: 2rem;
+    }
+
+    .hub-title {
+        font-size: 0.85rem;
+    }
+
+    .spoke {
+        width: 100px;
+        height: 90px;
+    }
+
+    .spoke-icon {
+        font-size: 1.5rem;
+    }
+
+    .spoke-title {
+        font-size: 0.75rem;
+    }
+}
+
+/* Code block styling */
+pre {
+    font-size: 0.85rem;
+    line-height: 1.5;
+}
+
+/* Card enhancements */
+.card {
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #e9ecef;
+}
+
+/* Detail form styling */
+.detail-form {
+    padding: 1rem 0;
+}
+
+.detail-form .form-control,
+.detail-form .form-control:focus {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    cursor: default;
+}
+
+.detail-form textarea.form-control {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+/* Spoke details panel */
+#spoke-details {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Selected spoke highlight */
+.spoke.selected,
+.hub.selected {
+    border-color: #0d6efd !important;
+    box-shadow: 0 8px 20px rgba(13, 110, 253, 0.3) !important;
+}
