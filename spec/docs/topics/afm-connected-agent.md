@@ -2,7 +2,7 @@
 
 In the rapidly expanding universe of AI, building a powerful agent is only the beginning. The true challenge lies in making that agent a functional part of a larger ecosystem. This requires clear standards for what an agent is, what tools it can use, and how it collaborates. While protocols like the **Model Context Protocol (MCP)** provide a "toolbox" for agents and the **Agent-to-Agent (A2A) Protocol** provides the "communication channel," **Agent Flavored Markdown (AFM)** is the blueprint that connects the agent's definition to these powerful capabilities.
 
-An AFM file's role extends far beyond a simple description; it is the central configuration layer that activates an agent's ability to interact with the world. This is achieved through the `connections` block (for MCP tools) and the `interface` block (for A2A exposure) within the AFM front matter—simple yet powerful sections that transform a static definition into a dynamic, enabled entity.
+An AFM file's role extends far beyond a simple description; it is the central configuration layer that activates an agent's ability to interact with the world. This is achieved through the `tools` block (for MCP tools) and the `interface` block (for A2A exposure) within the AFM front matter—simple yet powerful sections that transform a static definition into a dynamic, enabled entity.
 
 <div class="grid cards" markdown>
 
@@ -20,11 +20,11 @@ An AFM file's role extends far beyond a simple description; it is the central co
 
 An agent's utility is measured by what it can do. AFM specifies this by declaring which MCP servers the agent is authorized to use.
 
-Within the `connections.mcp` section, an AFM file lists the specific MCP tool servers the agent can access. This could be a connection to a GitHub API, a local filesystem, or a corporate database.
+Within the `tools.mcp` section, an AFM file lists the specific MCP tool servers the agent can access. This could be a connection to a GitHub API, a local filesystem, or a corporate database.
 
 ```yaml
 # In an AFM file...
-connections:
+tools:
   mcp:
     servers:
       - name: github_api_server
@@ -57,7 +57,7 @@ connections:
 
 </div>
 
-By defining these connections, the AFM file does more than describe an agent; it **equips it**. It hands the agent its specific toolkit, making it instantly capable of performing tasks like creating a GitHub issue or reading a local file. This declarative approach means you can change an agent's tools and capabilities simply by editing its AFM file, without touching a line of runtime code.
+By defining these tool connections, the AFM file does more than describe an agent; it **equips it**. It hands the agent its specific toolkit, making it instantly capable of performing tasks like creating a GitHub issue or reading a local file. This declarative approach means you can change an agent's tools and capabilities simply by editing its AFM file, without touching a line of runtime code.
 
 ## Making Agents Collaborative with A2A
 

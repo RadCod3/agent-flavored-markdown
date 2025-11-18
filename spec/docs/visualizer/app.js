@@ -23,7 +23,7 @@ interface:
   exposure:
     http:
       path: "/code-review"
-connections:
+tools:
   mcp:
     servers:
       - name: "github"
@@ -183,7 +183,7 @@ function parseMarkdownSections(markdown) {
 function renderHubSpoke(metadata, markdownBody) {
     const container = document.getElementById('hub-spoke-container');
     
-    const mcpServers = metadata.connections?.mcp?.servers || [];
+    const mcpServers = metadata.tools?.mcp?.servers || [];
     const hasInterface = metadata.interface?.exposure;
     const interfaceTypes = hasInterface ? Object.keys(metadata.interface.exposure).map(escapeHtml) : [];
     const interfaceType = metadata.interface?.type || 'function';
@@ -252,7 +252,7 @@ function renderHubSpoke(metadata, markdownBody) {
                 </div>
                 ` : ''}
                 ${mcpServers.length > 0 ? `
-                <div class="spoke-group-label" style="position: absolute; top: 140px; left: 30px;">MCP Connections</div>
+                <div class="spoke-group-label" style="position: absolute; top: 140px; left: 30px;">MCP Tools</div>
                 ${mcpServers.map((server, idx) => {
                     const escapedServerName = escapeHtml(server.name);
                     const escapedTransportType = escapeHtml(server.transport?.type || 'stdio');
@@ -358,7 +358,7 @@ function showSpokeDetails(spokeType, spokeIndex) {
             break;
         
         case 'mcp':
-            const mcpServer = metadata.connections?.mcp?.servers?.[spokeIndex];
+            const mcpServer = metadata.tools?.mcp?.servers?.[spokeIndex];
             if (mcpServer) {
                 title = `<i class="bi bi-diagram-3 me-2"></i>MCP Server: ${escapeHtml(mcpServer.name)}`;
                 html = `
@@ -607,9 +607,9 @@ function renderMetadata(metadata) {
         { label: 'License', value: metadata.license },
     ];
 
-    const connections = [];
-    if (metadata.connections?.mcp?.servers) {
-        connections.push(`MCP Servers: ${metadata.connections.mcp.servers.length}`);
+    const tools = [];
+    if (metadata.tools?.mcp?.servers) {
+        tools.push(`MCP Servers: ${metadata.tools.mcp.servers.length}`);
     }
 
     const html = `
@@ -621,10 +621,10 @@ function renderMetadata(metadata) {
                         <td>${escapeHtml(f.value)}</td>
                     </tr>
                 `).join('')}
-                ${connections.length > 0 ? `
+                ${tools.length > 0 ? `
                     <tr>
-                        <th>Connections</th>
-                        <td>${connections.join('<br>')}</td>
+                        <th>Tools</th>
+                        <td>${tools.join('<br>')}</td>
                     </tr>
                 ` : ''}
             </tbody>

@@ -36,7 +36,7 @@ AFM is built around several core concepts that define how agents are structured 
 - **Role**: A specific function or set of responsibilities that an agent can perform, described in natural language within a specific context.
 - **Instructions**: Natural language directives that guide the agent's behavior and task execution, also known as the system prompt.
 - **Agent Details**: Programmatic metadata that describes the agent, including name, version, author, and other identifying information.
-- **Connections**: Mechanisms that enable agents to connect to external tools, services, and other agents for enhanced functionality.
+- **Tools**: External tools and services available to the agent (via MCP).
 - **Interface**: Specifications for how agents expose themselves to the outside world, defining their callable signature and service endpoints.
 - **Model**: Configuration for the Large Language Model (LLM) used by the agent *(coming soon)*.
 - **Memory**: Mechanisms for how agents can store and retrieve information across interactions *(coming soon)*.
@@ -75,7 +75,7 @@ This section contains metadata about the agent. These metadata fields are **OPTI
 | ----------------- | -------------------------------------------------------------------------------- |
 | [Agent Details](#51-about-the-agent)     | Information about the agent, such as its name, description, version, and author. |
 | [Agent Interface](#52-agent-interface)   | Defines how the agent is invoked and its input/output signature.                 |
-| [Agent Connections](#53-connections) | Defines outbound connections to external tools and peer agents.                  |
+| [Agent Tools](#53-tools) | Defines outbound connections to external tools and peer agents.                  |
 | [Agent Resources](#54-agent-resources)   | Coming soon                                                                      |
 
 Refer to the [AFM Schema](#5-schema-definitions) for a complete list of fields and their meanings.
@@ -305,27 +305,25 @@ interface:
         icon: "https://example.com/icons/research-assistant.png"
 ```
 
-### 5.3. Connections
+### 5.3. Tools
 
-This section defines the schema for an agent's **outbound connections** to external tools and other agents. It enables agents to consume external resources and collaborate with peer agents.
+This section defines the schema for an agent's tools. It also enables agents to consume external resources.
 
 #### 5.3.1. Schema Overview
 
-The connections fields are specified in the YAML frontmatter of an AFM file:
+The tools fields are specified in the YAML frontmatter of an AFM file:
 
 ```yaml
-connections:
+tools:
   mcp: object         # Configuration for connecting to MCP tools.
-  a2a: object         # Configuration for connecting to peer agents (coming soon).
 ```
 
 #### 5.3.2. Field Definitions
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `connections` | `object` | No | Container for protocol-specific connection configurations. |
-| `connections.mcp` | `object` | No | Configuration for Model Context Protocol. See [Section 6.1](#61-model-context-protocol-mcp) for details. |
-| `connections.a2a` | `object` | No | Configuration for Agent-to-Agent Protocol. **(Coming soon)** |
+| `tools` | `object` | No | Container for protocol-specific tool connection configurations. |
+| `tools.mcp` | `object` | No | Configuration for Model Context Protocol. See [Section 6.1](#61-model-context-protocol-mcp) for details. |
 
 **MCP Connection Object:**
 
@@ -334,17 +332,12 @@ connections:
 | `servers` | `array` | Yes | List of MCP servers to connect to. See [Section 6.1](#61-model-context-protocol-mcp) for detailed schema. |
 | `tool_filter` | `object` | No | Filter configuration for tools. See [Section 6.1](#61-model-context-protocol-mcp) for details. |
 
-**A2A Connection Object:**
-
-!!! warning "Coming Soon"
-    The A2A connection configuration for outbound peer agent connections is under development and will be available in a future version of the AFM specification.
-
 #### 5.3.3. Example Usage
 
-Here's a simple example of connections in an AFM file:
+Here's a simple example of tools in an AFM file:
 
 ```yaml
-connections:
+tools:
   mcp:
     servers:
       - name: "github_api"
@@ -426,10 +419,10 @@ mcp:
 
 #### 6.1.3. Example Implementation
 
-This example defines connections to a remote GitHub MCP server (requiring OAuth 2.0) and a local filesystem server. It then filters the available tools.
+This example defines tool connections to a remote GitHub MCP server (requiring OAuth 2.0) and a local filesystem server. It then filters the available tools.
 
 ```yaml
-connections:
+tools:
   mcp:
     servers:
       - name: github_mcp_server
