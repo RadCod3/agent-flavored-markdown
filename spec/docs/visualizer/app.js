@@ -6,7 +6,16 @@ const UI_CONSTANTS = {
     ROLE_HEIGHT: 280,
     INSTRUCTIONS_HEIGHT: 320,
     TOTAL_CONTENT_HEIGHT: 660,
-    HUB_SPOKE_MIN_HEIGHT: 850
+    HUB_SPOKE_MIN_HEIGHT: 850,
+    // Spoke positioning
+    SPOKE_START_TOP: 190,
+    SPOKE_SPACING: 160,
+    SPOKE_GROUP_LABEL_TOP: 140,
+    INTERFACE_SPOKE_TOP: 80,
+    INTERFACE_LABEL_TOP: 30,
+    // Text truncation
+    DESCRIPTION_MAX_LENGTH: 85,
+    HUB_CONTENT_MAX_LENGTH: 110
 };
 
 function escapeHtml(unsafe) {
@@ -70,8 +79,50 @@ function initializeMarked() {
     }
 }
 
+function initializeDarkMode() {
+    const themeToggle = document.getElementById('theme-toggle');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const savedTheme = localStorage.getItem('afm-theme');
+    const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark.matches);
+    
+    if (isDark) {
+        document.body.classList.add('dark-mode');
+        updateThemeIcon(true);
+    }
+    
+    themeToggle.addEventListener('click', () => {
+        const isDarkMode = document.body.classList.toggle('dark-mode');
+        localStorage.setItem('afm-theme', isDarkMode ? 'dark' : 'light');
+        updateThemeIcon(isDarkMode);
+    });
+    
+    prefersDark.addEventListener('change', (e) => {
+        if (!localStorage.getItem('afm-theme')) {
+            if (e.matches) {
+                document.body.classList.add('dark-mode');
+                updateThemeIcon(true);
+            } else {
+                document.body.classList.remove('dark-mode');
+                updateThemeIcon(false);
+            }
+        }
+    });
+}
+
+function updateThemeIcon(isDark) {
+    const icon = document.querySelector('#theme-toggle i');
+    if (isDark) {
+        icon.className = 'bi bi-sun-fill';
+    } else {
+        icon.className = 'bi bi-moon-stars';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initializeMarked();
+    initializeDarkMode();
+    
     const fileInput = document.getElementById('file-input');
     const dropZone = document.getElementById('drop-zone');
     
@@ -117,10 +168,49 @@ function handleFileSelect(e) {
     }
 }
 
+function showErrorModal(title, message) {
+    // Create a Bootstrap-style modal
+    const modal = document.createElement('div');
+    modal.innerHTML = `
+        <div class="modal fade show" style="display: block; background: rgba(0,0,0,0.5);" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">
+                            <i class="bi bi-exclamation-triangle me-2"></i>${title}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" onclick="this.closest('.modal').parentElement.remove()"></button>
+                    </div>
+                    <div class="modal-body">
+                        ${message}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').parentElement.remove()">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Auto-remove on backdrop click
+    modal.querySelector('.modal').addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal')) {
+            modal.remove();
+        }
+    });
+}
+
 function readFile(file) {
     // Validate file size
     if (file.size > MAX_FILE_SIZE) {
-        alert(`File is too large. Maximum size is ${MAX_FILE_SIZE / 1024 / 1024}MB.`);
+        showErrorModal(
+            'File Too Large',
+            `<p>The selected file is too large to process.</p>
+             <p><strong>Maximum allowed size:</strong> ${MAX_FILE_SIZE / 1024 / 1024}MB</p>
+             <p><strong>Your file size:</strong> ${(file.size / 1024 / 1024).toFixed(2)}MB</p>
+             <p class="mb-0">Please select a smaller file and try again.</p>`
+        );
         return;
     }
     
@@ -130,7 +220,18 @@ function readFile(file) {
     const hasValidExtension = validExtensions.some(ext => fileName.endsWith(ext));
     
     if (!hasValidExtension) {
-        alert('Invalid file type. Please upload a .md or .afm.md file.');
+        showErrorModal(
+            'Invalid File Type',
+            `<p>The file you selected is not a valid AFM file.</p>
+             <p><strong>Accepted file types:</strong></p>
+             <ul>
+                <li><code>.md</code> - Markdown files</li>
+                <li><code>.afm.md</code> - AFM markdown files</li>
+                <li><code>.afm</code> - AFM files</li>
+             </ul>
+             <p><strong>Your file:</strong> <code>${escapeHtml(file.name)}</code></p>
+             <p class="mb-0">Please select a valid AFM file and try again.</p>`
+        );
         return;
     }
     
@@ -140,13 +241,36 @@ function readFile(file) {
         try {
             loadAfmContent(e.target.result, file.name);
         } catch (error) {
-            alert('Error processing file: ' + error.message);
+            showErrorModal(
+                'Error Processing File',
+                `<p>An error occurred while processing your AFM file:</p>
+                 <div class="alert alert-danger mb-3">
+                    <code>${escapeHtml(error.message)}</code>
+                 </div>
+                 <p><strong>Common issues:</strong></p>
+                 <ul>
+                    <li>Invalid YAML frontmatter syntax</li>
+                    <li>Missing frontmatter delimiters (<code>---</code>)</li>
+                    <li>Incorrectly formatted metadata</li>
+                 </ul>
+                 <p class="mb-0">Please check your file format and try again.</p>`
+            );
             console.error('File processing error:', error);
         }
     };
     
     reader.onerror = (e) => {
-        alert('Error reading file. Please check the file and try again.');
+        showErrorModal(
+            'Error Reading File',
+            `<p>Failed to read the selected file.</p>
+             <p><strong>Possible causes:</strong></p>
+             <ul>
+                <li>File is corrupted</li>
+                <li>Insufficient permissions</li>
+                <li>File is locked by another program</li>
+             </ul>
+             <p class="mb-0">Please check the file and try again.</p>`
+        );
         console.error('FileReader error:', e);
     };
     
@@ -160,7 +284,29 @@ function loadAfmContent(content, filename) {
         showVisualizerSection();
         renderVisualization();
     } catch (error) {
-        alert('Error parsing AFM file: ' + error.message);
+        showErrorModal(
+            'Error Parsing AFM File',
+            `<p>Failed to parse the AFM file:</p>
+             <div class="alert alert-danger mb-3">
+                <code>${escapeHtml(error.message)}</code>
+             </div>
+             <p><strong>Expected AFM format:</strong></p>
+             <pre class="bg-light p-3 rounded"><code>---
+name: "Agent Name"
+description: "Description"
+version: "1.0.0"
+---
+
+# Role
+
+Your agent's role description
+
+## Instructions
+
+1. First instruction
+2. Second instruction</code></pre>
+             <p class="mb-0">Please ensure your file follows the AFM specification.</p>`
+        );
         console.error(error);
     }
 }
@@ -284,9 +430,9 @@ function renderHubSpoke(metadata, markdownBody) {
     const html = `
         <div class="hub-spoke-visual">
             <svg class="connections-svg" viewBox="0 0 1200 900">
-                ${hasInterface ? '<line x1="600" y1="450" x2="1010" y2="180" stroke="#ff7300" stroke-width="2.5" />' : ''}
+                ${hasInterface ? '<line x1="600" y1="450" x2="1010" y2="180" class="connection-line-interface" stroke-width="2.5" />' : ''}
                 ${mcpServers.map((_, idx) => 
-                    `<line x1="600" y1="450" x2="190" y2="${300 + (idx * 160)}" stroke="#cbd5e0" stroke-width="2.5" />`
+                    `<line x1="600" y1="450" x2="190" y2="${300 + (idx * 160)}" class="connection-line-mcp" stroke-width="2.5" />`
                 ).join('')}
             </svg>
 
@@ -295,7 +441,7 @@ function renderHubSpoke(metadata, markdownBody) {
                     <i class="bi bi-robot"></i>
                 </div>
                 <div class="hub-title">${escapedName}</div>
-                <div class="hub-subtitle">${escapedDescription.substring(0, 85)}${escapedDescription.length > 85 ? '...' : ''}</div>
+                <div class="hub-subtitle">${escapedDescription.substring(0, UI_CONSTANTS.DESCRIPTION_MAX_LENGTH)}${escapedDescription.length > UI_CONSTANTS.DESCRIPTION_MAX_LENGTH ? '...' : ''}</div>
                 <div class="hub-badges">
                     ${metadata.version ? `<span class="hub-version">v${escapedVersion}</span>` : ''}
                     <span class="hub-type hub-type-${escapedInterfaceType}">${escapedInterfaceType}</span>
@@ -308,7 +454,7 @@ function renderHubSpoke(metadata, markdownBody) {
                                 <i class="bi bi-person-badge me-1"></i>
                                 Role
                             </div>
-                            <div class="hub-section-content">${escapedRole.substring(0, 110)}${escapedRole.length > 110 ? '...' : ''}</div>
+                            <div class="hub-section-content">${escapedRole.substring(0, UI_CONSTANTS.HUB_CONTENT_MAX_LENGTH)}${escapedRole.length > UI_CONSTANTS.HUB_CONTENT_MAX_LENGTH ? '...' : ''}</div>
                         </div>
                         ` : ''}
                         ${sections.instructions ? `
@@ -317,7 +463,7 @@ function renderHubSpoke(metadata, markdownBody) {
                                 <i class="bi bi-list-check me-1"></i>
                                 Instructions
                             </div>
-                            <div class="hub-section-content">${escapedInstructions.substring(0, 110)}${escapedInstructions.length > 110 ? '...' : ''}</div>
+                            <div class="hub-section-content">${escapedInstructions.substring(0, UI_CONSTANTS.HUB_CONTENT_MAX_LENGTH)}${escapedInstructions.length > UI_CONSTANTS.HUB_CONTENT_MAX_LENGTH ? '...' : ''}</div>
                         </div>
                         ` : ''}
                     </div>
@@ -326,8 +472,8 @@ function renderHubSpoke(metadata, markdownBody) {
 
             <div class="spokes-container">
                 ${hasInterface ? `
-                <div class="spoke-group-label" style="position: absolute; top: 30px; right: 30px;">Interface</div>
-                <div class="spoke spoke-interface" data-spoke-type="interface" style="position: absolute; top: 80px; right: 30px;">
+                <div class="spoke-group-label" style="position: absolute; top: ${UI_CONSTANTS.INTERFACE_LABEL_TOP}px; right: 30px;">Interface</div>
+                <div class="spoke spoke-interface" data-spoke-type="interface" style="position: absolute; top: ${UI_CONSTANTS.INTERFACE_SPOKE_TOP}px; right: 30px;">
                     <div class="spoke-icon">
                         <i class="bi bi-broadcast"></i>
                     </div>
@@ -336,12 +482,12 @@ function renderHubSpoke(metadata, markdownBody) {
                 </div>
                 ` : ''}
                 ${mcpServers.length > 0 ? `
-                <div class="spoke-group-label" style="position: absolute; top: 140px; left: 30px;">MCP Tools</div>
+                <div class="spoke-group-label" style="position: absolute; top: ${UI_CONSTANTS.SPOKE_GROUP_LABEL_TOP}px; left: 30px;">MCP Tools</div>
                 ${mcpServers.map((server, idx) => {
                     const escapedServerName = escapeHtml(server.name);
                     const escapedTransportType = escapeHtml(server.transport?.type || 'stdio');
                     return `
-                    <div class="spoke spoke-mcp" data-spoke-type="mcp" data-spoke-index="${idx}" style="position: absolute; top: ${190 + (idx * 160)}px; left: 30px;">
+                    <div class="spoke spoke-mcp" data-spoke-type="mcp" data-spoke-index="${idx}" style="position: absolute; top: ${UI_CONSTANTS.SPOKE_START_TOP + (idx * UI_CONSTANTS.SPOKE_SPACING)}px; left: 30px;">
                         <div class="spoke-icon">
                             ${server.name && server.name.includes('github') ? '🔗' : 
                               server.name && server.name.includes('filesystem') ? '📁' : '🔧'}
@@ -372,291 +518,314 @@ function handleSpokeClick(e) {
     showSpokeDetails(spokeType, spokeIndex);
 }
 
+function renderHubDetails(markdownBody) {
+    const sections = parseMarkdownSections(markdownBody);
+    const renderedRole = sections.role ? convertMarkdownToHtml(sections.role) : '<p class="text-muted">No role defined</p>';
+    const renderedInstructions = sections.instructions ? convertMarkdownToHtml(sections.instructions) : '<p class="text-muted">No instructions defined</p>';
+    
+    return {
+        title: '<i class="bi bi-robot me-2"></i>Agent Core',
+        html: `
+            <div class="detail-form">
+                <div class="mb-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-person-badge me-2 text-primary"></i>
+                        <h6 class="mb-0 fw-bold">Role</h6>
+                    </div>
+                    <div class="markdown-content border rounded p-3 bg-light" style="height: ${UI_CONSTANTS.ROLE_HEIGHT}px; overflow-y: auto;">
+                        ${renderedRole}
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-list-check me-2 text-success"></i>
+                        <h6 class="mb-0 fw-bold">Instructions</h6>
+                    </div>
+                    <div class="markdown-content border rounded p-3 bg-light" style="height: ${UI_CONSTANTS.INSTRUCTIONS_HEIGHT}px; overflow-y: auto;">
+                        ${renderedInstructions}
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mb-0">
+                    <i class="bi bi-info-circle me-2"></i>
+                    The role and instructions define the agent's behavior and purpose. This is the core system prompt.
+                </div>
+            </div>
+        `
+    };
+}
+
+function renderMcpDetails(mcpServer) {
+    if (!mcpServer) {
+        return {
+            title: '<i class="bi bi-diagram-3 me-2"></i>MCP Server',
+            html: '<p class="text-muted">Server not found</p>'
+        };
+    }
+    
+    return {
+        title: `<i class="bi bi-diagram-3 me-2"></i>MCP Server: ${escapeHtml(mcpServer.name)}`,
+        html: `
+            <div class="detail-form">
+                <div class="row mb-3">
+                    <label class="col-sm-3 col-form-label fw-bold">Server Name</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" value="${escapeHtml(mcpServer.name)}" readonly>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label class="col-sm-3 col-form-label fw-bold">Transport Type</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" value="${escapeHtml(mcpServer.transport?.type || 'stdio')}" readonly>
+                    </div>
+                </div>
+                ${mcpServer.transport?.command ? `
+                <div class="row mb-3">
+                    <label class="col-sm-3 col-form-label fw-bold">Command</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" value="${escapeHtml(mcpServer.transport.command)}" readonly>
+                    </div>
+                </div>
+                ` : ''}
+                ${mcpServer.transport?.args && mcpServer.transport.args.length > 0 ? `
+                <div class="row mb-3">
+                    <label class="col-sm-3 col-form-label fw-bold">Arguments</label>
+                    <div class="col-sm-9">
+                        <div class="args-list">
+                            ${mcpServer.transport.args.map((arg, idx) => `
+                                <div class="arg-item">
+                                    <span class="arg-index">${idx}</span>
+                                    <code class="arg-value">${escapeHtml(arg)}</code>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+                ${mcpServer.transport?.url ? `
+                <div class="row mb-3">
+                    <label class="col-sm-3 col-form-label fw-bold">URL</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" value="${escapeHtml(mcpServer.transport.url)}" readonly>
+                    </div>
+                </div>
+                ` : ''}
+                ${mcpServer.authentication ? `
+                <div class="row mb-3">
+                    <label class="col-sm-3 col-form-label fw-bold">Authentication</label>
+                    <div class="col-sm-9">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
+                            <input type="text" class="form-control" value="${escapeHtml(mcpServer.authentication.type || 'configured')}" readonly>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    This MCP server provides tools and resources that the agent can use.
+                </div>
+            </div>
+        `
+    };
+}
+
+function renderInterfaceDetails(interfaceConfig) {
+    const interfaceExposure = interfaceConfig?.exposure || {};
+    const interfaceSignature = interfaceConfig?.signature;
+    const interfaceTypeValue = interfaceConfig?.type || 'function';
+    
+    return {
+        title: '<i class="bi bi-broadcast me-2"></i>Agent Interface',
+        html: `
+            <div class="detail-form">
+                <h6 class="text-muted mb-3">Interface Configuration</h6>
+                <div class="row mb-3">
+                    <label class="col-sm-3 col-form-label fw-bold">Type</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" value="${escapeHtml(interfaceTypeValue)}" readonly>
+                    </div>
+                </div>
+                
+                ${interfaceSignature ? `
+                    <hr class="my-4">
+                    <h6 class="text-muted mb-3">Signature</h6>
+                    
+                    ${interfaceSignature.input && interfaceSignature.input.length > 0 ? `
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Input Parameters</label>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Required</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${interfaceSignature.input.map(param => `
+                                            <tr>
+                                                <td><code>${escapeHtml(param.name)}</code></td>
+                                                <td><span class="badge bg-secondary">${escapeHtml(param.type || 'string')}</span></td>
+                                                <td>${param.required ? '<span class="badge bg-danger">Required</span>' : '<span class="badge bg-secondary">Optional</span>'}</td>
+                                                <td>${escapeHtml(param.description || '-')}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    ${interfaceSignature.output && interfaceSignature.output.length > 0 ? `
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Output Parameters</label>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${interfaceSignature.output.map(param => `
+                                            <tr>
+                                                <td><code>${escapeHtml(param.name)}</code></td>
+                                                <td><span class="badge bg-secondary">${escapeHtml(param.type || 'string')}</span></td>
+                                                <td>${escapeHtml(param.description || '-')}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    ` : ''}
+                ` : ''}
+                
+                ${Object.keys(interfaceExposure).length > 0 ? `
+                    <hr class="my-4">
+                    <h6 class="text-muted mb-3">Exposure Types</h6>
+                ` : ''}
+                ${Object.keys(interfaceExposure).map(type => {
+                    const config = interfaceExposure[type];
+                    if (type === 'http') {
+                        return `
+                            <div class="mb-4">
+                                <div class="row mb-3">
+                                    <label class="col-sm-3 col-form-label fw-bold">Type</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" value="HTTP" readonly>
+                                    </div>
+                                </div>
+                                ${config.path ? `
+                                <div class="row mb-3">
+                                    <label class="col-sm-3 col-form-label fw-bold">Path</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" value="${escapeHtml(config.path)}" readonly>
+                                    </div>
+                                </div>
+                                ` : ''}
+                                ${config.port ? `
+                                <div class="row mb-3">
+                                    <label class="col-sm-3 col-form-label fw-bold">Port</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" value="${escapeHtml(String(config.port))}" readonly>
+                                    </div>
+                                </div>
+                                ` : ''}
+                                ${config.authentication ? `
+                                <div class="row mb-3">
+                                    <label class="col-sm-3 col-form-label fw-bold">Authentication</label>
+                                    <div class="col-sm-9">
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
+                                            <input type="text" class="form-control" value="${escapeHtml(config.authentication.type || 'configured')}" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    } else if (type === 'a2a') {
+                        return `
+                            <div class="mb-4">
+                                <div class="row mb-3">
+                                    <label class="col-sm-3 col-form-label fw-bold">Type</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" value="A2A" readonly>
+                                    </div>
+                                </div>
+                                ${config.endpoint ? `
+                                <div class="row mb-3">
+                                    <label class="col-sm-3 col-form-label fw-bold">Endpoint</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" value="${escapeHtml(config.endpoint)}" readonly>
+                                    </div>
+                                </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    } else {
+                        return `
+                            <div class="mb-4">
+                                <div class="row mb-3">
+                                    <label class="col-sm-3 col-form-label fw-bold">Type</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" value="${escapeHtml(type.toUpperCase())}" readonly>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-sm-3 col-form-label fw-bold">Configuration</label>
+                                    <div class="col-sm-9">
+                                        <textarea class="form-control" rows="4" readonly>${escapeHtml(JSON.stringify(config, null, 2))}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }).join('')}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    The interface defines how this agent is exposed and can be accessed by external systems.
+                </div>
+            </div>
+        `
+    };
+}
+
 function showSpokeDetails(spokeType, spokeIndex) {
     const detailsTitle = document.getElementById('spoke-details-title');
     const detailsContent = document.getElementById('spoke-details-content');
     
     const { metadata, markdownBody } = currentAfmData;
     
-    let html = '';
-    let title = '';
-    
+    // Render details based on spoke type
+    let result;
     switch(spokeType) {
         case 'hub':
-            title = '<i class="bi bi-robot me-2"></i>Agent Core';
-            
-            // Parse Role and Instructions sections separately
-            const sections = parseMarkdownSections(markdownBody);
-            
-            const renderedRole = sections.role ? convertMarkdownToHtml(sections.role) : '<p class="text-muted">No role defined</p>';
-            const renderedInstructions = sections.instructions ? convertMarkdownToHtml(sections.instructions) : '<p class="text-muted">No instructions defined</p>';
-            
-            html = `
-                <div class="detail-form">
-                    <div class="mb-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <i class="bi bi-person-badge me-2 text-primary"></i>
-                            <h6 class="mb-0 fw-bold">Role</h6>
-                        </div>
-                        <div class="markdown-content border rounded p-3 bg-light" style="height: ${UI_CONSTANTS.ROLE_HEIGHT}px; overflow-y: auto;">
-                            ${renderedRole}
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <i class="bi bi-list-check me-2 text-success"></i>
-                            <h6 class="mb-0 fw-bold">Instructions</h6>
-                        </div>
-                        <div class="markdown-content border rounded p-3 bg-light" style="height: ${UI_CONSTANTS.INSTRUCTIONS_HEIGHT}px; overflow-y: auto;">
-                            ${renderedInstructions}
-                        </div>
-                    </div>
-                    
-                    <div class="alert alert-info mb-0">
-                        <i class="bi bi-info-circle me-2"></i>
-                        The role and instructions define the agent's behavior and purpose. This is the core system prompt.
-                    </div>
-                </div>
-            `;
+            result = renderHubDetails(markdownBody);
             break;
-        
         case 'mcp':
             const mcpServer = metadata.tools?.mcp?.servers?.[spokeIndex];
-            if (mcpServer) {
-                title = `<i class="bi bi-diagram-3 me-2"></i>MCP Server: ${escapeHtml(mcpServer.name)}`;
-                html = `
-                    <div class="detail-form">
-                        <div class="row mb-3">
-                            <label class="col-sm-3 col-form-label fw-bold">Server Name</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control" value="${escapeHtml(mcpServer.name)}" readonly>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <label class="col-sm-3 col-form-label fw-bold">Transport Type</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control" value="${escapeHtml(mcpServer.transport?.type || 'stdio')}" readonly>
-                            </div>
-                        </div>
-                        ${mcpServer.transport?.command ? `
-                        <div class="row mb-3">
-                            <label class="col-sm-3 col-form-label fw-bold">Command</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control" value="${escapeHtml(mcpServer.transport.command)}" readonly>
-                            </div>
-                        </div>
-                        ` : ''}
-                        ${mcpServer.transport?.args && mcpServer.transport.args.length > 0 ? `
-                        <div class="row mb-3">
-                            <label class="col-sm-3 col-form-label fw-bold">Arguments</label>
-                            <div class="col-sm-9">
-                                <div class="args-list">
-                                    ${mcpServer.transport.args.map((arg, idx) => `
-                                        <div class="arg-item">
-                                            <span class="arg-index">${idx}</span>
-                                            <code class="arg-value">${escapeHtml(arg)}</code>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        </div>
-                        ` : ''}
-                        ${mcpServer.transport?.url ? `
-                        <div class="row mb-3">
-                            <label class="col-sm-3 col-form-label fw-bold">URL</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control" value="${escapeHtml(mcpServer.transport.url)}" readonly>
-                            </div>
-                        </div>
-                        ` : ''}
-                        ${mcpServer.authentication ? `
-                        <div class="row mb-3">
-                            <label class="col-sm-3 col-form-label fw-bold">Authentication</label>
-                            <div class="col-sm-9">
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
-                                    <input type="text" class="form-control" value="${escapeHtml(mcpServer.authentication.type || 'configured')}" readonly>
-                                </div>
-                            </div>
-                        </div>
-                        ` : ''}
-                        <div class="alert alert-info">
-                            <i class="bi bi-info-circle me-2"></i>
-                            This MCP server provides tools and resources that the agent can use.
-                        </div>
-                    </div>
-                `;
-            }
+            result = renderMcpDetails(mcpServer);
             break;
-        
         case 'interface':
-            title = '<i class="bi bi-broadcast me-2"></i>Agent Interface';
-            const interfaceExposure = metadata.interface?.exposure || {};
-            const interfaceSignature = metadata.interface?.signature;
-            const interfaceTypeValue = metadata.interface?.type || 'function';
-            html = `
-                <div class="detail-form">
-                    <h6 class="text-muted mb-3">Interface Configuration</h6>
-                    <div class="row mb-3">
-                        <label class="col-sm-3 col-form-label fw-bold">Type</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" value="${escapeHtml(interfaceTypeValue)}" readonly>
-                        </div>
-                    </div>
-                    
-                    ${interfaceSignature ? `
-                        <hr class="my-4">
-                        <h6 class="text-muted mb-3">Signature</h6>
-                        
-                        ${interfaceSignature.input && interfaceSignature.input.length > 0 ? `
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">Input Parameters</label>
-                                <div class="table-responsive">
-                                    <table class="table table-sm table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Name</th>
-                                                <th>Type</th>
-                                                <th>Required</th>
-                                                <th>Description</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            ${interfaceSignature.input.map(param => `
-                                                <tr>
-                                                    <td><code>${escapeHtml(param.name)}</code></td>
-                                                    <td><span class="badge bg-secondary">${escapeHtml(param.type || 'string')}</span></td>
-                                                    <td>${param.required ? '<span class="badge bg-danger">Required</span>' : '<span class="badge bg-secondary">Optional</span>'}</td>
-                                                    <td>${escapeHtml(param.description || '-')}</td>
-                                                </tr>
-                                            `).join('')}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        ` : ''}
-                        
-                        ${interfaceSignature.output && interfaceSignature.output.length > 0 ? `
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">Output Parameters</label>
-                                <div class="table-responsive">
-                                    <table class="table table-sm table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Name</th>
-                                                <th>Type</th>
-                                                <th>Description</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            ${interfaceSignature.output.map(param => `
-                                                <tr>
-                                                    <td><code>${escapeHtml(param.name)}</code></td>
-                                                    <td><span class="badge bg-secondary">${escapeHtml(param.type || 'string')}</span></td>
-                                                    <td>${escapeHtml(param.description || '-')}</td>
-                                                </tr>
-                                            `).join('')}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        ` : ''}
-                    ` : ''}
-                    
-                    ${Object.keys(interfaceExposure).length > 0 ? `
-                        <hr class="my-4">
-                        <h6 class="text-muted mb-3">Exposure Types</h6>
-                    ` : ''}
-                    ${Object.keys(interfaceExposure).map(type => {
-                        const config = interfaceExposure[type];
-                        if (type === 'http') {
-                            return `
-                                <div class="mb-4">
-                                    <div class="row mb-3">
-                                        <label class="col-sm-3 col-form-label fw-bold">Type</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" class="form-control" value="HTTP" readonly>
-                                        </div>
-                                    </div>
-                                    ${config.path ? `
-                                    <div class="row mb-3">
-                                        <label class="col-sm-3 col-form-label fw-bold">Path</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" class="form-control" value="${escapeHtml(config.path)}" readonly>
-                                        </div>
-                                    </div>
-                                    ` : ''}
-                                    ${config.port ? `
-                                    <div class="row mb-3">
-                                        <label class="col-sm-3 col-form-label fw-bold">Port</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" class="form-control" value="${escapeHtml(String(config.port))}" readonly>
-                                        </div>
-                                    </div>
-                                    ` : ''}
-                                    ${config.authentication ? `
-                                    <div class="row mb-3">
-                                        <label class="col-sm-3 col-form-label fw-bold">Authentication</label>
-                                        <div class="col-sm-9">
-                                            <div class="input-group">
-                                                <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
-                                                <input type="text" class="form-control" value="${escapeHtml(config.authentication.type || 'configured')}" readonly>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    ` : ''}
-                                </div>
-                            `;
-                        } else if (type === 'a2a') {
-                            return `
-                                <div class="mb-4">
-                                    <div class="row mb-3">
-                                        <label class="col-sm-3 col-form-label fw-bold">Type</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" class="form-control" value="A2A" readonly>
-                                        </div>
-                                    </div>
-                                    ${config.endpoint ? `
-                                    <div class="row mb-3">
-                                        <label class="col-sm-3 col-form-label fw-bold">Endpoint</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" class="form-control" value="${escapeHtml(config.endpoint)}" readonly>
-                                        </div>
-                                    </div>
-                                    ` : ''}
-                                </div>
-                            `;
-                        } else {
-                            return `
-                                <div class="mb-4">
-                                    <div class="row mb-3">
-                                        <label class="col-sm-3 col-form-label fw-bold">Type</label>
-                                        <div class="col-sm-9">
-                                            <input type="text" class="form-control" value="${escapeHtml(type.toUpperCase())}" readonly>
-                                        </div>
-                                    </div>
-                                    <div class="row mb-3">
-                                        <label class="col-sm-3 col-form-label fw-bold">Configuration</label>
-                                        <div class="col-sm-9">
-                                            <textarea class="form-control" rows="4" readonly>${escapeHtml(JSON.stringify(config, null, 2))}</textarea>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                        }
-                    }).join('')}
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle me-2"></i>
-                        The interface defines how this agent is exposed and can be accessed by external systems.
-                    </div>
-                </div>
-            `;
+            result = renderInterfaceDetails(metadata.interface);
             break;
+        default:
+            result = {
+                title: '<i class="bi bi-info-circle me-2"></i>Details',
+                html: '<p class="text-muted">No details available</p>'
+            };
     }
     
-    detailsTitle.innerHTML = title;
-    detailsContent.innerHTML = html;
+    detailsTitle.innerHTML = result.title;
+    detailsContent.innerHTML = result.html;
 }
 
 function renderMetadata(metadata) {
