@@ -166,6 +166,9 @@ function renderVisualization() {
     
     renderHubSpoke(metadata, markdownBody);
     renderMetadata(metadata);
+    
+    // Open Agent Core by default
+    showSpokeDetails('hub', null);
 }
 
 function parseMarkdownSections(markdown) {
@@ -298,58 +301,45 @@ function showSpokeDetails(spokeType, spokeIndex) {
     switch(spokeType) {
         case 'hub':
             title = '<i class="bi bi-robot me-2"></i>Agent Core';
+            // Simple markdown to HTML conversion
+            let renderedMarkdown = markdownBody
+                // Convert headings
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                // Convert bold
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                // Convert italic
+                .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                // Convert line breaks to <br> but preserve paragraphs
+                .split('\n\n').map(para => {
+                    // If it's a list item, preserve it
+                    if (para.match(/^\d+\./m) || para.match(/^[-*]/m)) {
+                        return para;
+                    }
+                    // Wrap non-heading, non-list paragraphs
+                    if (!para.match(/^<h[1-6]>/)) {
+                        return '<p>' + para.replace(/\n/g, '<br>') + '</p>';
+                    }
+                    return para;
+                }).join('\n')
+                // Convert ordered lists
+                .replace(/^\d+\.\s+(.*)$/gim, '<li>$1</li>')
+                .replace(/(<li>.*<\/li>)/s, '<ol>$1</ol>')
+                // Convert unordered lists
+                .replace(/^[-*]\s+(.*)$/gim, '<li>$1</li>')
+                // Escape any remaining HTML to prevent XSS
+                .replace(/<(?!\/?(h[1-6]|p|br|strong|em|ol|ul|li)(\s|>))/g, '&lt;');
+            
             html = `
                 <div class="detail-form">
-                    <h6 class="text-muted mb-3">Metadata</h6>
-                    <div class="row mb-3">
-                        <label class="col-sm-3 col-form-label fw-bold">Agent Name</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" value="${escapeHtml(metadata.name || '')}" readonly>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <label class="col-sm-3 col-form-label fw-bold">Description</label>
-                        <div class="col-sm-9">
-                            <textarea class="form-control" rows="2" readonly>${escapeHtml(metadata.description || '')}</textarea>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <label class="col-sm-3 col-form-label fw-bold">Version</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" value="${escapeHtml(metadata.version || '')}" readonly>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <label class="col-sm-3 col-form-label fw-bold">Namespace</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" value="${escapeHtml(metadata.namespace || '')}" readonly>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <label class="col-sm-3 col-form-label fw-bold">Author</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" value="${escapeHtml(metadata.author || '')}" readonly>
-                        </div>
-                    </div>
-                    ${metadata.license ? `
-                    <div class="row mb-3">
-                        <label class="col-sm-3 col-form-label fw-bold">License</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" value="${escapeHtml(metadata.license)}" readonly>
-                        </div>
-                    </div>
-                    ` : ''}
-                    
-                    <hr class="my-4">
-                    
                     <h6 class="text-muted mb-3">Role & Instructions</h6>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Markdown Content</label>
-                        <textarea class="form-control" rows="12" readonly>${escapeHtml(markdownBody)}</textarea>
+                    <div class="markdown-content border rounded p-3 bg-light" style="height: 660px; overflow-y: auto;">
+                        ${renderedMarkdown}
                     </div>
-                    <div class="alert alert-info">
+                    <div class="alert alert-info mt-3 mb-3">
                         <i class="bi bi-info-circle me-2"></i>
-                        The hub represents the agent's core identity, including its metadata and behavior instructions.
+                        The role and instructions define the agent's behavior and purpose. This is the core system prompt.
                     </div>
                 </div>
             `;
