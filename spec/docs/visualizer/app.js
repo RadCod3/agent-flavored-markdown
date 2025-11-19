@@ -181,6 +181,111 @@ function parseMarkdownSections(markdown) {
     };
 }
 
+function convertMarkdownToHtml(text) {
+    // First apply inline formatting
+    text = text
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>');
+    
+    // Process line by line for better list handling
+    const lines = text.split('\n');
+    let result = [];
+    let inOrderedList = false;
+    let inUnorderedList = false;
+    let inNestedList = false;
+    
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const trimmed = line.trim();
+        const indent = line.match(/^(\s*)/)[0].length;
+        
+        // Check for headings
+        if (trimmed.match(/^###\s+(.+)$/)) {
+            if (inNestedList) { result.push('</ul>'); inNestedList = false; }
+            if (inOrderedList) { result.push('</ol>'); inOrderedList = false; }
+            if (inUnorderedList) { result.push('</ul>'); inUnorderedList = false; }
+            result.push('<h3>' + trimmed.substring(4) + '</h3>');
+        } else if (trimmed.match(/^##\s+(.+)$/)) {
+            if (inNestedList) { result.push('</ul>'); inNestedList = false; }
+            if (inOrderedList) { result.push('</ol>'); inOrderedList = false; }
+            if (inUnorderedList) { result.push('</ul>'); inUnorderedList = false; }
+            result.push('<h2>' + trimmed.substring(3) + '</h2>');
+        } else if (trimmed.match(/^#\s+(.+)$/)) {
+            if (inNestedList) { result.push('</ul>'); inNestedList = false; }
+            if (inOrderedList) { result.push('</ol>'); inOrderedList = false; }
+            if (inUnorderedList) { result.push('</ul>'); inUnorderedList = false; }
+            result.push('<h1>' + trimmed.substring(2) + '</h1>');
+        }
+        // Check for ordered list items (no indentation)
+        else if (indent < 2 && trimmed.match(/^\d+\.\s+(.+)$/)) {
+            const content = trimmed.replace(/^\d+\.\s+/, '');
+            if (inNestedList) { result.push('</ul>'); inNestedList = false; }
+            if (inUnorderedList) { result.push('</ul>'); inUnorderedList = false; }
+            if (!inOrderedList) {
+                result.push('<ol>');
+                inOrderedList = true;
+            }
+            result.push('<li>' + content);
+            // Don't close the li yet - nested content might follow
+        }
+        // Check for nested unordered list items (with indentation)
+        else if (indent >= 2 && trimmed.match(/^[-*]\s+(.+)$/)) {
+            const content = trimmed.replace(/^[-*]\s+/, '');
+            if (!inNestedList && (inOrderedList || inUnorderedList)) {
+                result.push('<ul>');
+                inNestedList = true;
+            }
+            result.push('<li>' + content + '</li>');
+        }
+        // Check for unordered list items (no indentation)
+        else if (indent < 2 && trimmed.match(/^[-*]\s+(.+)$/)) {
+            const content = trimmed.replace(/^[-*]\s+/, '');
+            if (inNestedList) { result.push('</ul>'); inNestedList = false; }
+            if (inOrderedList) { result.push('</ol>'); inOrderedList = false; }
+            if (!inUnorderedList) {
+                result.push('<ul>');
+                inUnorderedList = true;
+            }
+            result.push('<li>' + content + '</li>');
+        }
+        // Empty line - close nested list but keep main list open
+        else if (trimmed === '') {
+            if (inNestedList) {
+                result.push('</ul>');
+                inNestedList = false;
+            }
+            if (inOrderedList || inUnorderedList) {
+                result.push('</li>'); // Close the previous list item
+            }
+            // Don't add <br> inside lists
+            if (!inOrderedList && !inUnorderedList) {
+                result.push('<br>');
+            }
+        }
+        // Regular text - could be continuation of list item
+        else if (trimmed !== '') {
+            // If we're in a list but no nested list, this might be continuation text
+            if ((inOrderedList || inUnorderedList) && !inNestedList) {
+                // Just add the text (it's part of the list item)
+                result.push(' ' + trimmed);
+            } else {
+                // Close all lists and start a paragraph
+                if (inNestedList) { result.push('</ul>'); inNestedList = false; }
+                if (inOrderedList) { result.push('</li></ol>'); inOrderedList = false; }
+                if (inUnorderedList) { result.push('</li></ul>'); inUnorderedList = false; }
+                result.push('<p>' + trimmed + '</p>');
+            }
+        }
+    }
+    
+    // Close any open lists
+    if (inNestedList) result.push('</ul>');
+    if (inOrderedList) result.push('</li></ol>');
+    if (inUnorderedList) result.push('</li></ul>');
+    
+    return result.join('');
+}
+
 function renderHubSpoke(metadata, markdownBody) {
     const container = document.getElementById('hub-spoke-container');
     
@@ -301,43 +406,36 @@ function showSpokeDetails(spokeType, spokeIndex) {
     switch(spokeType) {
         case 'hub':
             title = '<i class="bi bi-robot me-2"></i>Agent Core';
-            // Simple markdown to HTML conversion
-            let renderedMarkdown = markdownBody
-                // Convert headings
-                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-                // Convert bold
-                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-                // Convert italic
-                .replace(/\*(.+?)\*/g, '<em>$1</em>')
-                // Convert line breaks to <br> but preserve paragraphs
-                .split('\n\n').map(para => {
-                    // If it's a list item, preserve it
-                    if (para.match(/^\d+\./m) || para.match(/^[-*]/m)) {
-                        return para;
-                    }
-                    // Wrap non-heading, non-list paragraphs
-                    if (!para.match(/^<h[1-6]>/)) {
-                        return '<p>' + para.replace(/\n/g, '<br>') + '</p>';
-                    }
-                    return para;
-                }).join('\n')
-                // Convert ordered lists
-                .replace(/^\d+\.\s+(.*)$/gim, '<li>$1</li>')
-                .replace(/(<li>.*<\/li>)/s, '<ol>$1</ol>')
-                // Convert unordered lists
-                .replace(/^[-*]\s+(.*)$/gim, '<li>$1</li>')
-                // Escape any remaining HTML to prevent XSS
-                .replace(/<(?!\/?(h[1-6]|p|br|strong|em|ol|ul|li)(\s|>))/g, '&lt;');
+            
+            // Parse Role and Instructions sections separately
+            const sections = parseMarkdownSections(markdownBody);
+            
+            const renderedRole = sections.role ? convertMarkdownToHtml(sections.role) : '<p class="text-muted">No role defined</p>';
+            const renderedInstructions = sections.instructions ? convertMarkdownToHtml(sections.instructions) : '<p class="text-muted">No instructions defined</p>';
             
             html = `
                 <div class="detail-form">
-                    <h6 class="text-muted mb-3">Role & Instructions</h6>
-                    <div class="markdown-content border rounded p-3 bg-light" style="height: 660px; overflow-y: auto;">
-                        ${renderedMarkdown}
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-person-badge me-2 text-primary"></i>
+                            <h6 class="mb-0 fw-bold">Role</h6>
+                        </div>
+                        <div class="markdown-content border rounded p-3 bg-light" style="height: 280px; overflow-y: auto;">
+                            ${renderedRole}
+                        </div>
                     </div>
-                    <div class="alert alert-info mt-3 mb-3">
+                    
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-list-check me-2 text-success"></i>
+                            <h6 class="mb-0 fw-bold">Instructions</h6>
+                        </div>
+                        <div class="markdown-content border rounded p-3 bg-light" style="height: 320px; overflow-y: auto;">
+                            ${renderedInstructions}
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mb-0">
                         <i class="bi bi-info-circle me-2"></i>
                         The role and instructions define the agent's behavior and purpose. This is the core system prompt.
                     </div>
