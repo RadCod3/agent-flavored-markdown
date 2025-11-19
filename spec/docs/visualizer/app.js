@@ -488,10 +488,7 @@ function renderHubSpoke(metadata, markdownBody) {
                     const escapedTransportType = escapeHtml(server.transport?.type || 'stdio');
                     return `
                     <div class="spoke spoke-mcp" data-spoke-type="mcp" data-spoke-index="${idx}" style="position: absolute; top: ${UI_CONSTANTS.SPOKE_START_TOP + (idx * UI_CONSTANTS.SPOKE_SPACING)}px; left: 30px;">
-                        <div class="spoke-icon">
-                            ${server.name && server.name.includes('github') ? '🔗' : 
-                              server.name && server.name.includes('filesystem') ? '📁' : '🔧'}
-                        </div>
+                        <div class="spoke-icon">🔧</div>
                         <div class="spoke-title">${escapedServerName}</div>
                         <div class="spoke-subtitle">${escapedTransportType}</div>
                     </div>
