@@ -1,5 +1,13 @@
 let currentAfmData = null;
+
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
+
+const UI_CONSTANTS = {
+    ROLE_HEIGHT: 280,
+    INSTRUCTIONS_HEIGHT: 320,
+    TOTAL_CONTENT_HEIGHT: 660,
+    HUB_SPOKE_MIN_HEIGHT: 850
+};
 
 function escapeHtml(unsafe) {
     if (unsafe === null || unsafe === undefined) {
@@ -49,7 +57,21 @@ You are a Code Review Assistant specializing in providing constructive feedback 
 5. Maintain a helpful and encouraging tone
 `;
 
+function initializeMarked() {
+    if (typeof marked !== 'undefined') {
+        marked.setOptions({
+            breaks: false,       // Don't convert single \n to <br> (use proper markdown line breaks)
+            gfm: true,           // GitHub Flavored Markdown
+            headerIds: false,    // Don't add IDs to headers
+            mangle: false,       // Don't escape autolinked email addresses
+            pedantic: false,     // Be lenient with markdown parsing
+            smartLists: true     // Use smarter list behavior
+        });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    initializeMarked();
     const fileInput = document.getElementById('file-input');
     const dropZone = document.getElementById('drop-zone');
     
@@ -96,14 +118,38 @@ function handleFileSelect(e) {
 }
 
 function readFile(file) {
+    // Validate file size
     if (file.size > MAX_FILE_SIZE) {
         alert(`File is too large. Maximum size is ${MAX_FILE_SIZE / 1024 / 1024}MB.`);
         return;
     }
     
+    // Validate file extension
+    const validExtensions = ['.md', '.afm.md', '.afm'];
+    const fileName = file.name.toLowerCase();
+    const hasValidExtension = validExtensions.some(ext => fileName.endsWith(ext));
+    
+    if (!hasValidExtension) {
+        alert('Invalid file type. Please upload a .md or .afm.md file.');
+        return;
+    }
+    
     const reader = new FileReader();
-    reader.onload = (e) => loadAfmContent(e.target.result, file.name);
-    reader.onerror = () => alert('Error reading file. Please try again.');
+    
+    reader.onload = (e) => {
+        try {
+            loadAfmContent(e.target.result, file.name);
+        } catch (error) {
+            alert('Error processing file: ' + error.message);
+            console.error('File processing error:', error);
+        }
+    };
+    
+    reader.onerror = (e) => {
+        alert('Error reading file. Please check the file and try again.');
+        console.error('FileReader error:', e);
+    };
+    
     reader.readAsText(file);
 }
 
@@ -126,23 +172,44 @@ function parseAfmFile(content) {
     
     const parts = content.split(/^---\s*$/m);
     if (parts.length < 3) {
-        throw new Error('Invalid AFM format: Missing frontmatter');
+        throw new Error('Invalid AFM format: Missing frontmatter delimiters (---). Expected format:\n---\n[YAML metadata]\n---\n[Markdown content]');
     }
 
+    let metadata;
     try {
-        const metadata = jsyaml.load(parts[1].trim(), {
+        metadata = jsyaml.load(parts[1].trim(), {
             schema: jsyaml.JSON_SCHEMA,
             json: true
-        }) || {};
+        });
         
-        return {
-            metadata,
-            markdownBody: parts.slice(2).join('---').trim(),
-            rawContent: content
-        };
+        if (metadata === null || metadata === undefined) {
+            metadata = {};
+        }
+        
+        // Validate metadata is an object
+        if (typeof metadata !== 'object' || Array.isArray(metadata)) {
+            throw new Error('YAML frontmatter must be an object');
+        }
+        
     } catch (error) {
-        throw new Error('Failed to parse YAML: ' + error.message);
+        if (error.name === 'YAMLException') {
+            throw new Error('Invalid YAML syntax in frontmatter: ' + error.message);
+        }
+        throw new Error('Failed to parse YAML frontmatter: ' + error.message);
     }
+    
+    const markdownBody = parts.slice(2).join('---').trim();
+    
+    // Validate markdown body exists
+    if (!markdownBody) {
+        console.warn('AFM file has no markdown content');
+    }
+    
+    return {
+        metadata,
+        markdownBody,
+        rawContent: content
+    };
 }
 
 function showUploadSection() {
@@ -182,108 +249,19 @@ function parseMarkdownSections(markdown) {
 }
 
 function convertMarkdownToHtml(text) {
-    // First apply inline formatting
-    text = text
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.+?)\*/g, '<em>$1</em>');
-    
-    // Process line by line for better list handling
-    const lines = text.split('\n');
-    let result = [];
-    let inOrderedList = false;
-    let inUnorderedList = false;
-    let inNestedList = false;
-    
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        const trimmed = line.trim();
-        const indent = line.match(/^(\s*)/)[0].length;
-        
-        // Check for headings
-        if (trimmed.match(/^###\s+(.+)$/)) {
-            if (inNestedList) { result.push('</ul>'); inNestedList = false; }
-            if (inOrderedList) { result.push('</ol>'); inOrderedList = false; }
-            if (inUnorderedList) { result.push('</ul>'); inUnorderedList = false; }
-            result.push('<h3>' + trimmed.substring(4) + '</h3>');
-        } else if (trimmed.match(/^##\s+(.+)$/)) {
-            if (inNestedList) { result.push('</ul>'); inNestedList = false; }
-            if (inOrderedList) { result.push('</ol>'); inOrderedList = false; }
-            if (inUnorderedList) { result.push('</ul>'); inUnorderedList = false; }
-            result.push('<h2>' + trimmed.substring(3) + '</h2>');
-        } else if (trimmed.match(/^#\s+(.+)$/)) {
-            if (inNestedList) { result.push('</ul>'); inNestedList = false; }
-            if (inOrderedList) { result.push('</ol>'); inOrderedList = false; }
-            if (inUnorderedList) { result.push('</ul>'); inUnorderedList = false; }
-            result.push('<h1>' + trimmed.substring(2) + '</h1>');
-        }
-        // Check for ordered list items (no indentation)
-        else if (indent < 2 && trimmed.match(/^\d+\.\s+(.+)$/)) {
-            const content = trimmed.replace(/^\d+\.\s+/, '');
-            if (inNestedList) { result.push('</ul>'); inNestedList = false; }
-            if (inUnorderedList) { result.push('</ul>'); inUnorderedList = false; }
-            if (!inOrderedList) {
-                result.push('<ol>');
-                inOrderedList = true;
-            }
-            result.push('<li>' + content);
-            // Don't close the li yet - nested content might follow
-        }
-        // Check for nested unordered list items (with indentation)
-        else if (indent >= 2 && trimmed.match(/^[-*]\s+(.+)$/)) {
-            const content = trimmed.replace(/^[-*]\s+/, '');
-            if (!inNestedList && (inOrderedList || inUnorderedList)) {
-                result.push('<ul>');
-                inNestedList = true;
-            }
-            result.push('<li>' + content + '</li>');
-        }
-        // Check for unordered list items (no indentation)
-        else if (indent < 2 && trimmed.match(/^[-*]\s+(.+)$/)) {
-            const content = trimmed.replace(/^[-*]\s+/, '');
-            if (inNestedList) { result.push('</ul>'); inNestedList = false; }
-            if (inOrderedList) { result.push('</ol>'); inOrderedList = false; }
-            if (!inUnorderedList) {
-                result.push('<ul>');
-                inUnorderedList = true;
-            }
-            result.push('<li>' + content + '</li>');
-        }
-        // Empty line - close nested list but keep main list open
-        else if (trimmed === '') {
-            if (inNestedList) {
-                result.push('</ul>');
-                inNestedList = false;
-            }
-            if (inOrderedList || inUnorderedList) {
-                result.push('</li>'); // Close the previous list item
-            }
-            // Don't add <br> inside lists
-            if (!inOrderedList && !inUnorderedList) {
-                result.push('<br>');
-            }
-        }
-        // Regular text - could be continuation of list item
-        else if (trimmed !== '') {
-            // If we're in a list but no nested list, this might be continuation text
-            if ((inOrderedList || inUnorderedList) && !inNestedList) {
-                // Just add the text (it's part of the list item)
-                result.push(' ' + trimmed);
-            } else {
-                // Close all lists and start a paragraph
-                if (inNestedList) { result.push('</ul>'); inNestedList = false; }
-                if (inOrderedList) { result.push('</li></ol>'); inOrderedList = false; }
-                if (inUnorderedList) { result.push('</li></ul>'); inUnorderedList = false; }
-                result.push('<p>' + trimmed + '</p>');
-            }
+    // Use marked library for proper markdown parsing
+    if (typeof marked !== 'undefined' && marked.parse) {
+        try {
+            return marked.parse(text);
+        } catch (error) {
+            console.error('Marked parsing error:', error);
+            // Fall through to fallback
         }
     }
     
-    // Close any open lists
-    if (inNestedList) result.push('</ul>');
-    if (inOrderedList) result.push('</li></ol>');
-    if (inUnorderedList) result.push('</li></ul>');
-    
-    return result.join('');
+    // Fallback: basic HTML with line breaks preserved
+    console.warn('Marked library not available, using fallback');
+    return '<p>' + escapeHtml(text).replace(/\n/g, '<br>') + '</p>';
 }
 
 function renderHubSpoke(metadata, markdownBody) {
@@ -420,7 +398,7 @@ function showSpokeDetails(spokeType, spokeIndex) {
                             <i class="bi bi-person-badge me-2 text-primary"></i>
                             <h6 class="mb-0 fw-bold">Role</h6>
                         </div>
-                        <div class="markdown-content border rounded p-3 bg-light" style="height: 280px; overflow-y: auto;">
+                        <div class="markdown-content border rounded p-3 bg-light" style="height: ${UI_CONSTANTS.ROLE_HEIGHT}px; overflow-y: auto;">
                             ${renderedRole}
                         </div>
                     </div>
@@ -430,7 +408,7 @@ function showSpokeDetails(spokeType, spokeIndex) {
                             <i class="bi bi-list-check me-2 text-success"></i>
                             <h6 class="mb-0 fw-bold">Instructions</h6>
                         </div>
-                        <div class="markdown-content border rounded p-3 bg-light" style="height: 320px; overflow-y: auto;">
+                        <div class="markdown-content border rounded p-3 bg-light" style="height: ${UI_CONSTANTS.INSTRUCTIONS_HEIGHT}px; overflow-y: auto;">
                             ${renderedInstructions}
                         </div>
                     </div>

@@ -28,14 +28,14 @@ body {
 /* Hub and Spoke Visualization */
 .hub-spoke-visual {
     position: relative;
-    min-height: 850px;
+    min-height: 850px; /* Should match UI_CONSTANTS.HUB_SPOKE_MIN_HEIGHT in app.js */
     width: 100%;
     padding: 40px;
 }
 
 /* Details panel height matching */
 #spoke-details-content {
-    max-height: none !important;
+    max-height: none;
     overflow-x: hidden;
 }
 
