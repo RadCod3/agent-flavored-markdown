@@ -1,26 +1,70 @@
 # Agent-Flavored Markdown (AFM)
 
-A markdown-based approach for portable and interoperable definitions of AI agents using natural language.
+A markdown-based format for portable and interoperable definitions of AI agents using natural language.
 
 ## Overview
 
-This repository contains the AFM specification website (MkDocs) and its source.
+This repository contains the **AFM Specification** and its documentation website built with [MkDocs](https://www.mkdocs.org/).
 
-Contents:
-- mkdocs.yml (site configuration)
-- docs/ (site source)
-- requirements.txt (Python dependencies for building the site)
-- Dockerfile (dev server image that runs `mkdocs serve`)
+**Repository Structure:**
+- `docs/specification.md` - **The AFM Specification** (core document)
+- `docs/visualizer/` - Interactive AFM file visualizer
+- `docs/` - Additional documentation and guides
+- `mkdocs.yml` - Documentation site configuration
+- `requirements.txt` - Python dependencies
+- `Dockerfile` - Development server container
 
-Quick local build
-1. Create a Python environment and install dependencies:
+## Quick Start
+
+### Local Development
+
+**Prerequisites:** Python 3.8+
+
+1. **Install dependencies:**
+   ```bash
    pip install -r requirements.txt
+   ```
 
-2. Run the live dev server:
+2. **Start the development server:**
+   ```bash
    mkdocs serve
+   ```
 
-The site will be available at http://127.0.0.1:8000 by default.
+3. **Access the site:**
+   Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser
 
-Docker (dev server)
-- Build: docker build -t afm-spec .
-- Run:  docker run -p 8000:8000 afm-spec
+The server will automatically reload when you make changes to the source files.
+
+### Docker Development
+
+**Build the image:**
+```bash
+docker build -t afm-spec .
+```
+
+**Run the container:**
+```bash
+docker run --rm -p 8000:8000 afm-spec
+```
+
+**Access the site:**
+Open [http://localhost:8000](http://localhost:8000) in your browser
+
+> **Tip:** Use `--rm` flag to automatically remove the container when stopped, preventing container accumulation.
+
+## Building for Production
+
+Generate static HTML files:
+```bash
+mkdocs build
+```
+
+The output will be in the `site/` directory.
+
+## Contributing
+
+Please read the [AFM Specification](https://maryamzi.github.io/agent-flavored-markdown/) for details on the format and structure.
+
+## License
+
+See [LICENSE.md](LICENSE.md) for details.
