@@ -9,7 +9,7 @@ hide:
 
 AFM (Agent Flavored Markdown) provides a structured, markdown-based format for defining the capabilities, behaviors, and knowledge of AI agents. The goal is to create a universal standard that allows agents to be easily defined, shared, and deployed.
 
-AFM is designed to be composable. It supports not only the definition of individual agents but also complex, multi-agent systems where agents can collaborate and delegate tasks to one another.
+AFM is designed to be composable. It supports not only the definition of individual agents but also complex, multi-agent systems where agents can expose services for other agents to consume.
 
 This document details the AFM file format, its syntax, and the schema for defining an agent.
 
@@ -43,15 +43,18 @@ AFM is built around several core concepts that define how agents are structured 
 
 ## 3. File Format and Content
 
-An agent definition file must use the `*.afm.md` or `.afm` extension. The filename without the extension part serves as the agent's unique artifact ID within its [namespace](#field-namespace). This ID is the "Agent Identifier" and is **REQUIRED**.
+An agent definition file must use the `*.afm.md` or `.afm` extension. 
 
-The "Agent Identifier" should not start with special characters, numbers, or whitespace. 
-The "Agent Identifier" **MUST** be unique within the namespace to avoid conflicts. 
+The filename (without extension) serves as the **Agent Identifier** - a unique identifier for the agent within its [namespace](#field-namespace). This identifier is **REQUIRED**.
+
+**Agent Identifier Rules:**
+- Should not start with special characters, numbers, or whitespace
+- **MUST** be unique within the namespace to avoid conflicts 
 
 The file content must be encoded in UTF-8. 
 
 !!! tip "Best Practices for Naming AFM Files"
-    When naming your AFM files, follow these best practices are **RECOMMENDED** to ensure clarity and consistency:
+    When naming your AFM files, following these best practices is **RECOMMENDED** to ensure clarity and consistency:
     
     - Use lowercase letters, numbers, and hyphens to separate words.
     - Avoid spaces and special characters to ensure compatibility across different systems.
@@ -89,7 +92,7 @@ Users can use markdown syntax to format the text, including lists, links, and co
 The Markdown body **SHOULD** contain the following headings, with corresponding content
 
  - `# Role`: A brief description of the agent's role.
- - `# Instructions`: A list of the agent's instructions for system promt
+ - `# Instructions`: A list of the agent's instructions for system prompt
 
 
 ### 4.4. Example
@@ -190,7 +193,7 @@ authors:
 provider:
     organization: "Example AI Solutions"
     url: "https://example.com"
-iconUrl: 
+iconUrl: "https://example.com/icons/math-tutor.png"
 license: "MIT"
 ---
 ```
@@ -199,9 +202,13 @@ license: "MIT"
 
 This section defines the agent's public "API" or "function signature." It is **OPTIONAL** and specifies how the agent receives inputs and produces outputs.
 
-Default values will be used if the interface is not explicitly defined. User can override the default values by specifying the `interface` field in the front matter.
+Default values will be used if the interface is not explicitly defined. Users can override the default values by specifying the `interface` field in the front matter.
 
-Interface default style is `function` which means the agent is callable within an application. Similarly, signature defaults to one string input parameter called `user_prompt` and one string output parameter called `response`
+**Default Behavior:**
+- The default `type` is `function`, which means the agent is callable within an application
+- The default `signature` (for both `function` and `service` types) includes:
+  - One string input parameter named `user_prompt`
+  - One string output parameter named `response`
 
 AFM implementations **SHALL** use this definition to generate the agent's callable interface and to ensure consistent behavior across different platforms. 
 
@@ -241,7 +248,7 @@ Each `input` or `output` object has the following structure:
 | Key           | Type      | Description                                     |
 |---------------|-----------|-------------------------------------------------|
 | `name`        | `string`  | The name of the parameter (e.g., `user_prompt`). |
-| `type`        | `string`  | The data type (e.g., `string`, `json`, `file`).  |
+| `type`        | `string`  | The data type. Common types include: `string`, `number`, `boolean`, `json`, `array`, `file`. The full set of supported types is implementation-specific. |
 | `description` | `string`  | A brief explanation of the parameter.           |
 | `required`    | `boolean` | (For `input` only) Whether the parameter is mandatory. |
 
@@ -263,12 +270,14 @@ Contains configurations for `service` agents.
 | Field            | Type     | Required | Description                                                                 |
 |------------------|----------|----------|-----------------------------------------------------------------------------|
 | `path`           | `string` | Yes      | The URL path segment for the agent's HTTP endpoint (e.g., `/math-tutor`). |
-| `authentication` | `object` | No       | Optional authentication configuration for the HTTP endpoint. See [Authentication Object](#authentication-object) for details. |
+| `authentication` | `object` | No       | Optional authentication configuration for the HTTP endpoint. Uses the same schema as the MCP [Authentication Object](#authentication-object). |
 
 !!! note "HTTP Object Usage"
     The `http` object is only applicable for agents of type `service`. It defines how the agent is exposed via a standard HTTP endpoint, allowing other systems to interact with it over the web.
 
     AFM does not define the HTTP methods (GET, POST, etc.) for the agent's endpoint. This is left to the implementation to decide based on the agent's functionality and requirements.
+    
+    HTTP authentication follows the same pattern as MCP authentication, where the `type` field specifies the authentication scheme (e.g., `oauth2`, `api_key`), and the agent's host environment is responsible for managing the actual credentials and authentication flow.
 
 #### 5.2.3. Example Usage
 
@@ -307,7 +316,7 @@ interface:
 
 ### 5.3. Tools
 
-This section defines the schema for an agent's tools. It also enables agents to consume external resources.
+This section defines which external tools and resources the agent can access.
 
 #### 5.3.1. Schema Overview
 
@@ -325,7 +334,7 @@ tools:
 | `tools` | `object` | No | Container for protocol-specific tool connection configurations. |
 | `tools.mcp` | `object` | No | Configuration for Model Context Protocol. See [Section 6.1](#61-model-context-protocol-mcp) for details. |
 
-**MCP Connection Object:**
+**MCP Object:**
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -413,8 +422,15 @@ mcp:
 
 | Key     | Type         | Required | Description                                                        |
 | ------- | ------------ | -------- | ------------------------------------------------------------------ |
-| `allow` | String Array | No       | A whitelist of tools to expose from this server, using just the tool name (e.g., `create_issue`, `read_file`). |
-| `deny`  | String Array | No       | A blacklist of tools to hide from this server, using just the tool name (e.g., `write_file`). |
+| `allow` | String Array | No       | A whitelist of tools to expose from this server, using just the tool name (e.g., `create_issue`, `read_file`). If specified, only these tools are available. |
+| `deny`  | String Array | No       | A blacklist of tools to hide from this server, using just the tool name (e.g., `write_file`). Applied after `allow` filtering. |
+
+!!! note "Filter Precedence"
+    When both `allow` and `deny` are specified:
+    1. First, if `allow` is present, only the tools in the allow list are made available
+    2. Then, `deny` is applied to remove specific tools from that filtered set
+    
+    If only `deny` is specified, all tools from the server are available except those in the deny list.
 
 #### 6.1.3. Example Implementation
 
