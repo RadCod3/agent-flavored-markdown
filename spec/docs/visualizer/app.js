@@ -29,13 +29,11 @@ tools:
       - name: "github"
         transport:
           type: "stdio"
-          command: "npx"
-          args: ["-y", "@modelcontextprotocol/server-github"]
+          command: "npx -y @modelcontextprotocol/server-github"
       - name: "filesystem"
         transport:
           type: "stdio"
-          command: "npx"
-          args: ["-y", "@modelcontextprotocol/server-filesystem"]
+          command: "npx -y @modelcontextprotocol/server-filesystem"
 ---
 
 # Role
