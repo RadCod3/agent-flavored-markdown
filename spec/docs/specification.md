@@ -5,6 +5,8 @@ hide:
   - navigation
 ---
 
+# AFM Specification v0.3.0
+
 ## 1. Introduction
 
 AFM (Agent Flavored Markdown) provides a structured, markdown-based format for defining the capabilities, behaviors, and knowledge of AI agents. The goal is to create a universal standard that allows agents to be easily defined, shared, and deployed.
@@ -102,6 +104,7 @@ The Markdown body **SHOULD** contain the following headings, with corresponding 
 
     ```yaml
     ---
+    spec_version: "0.3.0"
     name: "Math Tutor"
     description: "An AI assistant that helps with mathematics problems"
     version: "1.0.0"
@@ -140,6 +143,7 @@ The agent metadata fields are specified in the YAML frontmatter of an AFM file:
 
 ```yaml
 # Agent metadata schema
+spec_version: string   # AFM specification version (e.g., "0.3.0")
 name: string           # The name of the agent
 description: string    # Brief description of the agent's purpose and functionality
 version: string        # Semantic version (e.g., "1.0.0")
@@ -160,6 +164,7 @@ Each field serves a specific purpose in defining and organizing the agent:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
+| <a id="field-spec-version"></a>[`spec_version`](#field-spec-version) | `string` | No | Version of the AFM specification this file conforms to (e.g., "0.3.0").<br>This is **OPTIONAL** but recommended for forward compatibility.<br>AFM implementations **MAY** use this field to validate compatibility and provide warnings for newer spec versions. |
 | <a id="field-name"></a>[`name`](#field-name) | `string` | No | Identifies the agent in human-readable form.<br>Default: inferred from the filename of the AFM file.<br>AFM implementations **SHALL** use this field to display the agent's name in user interfaces. |
 | <a id="field-description"></a>[`description`](#field-description) | `string` | No | Provides a concise summary of what the agent does.<br>Default: inferred from the markdown body `# Role` section.<br>AFM implementations **SHALL** use this field to display the agent's description in user interfaces. |
 | <a id="field-version"></a>[`version`](#field-version) | `string` | No | [Semantic version](https://semver.org/) of the agent definition (MAJOR.MINOR.PATCH).<br>Default: "0.0.0".<br>AFM implementations **SHALL** use this field to display the agent's version in user interfaces. |
@@ -183,6 +188,7 @@ Here's an example of agent metadata in an AFM file:
 
 ```yaml
 ---
+spec_version: "0.3.0"
 name: "Math Tutor"
 description: "An AI assistant that helps with mathematics problems"
 version: "1.2.0"

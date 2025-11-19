@@ -30,6 +30,7 @@ function escapeHtml(unsafe) {
         .replace(/'/g, "&#039;");
 }
 const sampleAFM = `---
+spec_version: "0.3.0"
 name: "Code Review Assistant"
 description: "An AI assistant that helps review code and suggests improvements"
 version: "1.0.0"
@@ -829,6 +830,7 @@ function renderMetadata(metadata) {
     const container = document.getElementById('metadata-details');
     
     const fields = [
+        { label: 'Spec Version', value: metadata.spec_version },
         { label: 'Name', value: metadata.name },
         { label: 'Description', value: metadata.description },
         { label: 'Version', value: metadata.version },
