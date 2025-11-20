@@ -3,8 +3,8 @@ name: Deploy MkDocs to GitHub Pages
 on:
   push:
     branches:
-      - main  # Change this to your default branch name if different
-  workflow_dispatch:  # Allow manual triggering
+      - main
+  workflow_dispatch:
 
 permissions:
   contents: write

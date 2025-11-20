@@ -52,6 +52,12 @@ tools:
         transport:
           type: "stdio"
           command: "npx -y @modelcontextprotocol/server-filesystem"
+      - name: "code-analysis-api"
+        transport:
+          type: "streamable-http"
+          url: "https://api.example.com/mcp/v1"
+        authentication:
+          type: "bearer"
 ---
 
 # Role
