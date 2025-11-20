@@ -63,7 +63,7 @@ The output will be in the `site/` directory.
 
 ## Contributing
 
-Please read the [AFM Specification](https://maryamzi.github.io/agent-flavored-markdown/) for details on the format and structure.
+Please read the [AFM Specification](https://wso2.github.io/agent-flavored-markdown/) for details on the format and structure.
 
 ## License
 
