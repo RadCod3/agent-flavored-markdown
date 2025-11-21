@@ -186,19 +186,24 @@ function showErrorModal(title, message) {
                         <h5 class="modal-title">
                             <i class="bi bi-exclamation-triangle me-2"></i>${title}
                         </h5>
-                        <button type="button" class="btn-close btn-close-white" onclick="this.closest('.modal').parentElement.remove()"></button>
+                        <button type="button" class="btn-close btn-close-white"></button>
                     </div>
                     <div class="modal-body">
                         ${message}
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').parentElement.remove()">Close</button>
+                        <button type="button" class="btn btn-secondary modal-close-btn">Close</button>
                     </div>
                 </div>
             </div>
         </div>
     `;
     document.body.appendChild(modal);
+    
+    const closeButtons = modal.querySelectorAll('.btn-close, .modal-close-btn');
+    closeButtons.forEach(btn => {
+        btn.addEventListener('click', () => modal.remove());
+    });
     
     // Auto-remove on backdrop click
     modal.querySelector('.modal').addEventListener('click', (e) => {

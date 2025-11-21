@@ -10,7 +10,7 @@ repo_name: wso2/agent-flavored-markdown
 repo_url: https://github.com/wso2/agent-flavored-markdown
 
 # Copyright
-copyright: Copyright &copy; 2025 
+copyright: Copyright &copy; 2025
 
 theme:
   name: material

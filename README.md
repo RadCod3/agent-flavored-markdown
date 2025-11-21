@@ -7,12 +7,12 @@ A markdown-based format for portable and interoperable definitions of AI agents 
 This repository contains the **AFM Specification** and its documentation website built with [MkDocs](https://www.mkdocs.org/).
 
 **Repository Structure:**
-- `docs/specification.md` - **The AFM Specification** (core document)
-- `docs/visualizer/` - Interactive AFM file visualizer
-- `docs/` - Additional documentation and guides
-- `mkdocs.yml` - Documentation site configuration
-- `requirements.txt` - Python dependencies
-- `Dockerfile` - Development server container
+- `spec/docs/specification.md` - **The AFM Specification** (core document)
+- `spec/docs/visualizer/` - Interactive AFM file visualizer
+- `spec/docs/` - Additional documentation and guides
+- `spec/mkdocs.yml` - Documentation site configuration
+- `spec/requirements.txt` - Python dependencies
+- `spec/Dockerfile` - Development server container
 
 ## Quick Start
 
@@ -22,12 +22,12 @@ This repository contains the **AFM Specification** and its documentation website
 
 1. **Install dependencies:**
    ```bash
-   pip install -r requirements.txt
+   pip install -r spec/requirements.txt
    ```
 
 2. **Start the development server:**
    ```bash
-   mkdocs serve
+   cd spec && mkdocs serve
    ```
 
 3. **Access the site:**
@@ -39,7 +39,7 @@ The server will automatically reload when you make changes to the source files.
 
 **Build the image:**
 ```bash
-docker build -t afm-spec .
+docker build -t afm-spec spec/
 ```
 
 **Run the container:**
