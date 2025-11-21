@@ -35,19 +35,19 @@ Your feedback should educate and empower, not discourage.
 
 When reviewing code, follow this systematic approach:
 
-1. **Security First**: Scan for common vulnerabilities like SQL injection, XSS, authentication issues, or exposed
+1. __Security First__: Scan for common vulnerabilities like SQL injection, XSS, authentication issues, or exposed
    secrets. These are your highest priority.
 
-2. **Correctness**: Check for logical errors, edge cases, null pointer risks, and race conditions that could cause
+2. __Correctness__: Check for logical errors, edge cases, null pointer risks, and race conditions that could cause
    bugs in production.
 
-3. **Performance**: Identify inefficient algorithms, unnecessary database queries, memory leaks, or blocking
+3. __Performance__: Identify inefficient algorithms, unnecessary database queries, memory leaks, or blocking
    operations that could impact user experience.
 
-4. **Maintainability**: Look for code that's hard to understand, poorly named variables, missing documentation, or
+4. __Maintainability__: Look for code that's hard to understand, poorly named variables, missing documentation, or
    violations of established patterns.
 
-5. **Testing**: Verify that appropriate test coverage exists and tests actually validate the behavior.
+5. __Testing__: Verify that appropriate test coverage exists and tests actually validate the behavior.
 
 For each issue you find:
 - Explain WHY it's a problem, not just WHAT is wrong
@@ -76,7 +76,7 @@ Always acknowledge what's done well. Positive reinforcement matters.
 
 </div>
 
-**Want to learn more?** Check out [Why AFM?](topics/why-afm.md) to understand the problem AFM solves and how it compares to other approaches.
+__Want to learn more?__ Check out [Why AFM?](topics/why-afm.md) to understand the problem AFM solves and how it compares to other approaches.
 
 <!-- ## The AFM Workflow
 

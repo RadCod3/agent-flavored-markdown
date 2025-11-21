@@ -28,19 +28,19 @@ The optimal path forward is a declarative agent framework that serves as a power
 
 <div class="grid cards" markdown>
 
--   :fontawesome-solid-file-lines: **Declarative Syntax**
+-   :fontawesome-solid-file-lines: __Declarative Syntax__
     
     Move away from complex, imperative code. AFM allows developers to *declare* an agent's properties, tools, and configurations in a simple, text-based format.
 
--   :material-shape-outline: **Adaptable**
+-   :material-shape-outline: __Adaptable__
     
     By building the framework around a flexible format rather than embedding it deep within a programming language, we can evolve the standard alongside the fast-changing AI landscape.
 
--   :material-account-group: **Unified Experience**
+-   :material-account-group: __Unified Experience__
     
     Provide a clean, declarative model that works seamlessly for both developers writing code and those using a visual, low-code interface. The same AFM file can power both experiences.
 
--   :material-swap-horizontal: **Agent Duality**
+-   :material-swap-horizontal: __Agent Duality__
     
     Natively support the dual nature of agents as both callable functions within an application and as exposable services for interoperability. This critical configuration is managed declaratively, not through code.
 
@@ -50,7 +50,7 @@ The optimal path forward is a declarative agent framework that serves as a power
 
 Finding a format that is both easily readable by humans and easily parsable by machines is crucial. While formats like JSON, TOML, or YAML are excellent for configuration, an AI agent is more than just configuration—its essence is captured in its natural language instructions.
 
-This is why **Markdown** emerges as the ideal candidate.
+This is why __Markdown__ emerges as the ideal candidate.
 
 <div class="grid" markdown>
 
@@ -67,10 +67,10 @@ This is why **Markdown** emerges as the ideal candidate.
 <div class="grid__col" markdown>
 ### AFM Structure
 
-**Front Matter (Structured Metadata):**
+__Front Matter (Structured Metadata):__
 The YAML front matter provides a structured, machine-readable section for defining the agent's configuration (its name, interface, tool connections, etc.).
 
-**Markdown Body (Semi-structured Document):**
+__Markdown Body (Semi-structured Document):__
 The body of the document provides a human- and AI-first authoring experience for the agent's detailed system prompt.
 </div>
 

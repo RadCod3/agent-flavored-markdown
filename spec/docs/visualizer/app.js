@@ -104,7 +104,8 @@ function initializeDarkMode() {
     });
     
     prefersDark.addEventListener('change', (e) => {
-        if (!localStorage.getItem('afm-theme')) {
+        const themePref = localStorage.getItem('afm-theme');
+        if (!themePref) {
             if (e.matches) {
                 document.body.classList.add('dark-mode');
                 updateThemeIcon(true);
@@ -413,13 +414,13 @@ function convertMarkdownToHtml(text) {
             if (typeof DOMPurify !== 'undefined') {
                 return DOMPurify.sanitize(rawHtml);
             }
-            return rawHtml;
+            // If DOMPurify is not available, strip script tags as a minimal safeguard
+            return rawHtml.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '');
         } catch (error) {
             console.error('Marked parsing error:', error);
             // Fall through to fallback
         }
     }
-    
     // Fallback: basic HTML with line breaks preserved
     console.warn('Marked library not available, using fallback');
     return '<p>' + escapeHtml(text).replace(/\n/g, '<br>') + '</p>';
@@ -819,21 +820,25 @@ function showSpokeDetails(spokeType, spokeIndex) {
     // Render details based on spoke type
     let result;
     switch(spokeType) {
-        case 'hub':
+        case 'hub': {
             result = renderHubDetails(markdownBody);
             break;
-        case 'mcp':
+        }
+        case 'mcp': {
             const mcpServer = metadata.tools?.mcp?.servers?.[spokeIndex];
             result = renderMcpDetails(mcpServer);
             break;
-        case 'interface':
+        }
+        case 'interface': {
             result = renderInterfaceDetails(metadata.interface);
             break;
-        default:
+        }
+        default: {
             result = {
                 title: '<i class="bi bi-info-circle me-2"></i>Details',
                 html: '<p class="text-muted">No details available</p>'
             };
+        }
     }
     
     detailsTitle.innerHTML = result.title;
