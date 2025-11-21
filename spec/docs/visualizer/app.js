@@ -5,7 +5,6 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const UI_CONSTANTS = {
     ROLE_HEIGHT: 280,
     INSTRUCTIONS_HEIGHT: 320,
-    TOTAL_CONTENT_HEIGHT: 660,
     HUB_SPOKE_MIN_HEIGHT: 850,
     // Spoke positioning
     SPOKE_START_TOP: 190,
@@ -410,7 +409,11 @@ function convertMarkdownToHtml(text) {
     // Use marked library for proper markdown parsing
     if (typeof marked !== 'undefined' && marked.parse) {
         try {
-            return marked.parse(text);
+            const rawHtml = marked.parse(text);
+            if (typeof DOMPurify !== 'undefined') {
+                return DOMPurify.sanitize(rawHtml);
+            }
+            return rawHtml;
         } catch (error) {
             console.error('Marked parsing error:', error);
             // Fall through to fallback

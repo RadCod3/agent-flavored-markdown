@@ -56,7 +56,7 @@ Open [http://localhost:8000](http://localhost:8000) in your browser
 
 Generate static HTML files:
 ```bash
-mkdocs build
+cd spec && mkdocs build
 ```
 
 The output will be in the `site/` directory.

@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 # Set the working directory in the container
 WORKDIR /app
@@ -10,8 +10,9 @@ COPY requirements.txt .
 # Install the dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the spec content into the container
-COPY . .
+# Copy the documentation source and config into the container
+COPY docs docs/
+COPY mkdocs.yml .
 
 # Expose the port MkDocs will run on
 EXPOSE 8000
