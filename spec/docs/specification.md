@@ -520,10 +520,35 @@ interface:
         icon: "https://example.com/icons/research-assistant.png"
 ```
 
-## 7. Future Work 
+## 7. Variable Substitution
+
+AFM files MAY use `${...}` syntax for variable substitution. The timing of variable resolution is implementation-defined.
+
+The content within `${...}` is also implementation-defined and implementations are responsible for determining how and when variables are resolved, including handling prefix conventions (e.g., `${env:VAR}`, `${file:KEY}`).
+
+Variable resolution commonly occurs before the agent is made available for use, but MAY also happen at other stages depending on the implementation.
+
+### 7.1. Example Usage
+
+```yaml
+authentication:
+  type: "bearer"
+  token: "${API_TOKEN}"
+transport:
+  url: "${BASE_URL}/mcp/v1"
+```
+
+Implementations MAY adopt and support prefixes. E.g.,
+
+```yaml
+token: "${env:API_TOKEN}" # Environment variable
+url: "${file:api.baseUrl}" # From external config file
+password: "${secret:DB_PASSWORD}" # From secrets manager
+```
+
+## 8. Future Work
 
 This section outlines potential future enhancements to the AFM specification, including:
 
 - Model configuration for specifying the Large Language Model (LLM) used by the agent.
 - Memory management for agents to store and retrieve information across interactions.
-- Configurable support for Agent declaration. 

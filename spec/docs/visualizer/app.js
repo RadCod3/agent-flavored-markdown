@@ -1,3 +1,69 @@
+
+function renderMcpDetailsHtml(mcpServer) {
+    return `
+        <div class="detail-form">
+            <div class="mb-4">
+                <div class="fw-bold mb-1">Server Name</div>
+                <input type="text" class="form-control" value="${escapeHtml(mcpServer.name)}" readonly>
+            </div>
+
+            <div class="mb-4 border rounded p-3">
+                <h6 class="fw-bold mb-2">Transport</h6>
+                <div class="mb-3">
+                    <div class="fw-semibold">Type:</div>
+                    <div class="border rounded p-2 bg-white mt-1">${escapeHtml(mcpServer.transport?.type || 'stdio')}</div>
+                </div>
+                ${mcpServer.transport?.command ? `
+                <div class="mb-3">
+                    <div class="fw-semibold">Command:</div>
+                    <div class="border rounded p-2 bg-white mt-1">${highlightVars(mcpServer.transport.command)}</div>
+                </div>
+                ` : ''}
+                ${mcpServer.transport?.url ? `
+                <div class="mb-3">
+                    <div class="fw-semibold">URL:</div>
+                    <div class="border rounded p-2 bg-white mt-1">${highlightVars(mcpServer.transport.url)}</div>
+                </div>
+                ` : ''}
+            </div>
+
+            ${mcpServer.transport?.args && mcpServer.transport.args.length > 0 ? `
+            <div class="mb-4 border rounded p-3">
+                <h6 class="fw-bold mb-2">Arguments</h6>
+                <div id="transport-args">
+                    ${mcpServer.transport.args.map((arg, idx) => `
+                        <div class="mb-3">
+                            <div class="fw-semibold">${idx}</div>
+                            <div class="border rounded p-2 bg-white mt-1"><code class="arg-value">${highlightVars(arg)}</code></div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            ` : ''}
+
+            ${mcpServer.authentication ? `
+            <div class="mb-4 border rounded p-3">
+                <h6 class="fw-bold mb-2">Authentication</h6>
+                <div class="mb-3">
+                    <div class="fw-semibold">Type:</div>
+                    <div class="border rounded p-2 bg-white mt-1">${highlightVars(mcpServer.authentication.type || 'configured')}</div>
+                </div>
+                ${mcpServer.authentication.token ? `
+                <div class="mb-3">
+                    <div class="fw-semibold">Token:</div>
+                    <div class="border rounded p-2 bg-white mt-1">${highlightVars(mcpServer.authentication.token)}</div>
+                </div>
+                ` : ''}
+            </div>
+            ` : ''}
+
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>
+                This MCP server provides tools and resources that the agent can use.
+            </div>
+        </div>
+    `;
+}
 let currentAfmData = null;
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -29,34 +95,35 @@ function escapeHtml(unsafe) {
         .replace(/'/g, "&#039;");
 }
 const sampleAFM = `---
-spec_version: "0.3.0"
-name: "Code Review Assistant"
-description: "An AI assistant that helps review code and suggests improvements"
-version: "1.0.0"
-namespace: "development-tools"
-author: "Sample Author <author@example.com>"
+spec_version: \"0.3.0\"
+name: \"Code Review Assistant\"
+description: \"An AI assistant that helps review code and suggests improvements\"
+version: \"1.0.0\"
+namespace: \"development-tools\"
+author: \"Sample Author <author@example.com>\"
 interface:
   type: service
   exposure:
     http:
-      path: "/code-review"
+      path: \"/code-review\"
 tools:
   mcp:
     servers:
-      - name: "github"
+      - name: \"github\"
         transport:
-          type: "stdio"
-          command: "npx -y @modelcontextprotocol/server-github"
-      - name: "filesystem"
+          type: \"stdio\"
+          command: \"npx -y @modelcontextprotocol/server-github\"
+      - name: \"filesystem\"
         transport:
-          type: "stdio"
-          command: "npx -y @modelcontextprotocol/server-filesystem"
-      - name: "code-analysis-api"
+          type: \"stdio\"
+          command: \"npx -y @modelcontextprotocol/server-filesystem\"
+      - name: \"code-analysis-api\"
         transport:
-          type: "streamable-http"
-          url: "https://api.example.com/mcp/v1"
+          type: \"streamable-http\"
+          url: \"\${BASE_URL}/mcp/v1\"
         authentication:
-          type: "bearer"
+          type: \"bearer\"
+          token: \"\${env:API_TOKEN}\"
 ---
 
 # Role
@@ -579,70 +646,16 @@ function renderMcpDetails(mcpServer) {
     
     return {
         title: `<i class="bi bi-diagram-3 me-2"></i>MCP Server: ${escapeHtml(mcpServer.name)}`,
-        html: `
-            <div class="detail-form">
-                <div class="row mb-3">
-                    <label class="col-sm-3 col-form-label fw-bold">Server Name</label>
-                    <div class="col-sm-9">
-                        <input type="text" class="form-control" value="${escapeHtml(mcpServer.name)}" readonly>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <label class="col-sm-3 col-form-label fw-bold">Transport Type</label>
-                    <div class="col-sm-9">
-                        <input type="text" class="form-control" value="${escapeHtml(mcpServer.transport?.type || 'stdio')}" readonly>
-                    </div>
-                </div>
-                ${mcpServer.transport?.command ? `
-                <div class="row mb-3">
-                    <label class="col-sm-3 col-form-label fw-bold">Command</label>
-                    <div class="col-sm-9">
-                        <input type="text" class="form-control" value="${escapeHtml(mcpServer.transport.command)}" readonly>
-                    </div>
-                </div>
-                ` : ''}
-                ${mcpServer.transport?.args && mcpServer.transport.args.length > 0 ? `
-                <div class="row mb-3">
-                    <label class="col-sm-3 col-form-label fw-bold">Arguments</label>
-                    <div class="col-sm-9">
-                        <div class="args-list">
-                            ${mcpServer.transport.args.map((arg, idx) => `
-                                <div class="arg-item">
-                                    <span class="arg-index">${idx}</span>
-                                    <code class="arg-value">${escapeHtml(arg)}</code>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                </div>
-                ` : ''}
-                ${mcpServer.transport?.url ? `
-                <div class="row mb-3">
-                    <label class="col-sm-3 col-form-label fw-bold">URL</label>
-                    <div class="col-sm-9">
-                        <input type="text" class="form-control" value="${escapeHtml(mcpServer.transport.url)}" readonly>
-                    </div>
-                </div>
-                ` : ''}
-                ${mcpServer.authentication ? `
-                <div class="row mb-3">
-                    <label class="col-sm-3 col-form-label fw-bold">Authentication</label>
-                    <div class="col-sm-9">
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
-                            <input type="text" class="form-control" value="${escapeHtml(mcpServer.authentication.type || 'configured')}" readonly>
-                        </div>
-                    </div>
-                </div>
-                ` : ''}
-                <div class="alert alert-info">
-                    <i class="bi bi-info-circle me-2"></i>
-                    This MCP server provides tools and resources that the agent can use.
-                </div>
-            </div>
-        `
+        html: renderMcpDetailsHtml(mcpServer)
     };
 }
+
+// Helper to highlight variable substitutions
+function highlightVars(val) {
+    if (typeof val !== 'string') return escapeHtml(val);
+    return escapeHtml(val).replace(/(\$\{[^}]+\})/g, '<span class="badge bg-warning text-dark" title="Variable substitution">$1</span>');
+}
+
 
 function renderInterfaceDetails(interfaceConfig) {
     const interfaceExposure = interfaceConfig?.exposure || {};
