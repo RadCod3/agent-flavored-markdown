@@ -204,40 +204,55 @@ license: "MIT"
 ---
 ```
 
+
 ### 5.2. Agent Interface
 
-This section defines the agent's public "API" or "function signature." It is **OPTIONAL** and specifies how the agent receives inputs and produces outputs.
+This section defines how an agent can be interacted with or triggered. The "interface" describes the agent's public API, function signature, or service endpoint. It is **OPTIONAL** and specifies how the agent receives inputs and produces outputs.
 
-Default values will be used if the interface is not explicitly defined. Users can override the default values by specifying the `interface` field in the front matter.
+#### Interface Types
 
-**Default Behavior:**
-- The default `type` is `function`, which means the agent is callable within an application
-- The default `signature` (for both `function` and `service` types) includes:
-  - One string input parameter named `user_prompt`
-  - One string output parameter named `response`
 
-AFM implementations **SHALL** use this definition to generate the agent's callable interface and to ensure consistent behavior across different platforms. 
+#### 5.2.1. Interface Types
+
+The `interface.type` field **MUST** be one of the following values:
+
+| Value      | Description                                                                                                 |
+|------------|-------------------------------------------------------------------------------------------------------------|
+| `function` | The agent is invoked as a callable function within an application or as a scheduled task.                   |
+| `service`  | The agent is exposed as a network-accessible service (e.g., REST API).                                      |
+| `chat`     | The agent is optimized for conversational use, with string input/output (e.g., chatbots).                   |
+| `webhook`  | The agent is exposed as a webhook endpoint and supports subscription details (e.g., WebSub hub integration).|
+
+Each interface type defines how the agent is triggered and interacted with. Implementations **SHALL** support all four types as described above.
 
 #### 5.2.1. Schema Overview
 
 ```yaml
 interface:
-  type: string           # The invocation style: 'service' or 'function'.
+  type: function | service | chat | webhook
   signature:
     input: [object]      # A list of input parameter objects.
     output: [object]     # A list of output parameter objects.
-  exposure:              # Optional, for 'service' type agents.
+  # Optional, depending on type:
+  exposure:              # For service/chat/webhook types
     http: object         # Configuration for exposing as an HTTP endpoint.
     a2a: object          # Configuration for exposing as an A2A-compliant service.
+  subscription:          # For webhook type
+    protocol: string     # e.g., "websub"
+    hub: string          # Subscription hub URL
+    topic: string        # Topic to subscribe to
+    callback: string     # Callback URL for receiving events (optional, for dynamic registration)
+    secret: string       # Secret for verifying webhook payloads (optional)
 ```
 
 #### 5.2.2. Field Definitions
 
 | Field         | Type     | Required | Description                                                                                             |
 |---------------|----------|----------|---------------------------------------------------------------------------------------------------------|
-| `type`        | `string` | Yes      | The agent's invocation style. Must be one of:<br>- `service`: A network-accessible agent.<br>- `function`: An agent callable within an application. |
+| `type`        | `string` | Yes      | The agent's interface type. Must be one of:<br>- `function`: Callable within an application.<br>- `service`: Network-accessible agent.<br>- `chat`: Conversational agent (string input/output).<br>- `webhook`: Service with subscription support. |
 | `signature`   | `object` | Yes      | Defines the agent's input and output parameters. See [Signature Object](#signature-object).                  |
-| `exposure`    | `object` | No       | Configuration for how a `service` agent is exposed. See [Exposure Object](#exposure-object).                |
+| `exposure`    | `object` | No       | Configuration for how a `service`, `chat`, or `webhook` agent is exposed. See [Exposure Object](#exposure-object).                |
+| `subscription`| `object` | No       | (webhook only) Subscription configuration. See below. |
 
 <a id="signature-object"></a>
 **Signature Object:**
@@ -257,6 +272,121 @@ Each `input` or `output` object has the following structure:
 | `type`        | `string`  | The data type. Common types include: `string`, `number`, `boolean`, `json`, `array`, `file`. The full set of supported types is implementation-specific. |
 | `description` | `string`  | A brief explanation of the parameter.           |
 | `required`    | `boolean` | (For `input` only) Whether the parameter is mandatory. |
+
+
+**Subscription Object (webhook only):**
+
+| Field      | Type     | Required | Description |
+|------------|----------|----------|-------------|
+| `protocol` | `string` | Yes      | The subscription protocol (e.g., `websub`). |
+| `hub`      | `string` | Yes      | The subscription hub URL. |
+| `topic`    | `string` | No       | The topic to subscribe to (recommended for most webhook protocols). |
+| `callback` | `string` | No       | The callback URL where events should be delivered (optional, for dynamic or self-registration). |
+| `secret`   | `string` | No       | A secret used to sign or verify webhook payloads (optional, for security). |
+
+**Default Behavior:**
+- The default `type` is `function`.
+- The default `signature` includes one string input parameter named `user_prompt` and one string output parameter named `response`.
+
+AFM implementations **SHALL** use this definition to generate the agent's callable interface and to ensure consistent behavior across different platforms.
+
+#### 5.2.3. Example Usages
+
+**Function agent (default):**
+```yaml
+interface:
+  type: function
+  signature:
+    input:
+      - name: user_prompt
+        type: string
+        description: "The user's query or request"
+        required: true
+    output:
+      - name: response
+        type: string
+        description: "The agent's response to the user prompt"
+```
+
+**Service agent:**
+```yaml
+interface:
+  type: service
+  signature:
+    input:
+      - name: user_prompt
+        type: string
+        description: "The user's query or request"
+        required: true
+      - name: context
+        type: json
+        description: "Additional context for the request"
+        required: false
+    output:
+      - name: response
+        type: string
+        description: "The agent's response to the user prompt"
+      - name: confidence
+        type: number
+        description: "Confidence score for the response"
+  exposure:
+    http:
+      path: "/research-assistant"
+    a2a:
+      discoverable: true
+      agent_card:
+        name: "Research Assistant"
+        description: "Expert in finding, analyzing, and summarizing research papers"
+        icon: "https://example.com/icons/research-assistant.png"
+```
+
+**Chat agent:**
+```yaml
+interface:
+  type: chat
+  signature:
+    input:
+      - name: message
+        type: string
+        description: "The user's chat message"
+        required: true
+    output:
+      - name: reply
+        type: string
+        description: "The agent's chat reply"
+  exposure:
+    http:
+      path: "/chatbot"
+```
+
+**Webhook agent:**
+```yaml
+interface:
+  type: webhook
+  signature:
+    input:
+      - name: event
+        type: string
+        description: "The event type received by the webhook"
+        required: true
+      - name: payload
+        type: json
+        description: "The event payload"
+        required: true
+    output:
+      - name: result
+        type: string
+        description: "The agent's response to the webhook event"
+  subscription:
+    protocol: "websub"
+    hub: "https://example.com/websub-hub"
+    topic: "https://example.com/events/agent"
+    callback: "https://myagent.example.com/webhook-callback"
+    secret: "supersecretvalue"
+  exposure:
+    http:
+      path: "/webhook-handler"
+```
 
 <a id="exposure-object"></a>
 **Exposure Object:**

@@ -4,7 +4,7 @@ function renderMcpDetailsHtml(mcpServer) {
         <div class="detail-form">
             <div class="mb-4">
                 <div class="fw-bold mb-1">Server Name</div>
-                <input type="text" class="form-control" value="${escapeHtml(mcpServer.name)}" readonly>
+                <div class="form-control" style="height:auto">${highlightVars(mcpServer.name)}</div>
             </div>
 
             <div class="mb-4 border rounded p-3">
@@ -406,30 +406,68 @@ function parseAfmFile(content) {
             schema: jsyaml.JSON_SCHEMA,
             json: true
         });
-        
+
         if (metadata === null || metadata === undefined) {
             metadata = {};
         }
-        
-        // Validate metadata is an object
+
         if (typeof metadata !== 'object' || Array.isArray(metadata)) {
             throw new Error('YAML frontmatter must be an object');
         }
-        
     } catch (error) {
         if (error.name === 'YAMLException') {
             throw new Error('Invalid YAML syntax in frontmatter: ' + error.message);
         }
         throw new Error('Failed to parse YAML frontmatter: ' + error.message);
     }
-    
+
+    const allowedTypes = ['function', 'service', 'chat', 'webhook'];
+    if (Object.prototype.hasOwnProperty.call(metadata, 'interface')) {
+        const iface = metadata.interface;
+        if (!iface || typeof iface !== 'object' || Array.isArray(iface)) {
+            throw new Error('interface must be an object if present');
+        }
+        if (!iface.type || !allowedTypes.includes(iface.type)) {
+            throw new Error(`interface.type must be one of: ${allowedTypes.join(', ')}`);
+        }
+        if (iface.type === 'function') {
+            if (!iface.signature || typeof iface.signature !== 'object' || Array.isArray(iface.signature)) {
+                throw new Error('interface.signature is required and must be an object for function type');
+            }
+            if (!Array.isArray(iface.signature.input) || iface.signature.input.length === 0) {
+                throw new Error('interface.signature.input must be a non-empty array for function type');
+            }
+            if (!Array.isArray(iface.signature.output) || iface.signature.output.length === 0) {
+                throw new Error('interface.signature.output must be a non-empty array for function type');
+            }
+        } else if (iface.signature !== undefined) {
+            if (typeof iface.signature !== 'object' || Array.isArray(iface.signature)) {
+                throw new Error('interface.signature must be an object if present');
+            }
+            if (iface.signature.input !== undefined && (!Array.isArray(iface.signature.input) || iface.signature.input.length === 0)) {
+                throw new Error('interface.signature.input must be a non-empty array if present');
+            }
+            if (iface.signature.output !== undefined && (!Array.isArray(iface.signature.output) || iface.signature.output.length === 0)) {
+                throw new Error('interface.signature.output must be a non-empty array if present');
+            }
+        }
+        if (iface.type === 'webhook') {
+            if (!iface.subscription || typeof iface.subscription !== 'object' || Array.isArray(iface.subscription)) {
+                throw new Error('interface.subscription is required and must be an object for webhook type');
+            }
+            if (!iface.subscription.protocol) {
+                throw new Error('interface.subscription.protocol is required for webhook type');
+            }
+            if (!iface.subscription.hub) {
+                throw new Error('interface.subscription.hub is required for webhook type');
+            }
+        }
+    }
+
     const markdownBody = parts.slice(2).join('---').trim();
-    
-    // Validate markdown body exists
     if (!markdownBody) {
         console.warn('AFM file has no markdown content');
     }
-    
     return {
         metadata,
         markdownBody,
@@ -653,7 +691,7 @@ function renderMcpDetails(mcpServer) {
 // Helper to highlight variable substitutions
 function highlightVars(val) {
     if (typeof val !== 'string') return escapeHtml(val);
-    return escapeHtml(val).replace(/(\$\{[^}]+\})/g, '<span class="badge bg-warning text-dark" title="Variable substitution">$1</span>');
+    return escapeHtml(val).replace(/(\$\{[^}]+\})/g, '<span class="badge badge-var-interp" title="Variable substitution">$1</span>');
 }
 
 
@@ -662,6 +700,25 @@ function renderInterfaceDetails(interfaceConfig) {
     const interfaceSignature = interfaceConfig?.signature;
     const interfaceTypeValue = interfaceConfig?.type || 'function';
     
+    let subscriptionHtml = '';
+    if (interfaceTypeValue === 'webhook' && interfaceConfig.subscription) {
+        const sub = interfaceConfig.subscription;
+        subscriptionHtml = `
+            <hr class="my-4">
+            <h6 class="text-muted mb-3">Webhook Subscription</h6>
+            <div class="mb-3 row">
+                <label class="col-sm-3 col-form-label fw-bold">Protocol</label>
+                <div class="col-sm-9"><div class="form-control" style="height:auto">${highlightVars(sub.protocol || '')}</div></div>
+            </div>
+            <div class="mb-3 row">
+                <label class="col-sm-3 col-form-label fw-bold">Hub</label>
+                <div class="col-sm-9"><div class="form-control" style="height:auto">${highlightVars(sub.hub || '')}</div></div>
+            </div>
+            ${sub.topic ? `<div class="mb-3 row"><label class="col-sm-3 col-form-label fw-bold">Topic</label><div class="col-sm-9"><div class="form-control" style="height:auto">${highlightVars(sub.topic)}</div></div></div>` : ''}
+            ${sub.callback ? `<div class="mb-3 row"><label class="col-sm-3 col-form-label fw-bold">Callback</label><div class="col-sm-9"><div class="form-control" style="height:auto">${highlightVars(sub.callback)}</div></div></div>` : ''}
+            ${sub.secret ? `<div class="mb-3 row"><label class="col-sm-3 col-form-label fw-bold">Secret</label><div class="col-sm-9"><div class="form-control" style="height:auto">${highlightVars(sub.secret)}</div></div></div>` : ''}
+        `;
+    }
     return {
         title: '<i class="bi bi-broadcast me-2"></i>Agent Interface',
         html: `
@@ -670,14 +727,12 @@ function renderInterfaceDetails(interfaceConfig) {
                 <div class="row mb-3">
                     <label class="col-sm-3 col-form-label fw-bold">Type</label>
                     <div class="col-sm-9">
-                        <input type="text" class="form-control" value="${escapeHtml(interfaceTypeValue)}" readonly>
+                        <div class="form-control" style="height:auto">${highlightVars(interfaceTypeValue)}</div>
                     </div>
                 </div>
-                
                 ${interfaceSignature ? `
                     <hr class="my-4">
                     <h6 class="text-muted mb-3">Signature</h6>
-                    
                     ${interfaceSignature.input && interfaceSignature.input.length > 0 ? `
                         <div class="mb-4">
                             <label class="form-label fw-bold">Input Parameters</label>
@@ -705,7 +760,6 @@ function renderInterfaceDetails(interfaceConfig) {
                             </div>
                         </div>
                     ` : ''}
-                    
                     ${interfaceSignature.output && interfaceSignature.output.length > 0 ? `
                         <div class="mb-4">
                             <label class="form-label fw-bold">Output Parameters</label>
@@ -732,7 +786,7 @@ function renderInterfaceDetails(interfaceConfig) {
                         </div>
                     ` : ''}
                 ` : ''}
-                
+                ${subscriptionHtml}
                 ${Object.keys(interfaceExposure).length > 0 ? `
                     <hr class="my-4">
                     <h6 class="text-muted mb-3">Exposure Types</h6>
@@ -745,14 +799,14 @@ function renderInterfaceDetails(interfaceConfig) {
                                 <div class="row mb-3">
                                     <label class="col-sm-3 col-form-label fw-bold">Type</label>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" value="HTTP" readonly>
+                                        <div class="form-control" style="height:auto">HTTP</div>
                                     </div>
                                 </div>
                                 ${config.path ? `
                                 <div class="row mb-3">
                                     <label class="col-sm-3 col-form-label fw-bold">Path</label>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" value="${escapeHtml(config.path)}" readonly>
+                                        <div class="form-control" style="height:auto">${highlightVars(config.path)}</div>
                                     </div>
                                 </div>
                                 ` : ''}
@@ -760,7 +814,7 @@ function renderInterfaceDetails(interfaceConfig) {
                                 <div class="row mb-3">
                                     <label class="col-sm-3 col-form-label fw-bold">Port</label>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" value="${escapeHtml(String(config.port))}" readonly>
+                                        <div class="form-control" style="height:auto">${highlightVars(String(config.port))}</div>
                                     </div>
                                 </div>
                                 ` : ''}
@@ -770,7 +824,7 @@ function renderInterfaceDetails(interfaceConfig) {
                                     <div class="col-sm-9">
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
-                                            <input type="text" class="form-control" value="${escapeHtml(config.authentication.type || 'configured')}" readonly>
+                                            <div class="form-control" style="height:auto">${highlightVars(config.authentication.type || 'configured')}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -783,14 +837,14 @@ function renderInterfaceDetails(interfaceConfig) {
                                 <div class="row mb-3">
                                     <label class="col-sm-3 col-form-label fw-bold">Type</label>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" value="A2A" readonly>
+                                        <div class="form-control" style="height:auto">A2A</div>
                                     </div>
                                 </div>
                                 ${config.endpoint ? `
                                 <div class="row mb-3">
                                     <label class="col-sm-3 col-form-label fw-bold">Endpoint</label>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" value="${escapeHtml(config.endpoint)}" readonly>
+                                        <div class="form-control" style="height:auto">${highlightVars(config.endpoint)}</div>
                                     </div>
                                 </div>
                                 ` : ''}
@@ -802,7 +856,7 @@ function renderInterfaceDetails(interfaceConfig) {
                                 <div class="row mb-3">
                                     <label class="col-sm-3 col-form-label fw-bold">Type</label>
                                     <div class="col-sm-9">
-                                        <input type="text" class="form-control" value="${escapeHtml(type.toUpperCase())}" readonly>
+                                        <div class="form-control" style="height:auto">${highlightVars(type.toUpperCase())}</div>
                                     </div>
                                 </div>
                                 <div class="row mb-3">

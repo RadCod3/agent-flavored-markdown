@@ -1,3 +1,9 @@
+/* Lighter yellow for variable interpolation badges */
+.badge-var-interp {
+    background-color: #fff9c4 !important; /* pale yellow */
+    color: #665c00 !important;           /* dark yellow text */
+    border: 1px solid #ffe082;
+}
 /* AFM Visualizer Styles */
 
 :root {
