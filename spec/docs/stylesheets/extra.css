@@ -66,3 +66,63 @@
 [data-md-color-scheme="slate"] .md-typeset .grid > .card {
   background-color: var(--md-code-bg-color);
 }
+
+/* Footer customization */
+.md-footer-meta {
+  background-color: #1a1a1a;
+  padding: 0.5rem 0;
+  font-size: 0.7rem;
+}
+
+[data-md-color-scheme="slate"] .md-footer-meta {
+  background-color: #000000;
+}
+
+.md-footer-copyright {
+  flex: 1;
+  padding: 0;
+  font-size: 0.7rem;
+}
+
+.md-footer-copyright a {
+  color: rgba(255, 255, 255, 0.7);
+  transition: opacity 0.2s ease;
+}
+
+.md-footer-copyright a:hover {
+  color: rgba(255, 255, 255, 0.9);
+  opacity: 0.9;
+}
+
+.md-footer-meta__inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  max-width: 100%;
+  padding: 0.5rem 0.8rem;
+}
+
+.md-footer-meta__inner > * {
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+/* Header customization - wider layout to match footer */
+.md-header__inner {
+  max-width: 100%;
+  padding: 0 1.5rem;
+}
+
+/* Navigation tabs - wider layout to match header */
+.md-tabs {
+  max-width: 100%;
+}
+
+.md-tabs .md-grid {
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding-left: 1.5rem !important;
+  padding-right: 1.5rem !important;
+}

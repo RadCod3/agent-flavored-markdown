@@ -12,6 +12,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the documentation source and config into the container
 COPY docs docs/
+COPY overrides overrides/
 COPY mkdocs.yml .
 
 # Expose the port MkDocs will run on

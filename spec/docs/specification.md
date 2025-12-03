@@ -80,7 +80,7 @@ This section contains metadata about the agent. These metadata fields are **OPTI
 | [Agent Details](#51-about-the-agent)     | Information about the agent, such as its name, description, version, and author. |
 | [Agent Interface](#52-agent-interface)   | Defines how the agent is invoked and its input/output signature.                 |
 | [Agent Tools](#53-tools) | Defines external tools available to the agent (e.g., via MCP).                  |
-| [Agent Resources](#54-agent-resources)   | Coming soon                                                                      |
+| Agent Resources   | Coming soon                                                                      |
 
 Refer to the [AFM Schema](#5-schema-definitions) for a complete list of fields and their meanings.
 
@@ -212,8 +212,6 @@ If the `interface` field is not explicitly defined in the front matter, AFM impl
 
 Users can override these defaults by specifying the `interface` field in the front matter. AFM implementations **SHALL** use this definition to generate the agent's callable interface and to ensure consistent behavior across different platforms.
 
-#### Interface Types
-
 #### 5.2.1. Interface Types
 
 The `interface.type` field **MUST** be one of the following values:
@@ -255,8 +253,7 @@ interface:
 | `exposure`    | `object` | No       | Configuration for how a `service`, `chat`, or `webhook` agent is exposed. See [Exposure Object](#exposure-object).                |
 | `subscription`| `object` | No       | (webhook only) Subscription configuration. See below. |
 
-<a id="signature-object"></a>
-**Signature Object:**
+##### Signature Object {#signature-object}
 
 Defines the data contract for the agent.
 
@@ -275,6 +272,12 @@ Each `input` or `output` object has the following structure:
 | `required`    | `boolean` | (For `input` only) Whether the parameter is mandatory. |
 
 
+**Default Behavior:**
+- The default `type` is `function`.
+- The default `signature` includes one string input parameter named `user_prompt` and one string output parameter named `response`.
+
+AFM implementations **SHALL** use this definition to generate the agent's callable interface and to ensure consistent behavior across different platforms.
+
 **Subscription Object (webhook only):**
 
 | Field      | Type     | Required | Description |
@@ -285,11 +288,31 @@ Each `input` or `output` object has the following structure:
 | `callback` | `string` | No       | The callback URL where events should be delivered (optional, for dynamic or self-registration). |
 | `secret`   | `string` | No       | A secret used to sign or verify webhook payloads (optional, for security). |
 
-**Default Behavior:**
-- The default `type` is `function`.
-- The default `signature` includes one string input parameter named `user_prompt` and one string output parameter named `response`.
+##### Exposure Object {#exposure-object}
 
-AFM implementations **SHALL** use this definition to generate the agent's callable interface and to ensure consistent behavior across different platforms.
+Contains configurations for `service` agents.
+
+| Field  | Type     | Required | Description                                                          |
+|--------|----------|----------|----------------------------------------------------------------------|
+| `http` | `object` | No | Defines how to expose the agent via a standard HTTP endpoint.        |
+
+!!! warning "WIP"
+    Work in progress
+
+**HTTP Object:**
+
+| Field            | Type     | Required | Description                                                                 |
+|------------------|----------|----------|-----------------------------------------------------------------------------|
+| `path`           | `string` | Yes      | The URL path segment for the agent's HTTP endpoint (e.g., `/math-tutor`). |
+| `authentication` | `object` | No       | Optional authentication configuration for the HTTP endpoint. Uses the same schema as the MCP [Authentication Object](#authentication-object). |
+
+!!! note "HTTP Object Usage"
+    The `http` object is applicable for agents of type `service`, `chat`, or `webhook`. It defines how the agent is exposed via a standard HTTP endpoint, allowing other systems to interact with it over the web.
+
+    AFM does not define the HTTP methods (GET, POST, etc.) for the agent's endpoint. This is left to the implementation to decide based on the agent's functionality and requirements.
+    
+    HTTP authentication follows the same pattern as MCP authentication, where the `type` field specifies the authentication scheme (e.g., `oauth2`, `api_key`), and the agent's host environment is responsible for managing the actual credentials and authentication flow.
+
 
 #### 5.2.3. Example Usages
 
@@ -377,65 +400,10 @@ interface:
     hub: "https://example.com/websub-hub"
     topic: "https://example.com/events/agent"
     callback: "https://myagent.example.com/webhook-callback"
-    secret: "supersecretvalue"
+    secret: "${WEBHOOK_SECRET}"
   exposure:
     http:
       path: "/webhook-handler"
-```
-
-<a id="exposure-object"></a>
-**Exposure Object:**
-
-Contains configurations for `service` agents.
-
-| Field  | Type     | Required | Description                                                          |
-|--------|----------|----------|----------------------------------------------------------------------|
-| `http` | `object` | No | Defines how to expose the agent via a standard HTTP endpoint.        |
-
-!!! warning "WIP"
-    Work in progress
-
-**<a id="http-object"></a>HTTP Object:**
-
-| Field            | Type     | Required | Description                                                                 |
-|------------------|----------|----------|-----------------------------------------------------------------------------|
-| `path`           | `string` | Yes      | The URL path segment for the agent's HTTP endpoint (e.g., `/math-tutor`). |
-| `authentication` | `object` | No       | Optional authentication configuration for the HTTP endpoint. Uses the same schema as the MCP [Authentication Object](#authentication-object). |
-
-!!! note "HTTP Object Usage"
-    The `http` object is applicable for agents of type `service`, `chat`, or `webhook`. It defines how the agent is exposed via a standard HTTP endpoint, allowing other systems to interact with it over the web.
-
-    AFM does not define the HTTP methods (GET, POST, etc.) for the agent's endpoint. This is left to the implementation to decide based on the agent's functionality and requirements.
-    
-    HTTP authentication follows the same pattern as MCP authentication, where the `type` field specifies the authentication scheme (e.g., `oauth2`, `api_key`), and the agent's host environment is responsible for managing the actual credentials and authentication flow.
-
-#### 5.2.3. Example Usage
-
-Here's an example of a service agent with custom interface:
-
-```yaml
-interface:
-  type: service
-  signature:
-    input:
-      - name: user_prompt
-        type: string
-        description: "The user's query or request"
-        required: true
-      - name: context
-        type: json
-        description: "Additional context for the request"
-        required: false
-    output:
-      - name: response
-        type: string
-        description: "The agent's response to the user prompt"
-      - name: confidence
-        type: number
-        description: "Confidence score for the response"
-  exposure:
-    http:
-      path: "/research-assistant"
 ```
 
 ### 5.3. Tools

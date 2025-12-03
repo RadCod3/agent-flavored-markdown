@@ -18,7 +18,7 @@ This repository contains the **AFM Specification** and its documentation website
 
 ### Local Development
 
-**Prerequisites:** Python 3.8+
+**Prerequisites:** Python 3.12+
 
 1. **Install dependencies:**
    ```bash

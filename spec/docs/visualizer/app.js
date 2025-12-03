@@ -138,7 +138,7 @@ tools:
           command: \"npx -y @modelcontextprotocol/server-filesystem\"
       - name: \"code-analysis-api\"
         transport:
-          type: \"streamable-http\"
+          type: \"streamable_http\"
           url: \"\${BASE_URL}/mcp/v1\"
         authentication:
           type: \"bearer\"
@@ -279,6 +279,16 @@ function handleFileSelect(e) {
 }
 
 function showErrorModal(title, message) {
+    const sanitizedTitle = typeof DOMPurify !== 'undefined' 
+        ? DOMPurify.sanitize(title, { ALLOWED_TAGS: ['strong', 'em', 'code'], ALLOWED_ATTR: [] })
+        : escapeHtml(title);
+    const sanitizedMessage = typeof DOMPurify !== 'undefined'
+        ? DOMPurify.sanitize(message, { 
+            ALLOWED_TAGS: ['p', 'strong', 'em', 'code', 'ul', 'ol', 'li', 'div', 'pre'],
+            ALLOWED_ATTR: ['class']
+          })
+        : escapeHtml(message);
+    
     // Create a Bootstrap-style modal
     const modal = document.createElement('div');
     modal.innerHTML = `
@@ -287,12 +297,12 @@ function showErrorModal(title, message) {
                 <div class="modal-content">
                     <div class="modal-header bg-danger text-white">
                         <h5 class="modal-title">
-                            <i class="bi bi-exclamation-triangle me-2"></i>${title}
+                            <i class="bi bi-exclamation-triangle me-2"></i>${sanitizedTitle}
                         </h5>
                         <button type="button" class="btn-close btn-close-white"></button>
                     </div>
                     <div class="modal-body">
-                        ${message}
+                        ${sanitizedMessage}
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary modal-close-btn">Close</button>
@@ -579,7 +589,6 @@ function renderHubSpoke(metadata, markdownBody) {
     const mcpServers = metadata.tools?.mcp?.servers || [];
     const hasInterface = metadata.interface;
     const interfaceType = metadata.interface?.type || 'function';
-    const exposureTypes = metadata.interface?.exposure ? Object.keys(metadata.interface.exposure).map(escapeHtml) : [];
 
     const escapedName = escapeHtml(metadata.name || 'Unnamed Agent');
     const escapedDescription = escapeHtml(metadata.description || 'No description');

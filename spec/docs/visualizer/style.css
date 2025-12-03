@@ -63,6 +63,32 @@ body {
     background-color: var(--bg-primary);
     color: var(--text-primary);
     transition: background-color 0.3s ease, color 0.3s ease;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+#app > .container-fluid {
+    flex: 1; /* Takes up remaining space to push footer down */
+}
+
+/* Navbar full width - override Bootstrap defaults */
+.navbar {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.navbar .container-fluid {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
 }
 
 body.dark-mode .navbar-dark {
@@ -993,4 +1019,49 @@ body.dark-mode .table th {
 .markdown-instructions-content {
     height: 320px;
     overflow-y: auto;
+}
+
+/* Footer styles */
+footer {
+    background-color: #1a1a1a !important;
+    margin-top: auto;
+    border-top: 1px solid #2d2d2d;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+}
+
+footer .container-fluid {
+    max-width: 100%;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+}
+
+footer a {
+    transition: opacity 0.2s ease;
+}
+
+footer a:hover {
+    opacity: 0.8 !important;
+}
+
+footer .text-white-50 {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+footer .text-white-50:hover {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+body.dark-mode footer {
+    background-color: #000000 !important;
+    border-top: 1px solid #1a1a1a;
+}
+
+/* Header logo styles */
+.navbar-brand {
+    margin-bottom: 0 !important;
+}
+
+.navbar a.text-white:hover {
+    opacity: 0.8;
 }
