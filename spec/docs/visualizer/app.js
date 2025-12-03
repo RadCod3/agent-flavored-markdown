@@ -1,3 +1,4 @@
+const AFM_SPEC_VERSION = '0.3.0';
 
 function renderMcpDetailsHtml(mcpServer) {
     return `
@@ -95,7 +96,7 @@ function escapeHtml(unsafe) {
         .replace(/'/g, "&#039;");
 }
 const sampleAFM = `---
-spec_version: \"0.3.0\"
+spec_version: \"${AFM_SPEC_VERSION}\"
 name: \"Code Review Assistant\"
 description: \"An AI assistant that helps review code and suggests improvements\"
 version: \"1.0.0\"
@@ -196,6 +197,11 @@ function updateThemeIcon(isDark) {
 document.addEventListener('DOMContentLoaded', () => {
     initializeMarked();
     initializeDarkMode();
+    
+    const versionBadge = document.querySelector('.navbar .badge');
+    if (versionBadge) {
+        versionBadge.textContent = `Spec v${AFM_SPEC_VERSION}`;
+    }
     
     const fileInput = document.getElementById('file-input');
     const dropZone = document.getElementById('drop-zone');
@@ -535,9 +541,9 @@ function renderHubSpoke(metadata, markdownBody) {
     const container = document.getElementById('hub-spoke-container');
     
     const mcpServers = metadata.tools?.mcp?.servers || [];
-    const hasInterface = metadata.interface?.exposure;
-    const interfaceTypes = hasInterface ? Object.keys(metadata.interface.exposure).map(escapeHtml) : [];
+    const hasInterface = metadata.interface;
     const interfaceType = metadata.interface?.type || 'function';
+    const exposureTypes = metadata.interface?.exposure ? Object.keys(metadata.interface.exposure).map(escapeHtml) : [];
 
     const escapedName = escapeHtml(metadata.name || 'Unnamed Agent');
     const escapedDescription = escapeHtml(metadata.description || 'No description');
@@ -596,10 +602,13 @@ function renderHubSpoke(metadata, markdownBody) {
                 <div class="spoke-group-label" style="position: absolute; top: ${UI_CONSTANTS.INTERFACE_LABEL_TOP}px; right: 30px;">Interface</div>
                 <div class="spoke spoke-interface" data-spoke-type="interface" style="position: absolute; top: ${UI_CONSTANTS.INTERFACE_SPOKE_TOP}px; right: 30px;">
                     <div class="spoke-icon">
-                        <i class="bi bi-broadcast"></i>
+                        ${interfaceType === 'function' ? '<i class="bi bi-code-square"></i>' : ''}
+                        ${interfaceType === 'service' ? '<i class="bi bi-cloud"></i>' : ''}
+                        ${interfaceType === 'chat' ? '<i class="bi bi-chat-dots"></i>' : ''}
+                        ${interfaceType === 'webhook' ? '<i class="bi bi-broadcast"></i>' : ''}
                     </div>
                     <div class="spoke-title">Interface</div>
-                    <div class="spoke-subtitle">${interfaceTypes.join(', ')}</div>
+                    <div class="spoke-subtitle">${escapedInterfaceType}</div>
                 </div>
                 ` : ''}
                 ${mcpServers.length > 0 ? `
