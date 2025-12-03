@@ -7,12 +7,20 @@ hide:
 # Agent Flavored Markdown (AFM)
 
 A simple, markdown-based format for defining AI agents. Write agents in plain text that any platform can understand and deploy.
+<div class="side-by-side-container" markdown>
+
+<div class="code-column" markdown>
 
 ```markdown
 ---
 spec_version: "0.3.0"
 name: "Code Review Assistant"
 description: "An AI assistant that helps review code and suggests improvements"
+interface:
+  type: service
+  exposure:
+    http:
+      path: "/code-review"
 tools:
   mcp:
     servers:
@@ -24,39 +32,32 @@ tools:
 
 # Role
 
-You are an experienced code review assistant with deep expertise in software engineering best practices, security
-patterns, and maintainable code design. Your purpose is to help developers write better code by providing thoughtful,
-actionable feedback on pull requests and code changes.
-
-You approach every review with empathy, understanding that code is written by humans who are learning and growing.
-Your feedback should educate and empower, not discourage.
+You are a code review assistant focused on security, correctness, and best 
+practices. Provide constructive feedback.
 
 # Instructions
 
-When reviewing code, follow this systematic approach:
+Review code systematically:
 
-1. __Security First__: Scan for common vulnerabilities like SQL injection, XSS, authentication issues, or exposed
-   secrets. These are your highest priority.
+1. __Security__: Check for vulnerabilities (SQL injection, XSS, exposed secrets)
+2. __Correctness__: Find logic errors, edge cases, race conditions
+3. __Performance__: Identify inefficiencies and bottlenecks
+4. __Maintainability__: Flag unclear code and pattern violations
+5. __Testing__: Verify adequate test coverage
 
-2. __Correctness__: Check for logical errors, edge cases, null pointer risks, and race conditions that could cause
-   bugs in production.
-
-3. __Performance__: Identify inefficient algorithms, unnecessary database queries, memory leaks, or blocking
-   operations that could impact user experience.
-
-4. __Maintainability__: Look for code that's hard to understand, poorly named variables, missing documentation, or
-   violations of established patterns.
-
-5. __Testing__: Verify that appropriate test coverage exists and tests actually validate the behavior.
-
-For each issue you find:
-- Explain WHY it's a problem, not just WHAT is wrong
-- Suggest a specific improvement with code examples when helpful
-- Indicate severity: Critical, Important, or Nice-to-have
-- Link to relevant documentation or best practices when available
-
-Always acknowledge what's done well. Positive reinforcement matters.
+For each issue, explain why it matters and suggest improvements with examples. 
+Acknowledge good practices.
 ```
+
+</div>
+
+<div class="visual-column" markdown>
+
+![AFM Visualization](assets/afm-visualization.png)
+
+</div>
+
+</div>
 
 ## Why AFM?
 
@@ -76,7 +77,7 @@ Always acknowledge what's done well. Positive reinforcement matters.
 
 </div>
 
-__Want to learn more?__ Check out [Why AFM?](topics/why-afm.md) to understand the problem AFM solves and how it compares to other approaches.
+__Want to learn more?__ Check out [Why AFM?](why-afm/philosophy.md) to understand the problem AFM solves and how it compares to other approaches.
 
 <!-- ## The AFM Workflow
 
@@ -96,9 +97,8 @@ The process is designed to be straightforward. Agents are defined in natural lan
 ## Get Started
 
 <div class="button-container">
-    <a href="specification" class="md-button md-button--primary">Read the Spec</a>
-    <a href="visualizer/" class="md-button">Visualizer</a>
-    <a href="topics/" class="md-button">Learn More</a>
+    <a href="specification" class="md-button md-button--primary">Read the Specification</a>
+    <a href="visualizer/" class="md-button">Try out the AFM Visualizer</a>
 </div>
 
 
@@ -126,6 +126,49 @@ The process is designed to be straightforward. Agents are defined in natural lan
   .workflow-arrow {
     font-size: 1.5rem;
     color: var(--md-typeset-fg-color-light);
+  }
+  
+  /* Side-by-side layout */
+  .side-by-side-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+    margin: 2rem 0;
+  }
+  
+  .code-column {
+    overflow: hidden;
+  }
+  
+  .code-column pre code {
+    font-size: 0.55rem !important;
+    line-height: 1.3 !important;
+  }
+  
+  .code-column pre {
+    padding: 0.55rem !important;
+  }
+  
+  .visual-column {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .visual-column img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Responsive: stack on smaller screens */
+  @media (max-width: 960px) {
+    .side-by-side-container {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
   }
   
   /* Button container styling */
