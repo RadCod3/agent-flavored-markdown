@@ -1,3 +1,21 @@
+/**
+ * Copyright (c) 2025, WSO2 LLC (http://www.wso2.com) All Rights Reserved.
+ *
+ * WSO2 LLC licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 const AFM_SPEC_VERSION = '0.3.0';
 
 function renderMcpDetailsHtml(mcpServer) {
@@ -5,7 +23,7 @@ function renderMcpDetailsHtml(mcpServer) {
         <div class="detail-form">
             <div class="mb-4">
                 <div class="fw-bold mb-1">Server Name</div>
-                <div class="form-control" style="height:auto">${highlightVars(mcpServer.name)}</div>
+                <div class="form-control form-control-auto-height">${highlightVars(mcpServer.name)}</div>
             </div>
 
             <div class="mb-4 border rounded p-3">
@@ -150,6 +168,19 @@ function initializeMarked() {
             pedantic: false,     // Be lenient with markdown parsing
             smartLists: true     // Use smarter list behavior
         });
+        
+        // Strip raw HTML blocks from markdown - DOMPurify will handle sanitization
+        // This prevents any inline HTML/scripts in the markdown from being parsed
+        if (marked.use) {
+            marked.use({
+                renderer: {
+                    html(html) {
+                        // Strip raw HTML blocks - return empty string
+                        return '';
+                    }
+                }
+            });
+        }
     }
 }
 
@@ -172,8 +203,7 @@ function initializeDarkMode() {
     });
     
     prefersDark.addEventListener('change', (e) => {
-        const themePref = localStorage.getItem('afm-theme');
-        if (!themePref) {
+        if (!localStorage.getItem('afm-theme')) {
             if (e.matches) {
                 document.body.classList.add('dark-mode');
                 updateThemeIcon(true);
@@ -252,7 +282,7 @@ function showErrorModal(title, message) {
     // Create a Bootstrap-style modal
     const modal = document.createElement('div');
     modal.innerHTML = `
-        <div class="modal fade show" style="display: block; background: rgba(0,0,0,0.5);" tabindex="-1">
+        <div class="modal fade show modal-overlay" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header bg-danger text-white">
@@ -482,14 +512,14 @@ function parseAfmFile(content) {
 }
 
 function showUploadSection() {
-    document.getElementById('upload-section').style.display = 'block';
-    document.getElementById('visualizer-section').style.display = 'none';
+    document.getElementById('upload-section').classList.remove('d-none');
+    document.getElementById('visualizer-section').classList.remove('active');
     document.getElementById('file-input').value = '';
 }
 
 function showVisualizerSection() {
-    document.getElementById('upload-section').style.display = 'none';
-    document.getElementById('visualizer-section').style.display = 'block';
+    document.getElementById('upload-section').classList.add('d-none');
+    document.getElementById('visualizer-section').classList.add('active');
 }
 
 function renderVisualization() {
@@ -523,17 +553,23 @@ function convertMarkdownToHtml(text) {
         try {
             const rawHtml = marked.parse(text);
             if (typeof DOMPurify !== 'undefined') {
-                return DOMPurify.sanitize(rawHtml);
+                return DOMPurify.sanitize(rawHtml, {
+                    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 
+                                   'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'a', 'img', 'hr', 
+                                   'table', 'thead', 'tbody', 'tr', 'th', 'td', 'div', 'span'],
+                    ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class']
+                });
             }
-            // If DOMPurify is not available, strip script tags as a minimal safeguard
-            return rawHtml.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '');
+            // If DOMPurify is not available, throw error rather than using unsafe HTML
+            console.error('DOMPurify not available - cannot safely render markdown');
+            throw new Error('DOMPurify library required for safe markdown rendering');
         } catch (error) {
-            console.error('Marked parsing error:', error);
-            // Fall through to fallback
+            console.error('Markdown parsing/sanitization error:', error);
+            // Fall through to safe fallback
         }
     }
-    // Fallback: basic HTML with line breaks preserved
-    console.warn('Marked library not available, using fallback');
+    // Fallback: basic HTML with line breaks preserved (safe - no user HTML)
+    console.warn('Marked library not available, using safe fallback');
     return '<p>' + escapeHtml(text).replace(/\n/g, '<br>') + '</p>';
 }
 
@@ -659,7 +695,7 @@ function renderHubDetails(markdownBody) {
                         <i class="bi bi-person-badge me-2 text-primary"></i>
                         <h6 class="mb-0 fw-bold">Role</h6>
                     </div>
-                    <div class="markdown-content border rounded p-3 bg-light" style="height: ${UI_CONSTANTS.ROLE_HEIGHT}px; overflow-y: auto;">
+                    <div class="markdown-content markdown-role-content border rounded p-3 bg-light">
                         ${renderedRole}
                     </div>
                 </div>
@@ -669,7 +705,7 @@ function renderHubDetails(markdownBody) {
                         <i class="bi bi-list-check me-2 text-success"></i>
                         <h6 class="mb-0 fw-bold">Instructions</h6>
                     </div>
-                    <div class="markdown-content border rounded p-3 bg-light" style="height: ${UI_CONSTANTS.INSTRUCTIONS_HEIGHT}px; overflow-y: auto;">
+                    <div class="markdown-content markdown-instructions-content border rounded p-3 bg-light">
                         ${renderedInstructions}
                     </div>
                 </div>
@@ -717,15 +753,15 @@ function renderInterfaceDetails(interfaceConfig) {
             <h6 class="text-muted mb-3">Webhook Subscription</h6>
             <div class="mb-3 row">
                 <label class="col-sm-3 col-form-label fw-bold">Protocol</label>
-                <div class="col-sm-9"><div class="form-control" style="height:auto">${highlightVars(sub.protocol || '')}</div></div>
+                <div class="col-sm-9"><div class="form-control form-control-auto-height">${highlightVars(sub.protocol || '')}</div></div>
             </div>
             <div class="mb-3 row">
                 <label class="col-sm-3 col-form-label fw-bold">Hub</label>
-                <div class="col-sm-9"><div class="form-control" style="height:auto">${highlightVars(sub.hub || '')}</div></div>
+                <div class="col-sm-9"><div class="form-control form-control-auto-height">${highlightVars(sub.hub || '')}</div></div>
             </div>
-            ${sub.topic ? `<div class="mb-3 row"><label class="col-sm-3 col-form-label fw-bold">Topic</label><div class="col-sm-9"><div class="form-control" style="height:auto">${highlightVars(sub.topic)}</div></div></div>` : ''}
-            ${sub.callback ? `<div class="mb-3 row"><label class="col-sm-3 col-form-label fw-bold">Callback</label><div class="col-sm-9"><div class="form-control" style="height:auto">${highlightVars(sub.callback)}</div></div></div>` : ''}
-            ${sub.secret ? `<div class="mb-3 row"><label class="col-sm-3 col-form-label fw-bold">Secret</label><div class="col-sm-9"><div class="form-control" style="height:auto">${highlightVars(sub.secret)}</div></div></div>` : ''}
+            ${sub.topic ? `<div class="mb-3 row"><label class="col-sm-3 col-form-label fw-bold">Topic</label><div class="col-sm-9"><div class="form-control form-control-auto-height">${highlightVars(sub.topic)}</div></div></div>` : ''}
+            ${sub.callback ? `<div class="mb-3 row"><label class="col-sm-3 col-form-label fw-bold">Callback</label><div class="col-sm-9"><div class="form-control form-control-auto-height">${highlightVars(sub.callback)}</div></div></div>` : ''}
+            ${sub.secret ? `<div class="mb-3 row"><label class="col-sm-3 col-form-label fw-bold">Secret</label><div class="col-sm-9"><div class="form-control form-control-auto-height">${highlightVars(sub.secret)}</div></div></div>` : ''}
         `;
     }
     return {
@@ -736,7 +772,7 @@ function renderInterfaceDetails(interfaceConfig) {
                 <div class="row mb-3">
                     <label class="col-sm-3 col-form-label fw-bold">Type</label>
                     <div class="col-sm-9">
-                        <div class="form-control" style="height:auto">${highlightVars(interfaceTypeValue)}</div>
+                        <div class="form-control form-control-auto-height">${highlightVars(interfaceTypeValue)}</div>
                     </div>
                 </div>
                 ${interfaceSignature ? `
@@ -808,14 +844,14 @@ function renderInterfaceDetails(interfaceConfig) {
                                 <div class="row mb-3">
                                     <label class="col-sm-3 col-form-label fw-bold">Type</label>
                                     <div class="col-sm-9">
-                                        <div class="form-control" style="height:auto">HTTP</div>
+                                        <div class="form-control form-control-auto-height">HTTP</div>
                                     </div>
                                 </div>
                                 ${config.path ? `
                                 <div class="row mb-3">
                                     <label class="col-sm-3 col-form-label fw-bold">Path</label>
                                     <div class="col-sm-9">
-                                        <div class="form-control" style="height:auto">${highlightVars(config.path)}</div>
+                                        <div class="form-control form-control-auto-height">${highlightVars(config.path)}</div>
                                     </div>
                                 </div>
                                 ` : ''}
@@ -823,7 +859,7 @@ function renderInterfaceDetails(interfaceConfig) {
                                 <div class="row mb-3">
                                     <label class="col-sm-3 col-form-label fw-bold">Port</label>
                                     <div class="col-sm-9">
-                                        <div class="form-control" style="height:auto">${highlightVars(String(config.port))}</div>
+                                        <div class="form-control form-control-auto-height">${highlightVars(String(config.port))}</div>
                                     </div>
                                 </div>
                                 ` : ''}
@@ -833,7 +869,7 @@ function renderInterfaceDetails(interfaceConfig) {
                                     <div class="col-sm-9">
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
-                                            <div class="form-control" style="height:auto">${highlightVars(config.authentication.type || 'configured')}</div>
+                                            <div class="form-control form-control-auto-height">${highlightVars(config.authentication.type || 'configured')}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -846,14 +882,14 @@ function renderInterfaceDetails(interfaceConfig) {
                                 <div class="row mb-3">
                                     <label class="col-sm-3 col-form-label fw-bold">Type</label>
                                     <div class="col-sm-9">
-                                        <div class="form-control" style="height:auto">A2A</div>
+                                        <div class="form-control form-control-auto-height">A2A</div>
                                     </div>
                                 </div>
                                 ${config.endpoint ? `
                                 <div class="row mb-3">
                                     <label class="col-sm-3 col-form-label fw-bold">Endpoint</label>
                                     <div class="col-sm-9">
-                                        <div class="form-control" style="height:auto">${highlightVars(config.endpoint)}</div>
+                                        <div class="form-control form-control-auto-height">${highlightVars(config.endpoint)}</div>
                                     </div>
                                 </div>
                                 ` : ''}
@@ -865,7 +901,7 @@ function renderInterfaceDetails(interfaceConfig) {
                                 <div class="row mb-3">
                                     <label class="col-sm-3 col-form-label fw-bold">Type</label>
                                     <div class="col-sm-9">
-                                        <div class="form-control" style="height:auto">${highlightVars(type.toUpperCase())}</div>
+                                        <div class="form-control form-control-auto-height">${highlightVars(type.toUpperCase())}</div>
                                     </div>
                                 </div>
                                 <div class="row mb-3">

@@ -1,3 +1,21 @@
+/**
+ * Copyright (c) 2025, WSO2 LLC (http://www.wso2.com) All Rights Reserved.
+ *
+ * WSO2 LLC licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 /* Lighter yellow for variable interpolation badges */
 .badge-var-interp {
     background-color: #fff9c4 !important; /* pale yellow */
@@ -925,4 +943,54 @@ body.dark-mode .table {
 
 body.dark-mode .table th {
     color: var(--text-primary);
+}
+
+/* Inline style replacements for CSP compliance */
+.spec-version-badge {
+    font-size: 0.7rem;
+    font-weight: normal;
+}
+
+#file-input {
+    display: none;
+}
+
+#visualizer-section {
+    display: none;
+}
+
+#visualizer-section.active {
+    display: block;
+}
+
+.sticky-details-card {
+    position: sticky;
+    top: 20px;
+}
+
+#raw-content {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Auto-height form controls */
+.form-control-auto-height {
+    height: auto;
+}
+
+/* Modal overlay for CSP compliance */
+.modal-overlay {
+    display: block;
+    background: rgba(0,0,0,0.5);
+}
+
+/* Markdown content containers */
+.markdown-role-content {
+    height: 280px;
+    overflow-y: auto;
+}
+
+.markdown-instructions-content {
+    height: 320px;
+    overflow-y: auto;
 }
