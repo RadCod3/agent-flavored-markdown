@@ -238,7 +238,6 @@ interface:
   # Optional, depending on type:
   exposure:              # For service/chat/webhook types
     http: object         # Configuration for exposing as an HTTP endpoint.
-    a2a: object          # Configuration for exposing as an A2A-compliant service.
   subscription:          # For webhook type
     protocol: string     # e.g., "websub"
     hub: string          # Subscription hub URL
@@ -334,12 +333,6 @@ interface:
   exposure:
     http:
       path: "/research-assistant"
-    a2a:
-      discoverable: true
-      agent_card:
-        name: "Research Assistant"
-        description: "Expert in finding, analyzing, and summarizing research papers"
-        icon: "https://example.com/icons/research-assistant.png"
 ```
 
 **Chat agent:**
@@ -398,7 +391,6 @@ Contains configurations for `service` agents.
 | Field  | Type     | Required | Description                                                          |
 |--------|----------|----------|----------------------------------------------------------------------|
 | `http` | `object` | No | Defines how to expose the agent via a standard HTTP endpoint.        |
-| `a2a`  | `object` | No | Defines how the agent is exposed and discovered within an A2A network. See [Section 6.2](#62-agent-to-agent-a2a) for Agent Card details. |
 
 !!! warning "WIP"
     Work in progress
@@ -419,7 +411,7 @@ Contains configurations for `service` agents.
 
 #### 5.2.3. Example Usage
 
-Here's an example of a service agent with custom interface and multiple exposure types:
+Here's an example of a service agent with custom interface:
 
 ```yaml
 interface:
@@ -444,12 +436,6 @@ interface:
   exposure:
     http:
       path: "/research-assistant"
-    a2a:
-      discoverable: true
-      agent_card:
-        name: "Research Assistant"
-        description: "Expert in finding, analyzing, and summarizing research papers"
-        icon: "https://example.com/icons/research-assistant.png"
 ```
 
 ### 5.3. Tools
@@ -606,55 +592,8 @@ tools:
 
 ### 6.2. Agent-to-Agent (A2A)
 
-The Agent-to-Agent Protocol (A2A) enables agents to expose themselves as services that other agents can discover and call, forming a multi-agent system where tasks can be delegated and information can be shared.
-
-#### 6.2.1. Schema Overview
-
-```yaml
-interface:
-  exposure:
-    a2a:
-      discoverable: boolean  # Whether the agent should be discoverable by other agents
-      agent_card:            # Optional metadata for agent discovery
-        name: string         # Display name for the agent in service directories
-        description: string  # Brief description of the agent's service capabilities
-        icon: string         # URL to an icon representing the agent service
-```
-
-#### 6.2.2. Field Definitions
-
-**A2A Exposure Object:**
-
-| Key | Type | Required | Description |
-|-----|------|----------|-------------|
-| `discoverable` | Boolean | No | Controls whether the agent is listed in service directories for other agents to find. Default: `true` when exposing as a service. |
-| `agent_card` | Object | No | Contains metadata used when the agent is listed in service directories. See [Agent Card Object](#agent-card-object) below. |
-
-**<a id="agent-card-object"></a>Agent Card Object:**
-
-| Key | Type | Required | Description |
-|-----|------|----------|-------------|
-| `name` | String | No | Display name for the agent in service directories. Default: Uses the agent's name from its metadata. |
-| `description` | String | No | Brief description of what services the agent provides. Default: Uses the agent's description from its metadata. |
-| `icon` | String | No | URL to an icon representing the agent service. Default: Uses the agent's iconUrl from its metadata. |
-
-#### 6.2.3. Example Implementation
-
-This example defines an agent that exposes itself as a discoverable A2A service with custom agent card information:
-
-```yaml
-interface:
-  type: service
-  exposure:
-    http:
-      path: "/research-assistant"
-    a2a:
-      discoverable: true
-      agent_card:
-        name: "Research Assistant"
-        description: "Expert in finding, analyzing, and summarizing research papers"
-        icon: "https://example.com/icons/research-assistant.png"
-```
+!!! warning "Coming Soon"
+    The Agent-to-Agent Protocol (A2A) specification for exposing agents as discoverable services is under development and will be available in a future version of AFM.
 
 ## 7. Variable Substitution
 
@@ -686,5 +625,5 @@ password: "${secret:DB_PASSWORD}" # From secrets manager
 
 This section outlines potential future enhancements to the AFM specification, including:
 
-- Model configuration for specifying the Large Language Model (LLM) used by the agent.
-- Memory management for agents to store and retrieve information across interactions.
+- Exposing agents via the Agent-to-Agent (A2A) protocol.
+- Specifying the Large Language Model (LLM) configuration for agents.
