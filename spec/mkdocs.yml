@@ -44,7 +44,6 @@ theme:
     - content.code.copy
     - content.tabs.link
     - content.cards
-    - header.autohide
     - announce.dismiss
 
 # Extensions
