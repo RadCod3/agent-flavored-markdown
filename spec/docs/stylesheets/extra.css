@@ -1,0 +1,128 @@
+/* Custom styling for AFM docs */
+
+/* WSO2 Brand Colors */
+:root {
+  --wso2-orange: #ff7300;
+  --wso2-black: #000000;
+  --wso2-white: #ffffff;
+}
+
+/* Override Material theme colors to use WSO2 orange */
+[data-md-color-accent="deep-orange"] {
+  --md-accent-fg-color: #ff7300;
+  --md-accent-fg-color--transparent: rgba(255, 115, 0, 0.1);
+  --md-accent-bg-color: #ffffff;
+  --md-accent-bg-color--light: rgba(255, 115, 0, 0.1);
+}
+
+/* Enhance card appearance */
+.md-typeset .grid.cards > :is(ul, ol) > li,
+.md-typeset .grid > .card {
+  border-radius: 0.5rem;
+  box-shadow: var(--md-shadow-z2);
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.md-typeset .grid.cards > :is(ul, ol) > li:hover,
+.md-typeset .grid > .card:hover {
+  transform: translateY(-0.2rem);
+  box-shadow: var(--md-shadow-z3);
+}
+
+/* Code block enhancements */
+.md-typeset pre > code {
+  border-radius: 0.5rem;
+}
+
+/* Enhanced buttons */
+.md-button {
+  transition: transform 0.15s, opacity 0.15s;
+  border-radius: 0.4rem !important;
+  font-weight: 600 !important;
+}
+
+.md-button:hover {
+  transform: translateY(-0.1rem);
+  opacity: 0.9;
+}
+
+.md-button--primary {
+  background-color: var(--md-primary-fg-color) !important;
+}
+
+/* Table enhancements */
+.md-typeset table:not([class]) {
+  border-radius: 0.5rem;
+  box-shadow: var(--md-shadow-z1);
+}
+
+.md-typeset table:not([class]) th {
+  background-color: var(--md-primary-fg-color);
+  color: var(--md-primary-bg-color);
+}
+
+/* Dark mode adjustments */
+[data-md-color-scheme="slate"] .md-typeset .grid.cards > :is(ul, ol) > li,
+[data-md-color-scheme="slate"] .md-typeset .grid > .card {
+  background-color: var(--md-code-bg-color);
+}
+
+/* Footer customization */
+.md-footer-meta {
+  background-color: #1a1a1a;
+  padding: 0.5rem 0;
+  font-size: 0.7rem;
+}
+
+[data-md-color-scheme="slate"] .md-footer-meta {
+  background-color: #000000;
+}
+
+.md-footer-copyright {
+  flex: 1;
+  padding: 0;
+  font-size: 0.7rem;
+}
+
+.md-footer-copyright a {
+  color: rgba(255, 255, 255, 0.7);
+  transition: opacity 0.2s ease;
+}
+
+.md-footer-copyright a:hover {
+  color: rgba(255, 255, 255, 0.9);
+  opacity: 0.9;
+}
+
+.md-footer-meta__inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  max-width: 100%;
+  padding: 0.5rem 0.8rem;
+}
+
+.md-footer-meta__inner > * {
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+/* Header customization - wider layout to match footer */
+.md-header__inner {
+  max-width: 100%;
+  padding: 0 1.5rem;
+}
+
+/* Navigation tabs - wider layout to match header */
+.md-tabs {
+  max-width: 100%;
+}
+
+.md-tabs .md-grid {
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding-left: 1.5rem !important;
+  padding-right: 1.5rem !important;
+}
