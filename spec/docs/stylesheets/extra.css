@@ -28,8 +28,6 @@
   --button-primary-text-light: var(--wso2-white);
   --button-secondary-border-light: #e5e5e5;
   --button-secondary-text-light: var(--wso2-black);
-  --integration-badge-bg-light: rgba(255, 115, 0, 0.1);
-  --integration-badge-text-light: var(--wso2-orange);
 }
 
 [data-md-color-scheme="slate"] {
@@ -49,8 +47,6 @@
   --button-primary-text-dark: var(--wso2-black);
   --button-secondary-border-dark: #30363d;
   --button-secondary-text-dark: #c9d1d9;
-  --integration-badge-bg-dark: rgba(255, 115, 0, 0.15);
-  --integration-badge-text-dark: var(--wso2-orange);
 }
 
 /* ============================================
@@ -85,31 +81,6 @@
   margin: 0 auto;
   position: relative;
   z-index: 1;
-}
-
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0;
-  background: transparent;
-  color: var(--badge-text-light);
-  border-radius: 0;
-  font-size: 0.875rem;
-  font-weight: 500;
-  margin-bottom: 1rem;
-  border: none;
-}
-
-[data-md-color-scheme="slate"] .hero-badge {
-  background: transparent;
-  color: var(--badge-text-dark);
-  border: none;
-}
-
-.badge-text {
-  text-transform: none;
-  letter-spacing: 0;
 }
 
 .hero-title {
@@ -207,7 +178,9 @@
 }
 
 .button-icon {
-  font-size: 0.75rem;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
 }
 
 /* ============================================
@@ -534,81 +507,6 @@
 }
 
 /* ============================================
-   Integration Showcase
-   ============================================ */
-
-.integration-showcase {
-  max-width: 1000px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-}
-
-.integration-item {
-  background: var(--card-bg-light);
-  border: 1px solid var(--card-border-light);
-  border-radius: 0.75rem;
-  padding: 2rem;
-  transition: all 0.2s ease;
-}
-
-[data-md-color-scheme="slate"] .integration-item {
-  background: var(--card-bg-dark);
-  border-color: var(--card-border-dark);
-}
-
-.integration-item:hover {
-  border-color: var(--wso2-orange);
-  box-shadow: 0 6px 20px var(--card-hover-shadow-light);
-  transform: translateY(-4px);
-}
-
-[data-md-color-scheme="slate"] .integration-item:hover {
-  box-shadow: 0 6px 20px var(--card-hover-shadow-dark);
-}
-
-.integration-badge {
-  display: inline-block;
-  background: var(--integration-badge-bg-light);
-  color: var(--integration-badge-text-light);
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 0.375rem 0.75rem;
-  border-radius: 0.375rem;
-  margin-bottom: 1rem;
-}
-
-[data-md-color-scheme="slate"] .integration-badge {
-  background: var(--integration-badge-bg-dark);
-  color: var(--integration-badge-text-dark);
-}
-
-.integration-item h4 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--hero-text-light);
-  margin: 0 0 0.75rem;
-}
-
-[data-md-color-scheme="slate"] .integration-item h4 {
-  color: var(--hero-text-dark);
-}
-
-.integration-item p {
-  font-size: 0.9375rem;
-  line-height: 1.6;
-  color: var(--hero-subtitle-light);
-  margin: 0;
-}
-
-[data-md-color-scheme="slate"] .integration-item p {
-  color: var(--hero-subtitle-dark);
-}
-
-/* ============================================
    CTA Section (Ready to get started)
    ============================================ */
 
@@ -734,86 +632,6 @@
 }
 
 /* ============================================
-   Legacy CTA Container (Commented out)
-   ============================================ */
-
-.cta-container {
-  max-width: 900px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-}
-
-.cta-card {
-  background: var(--card-bg-light);
-  border: 2px solid var(--card-border-light);
-  border-radius: 1rem;
-  padding: 2.5rem;
-  text-align: center;
-  transition: all 0.2s ease;
-}
-
-[data-md-color-scheme="slate"] .cta-card {
-  background: var(--card-bg-dark);
-  border-color: var(--card-border-dark);
-}
-
-.cta-card:hover {
-  border-color: var(--wso2-orange);
-  box-shadow: 0 8px 24px var(--card-hover-shadow-light);
-  transform: translateY(-4px);
-}
-
-[data-md-color-scheme="slate"] .cta-card:hover {
-  box-shadow: 0 8px 24px var(--card-hover-shadow-dark);
-}
-
-.cta-card h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--hero-text-light);
-  margin: 0 0 0.75rem;
-}
-
-[data-md-color-scheme="slate"] .cta-card h3 {
-  color: var(--hero-text-dark);
-}
-
-.cta-card p {
-  font-size: 1rem;
-  line-height: 1.6;
-  color: var(--hero-subtitle-light);
-  margin: 0 0 1.75rem;
-}
-
-[data-md-color-scheme="slate"] .cta-card p {
-  color: var(--hero-subtitle-dark);
-}
-
-.cta-button {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.75rem 1.5rem;
-  background: var(--wso2-orange);
-  color: var(--wso2-white);
-  font-size: 1rem;
-  font-weight: 600;
-  border-radius: 0.5rem;
-  text-decoration: none;
-  transition: all 0.2s ease;
-  border: 2px solid var(--wso2-orange);
-}
-
-.cta-button:hover {
-  background: #cc6200;
-  border-color: #cc6200;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 115, 0, 0.3);
-  color: var(--wso2-white);
-}
-
-/* ============================================
    Responsive Typography
    ============================================ */
 
@@ -884,6 +702,43 @@
 [data-md-color-scheme="slate"] .md-typeset .grid.cards > :is(ul, ol) > li,
 [data-md-color-scheme="slate"] .md-typeset .grid > .card {
   background-color: var(--md-code-bg-color);
+}
+
+/* ============================================
+   Links
+   ============================================ */
+
+.md-typeset a {
+  color: #ff7300;
+}
+
+.md-typeset a:hover {
+  color: #e66800;
+}
+
+[data-md-color-scheme="slate"] .md-typeset a {
+  color: #ff7300;
+}
+
+[data-md-color-scheme="slate"] .md-typeset a:hover {
+  color: #ff9933;
+}
+
+/* Navigation links */
+.md-nav__link--active,
+.md-nav__link:hover,
+.md-nav__link:focus {
+  color: #ff7300 !important;
+}
+
+.md-nav__item .md-nav__link--active {
+  color: #ff7300 !important;
+}
+
+[data-md-color-scheme="slate"] .md-nav__link--active,
+[data-md-color-scheme="slate"] .md-nav__link:hover,
+[data-md-color-scheme="slate"] .md-nav__link:focus {
+  color: #ff7300 !important;
 }
 
 /* ============================================
