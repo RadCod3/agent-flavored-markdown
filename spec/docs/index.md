@@ -138,7 +138,7 @@ examples. Acknowledge good practices.
 <div class="cta-section">
   <div class="cta-content">
     <h2 class="section-title">Ready to get started?</h2>
-    <p class="section-description">Read the specification to learn how to write your own agents, or try the visualizer to see AFM in action.</p>
+    <p class="section-description">Read the specification to learn how to write your own agents, or try the visualizer to visualize an agent defined in AFM.</p>
     <div class="cta-buttons">
       <a href="specification" class="cta-button-primary">
         <svg class="button-icon-left" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
