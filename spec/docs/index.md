@@ -72,6 +72,9 @@ Review code systematically:
 3. **Performance**: Identify bottlenecks
 4. **Maintainability**: Flag unclear patterns
 5. **Testing**: Verify test coverage
+
+For each issue, explain why it matters and suggest improvements with 
+examples. Acknowledge good practices.
 ```
 
 </div>
