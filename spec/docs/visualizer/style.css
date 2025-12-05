@@ -25,6 +25,11 @@
 /* AFM Visualizer Styles */
 
 :root {
+    /* Brand Colors */
+    --wso2-orange: #ff7300;
+    --wso2-black: #000000;
+    --wso2-white: #ffffff;
+    
     --bg-primary: #f8f9fa;
     --bg-secondary: #ffffff;
     --bg-tertiary: #f8f9fa;
@@ -1068,9 +1073,9 @@ body.dark-mode footer {
 
 /* Bootstrap Brand Color Overrides */
 .btn-primary {
-    background-color: #ff7300 !important;
-    border-color: #ff7300 !important;
-    color: #ffffff !important;
+    background-color: var(--wso2-orange) !important;
+    border-color: var(--wso2-orange) !important;
+    color: var(--wso2-white) !important;
 }
 
 .btn-primary:hover,
@@ -1078,17 +1083,17 @@ body.dark-mode footer {
 .btn-primary:active {
     background-color: #e66800 !important;
     border-color: #e66800 !important;
-    color: #ffffff !important;
+    color: var(--wso2-white) !important;
 }
 
 .text-primary {
-    color: #ff7300 !important;
+    color: var(--wso2-orange) !important;
 }
 
 .alert-info {
     background-color: rgba(255, 115, 0, 0.1) !important;
     border-color: rgba(255, 115, 0, 0.3) !important;
-    color: #000000 !important;
+    color: var(--wso2-black) !important;
 }
 
 body.dark-mode .alert-info {
@@ -1098,5 +1103,5 @@ body.dark-mode .alert-info {
 }
 
 .alert-info .bi-info-circle {
-    color: #ff7300 !important;
+    color: var(--wso2-orange) !important;
 }

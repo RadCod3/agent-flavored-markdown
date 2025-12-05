@@ -709,7 +709,7 @@
    ============================================ */
 
 .md-typeset a {
-  color: #ff7300;
+  color: var(--wso2-orange);
 }
 
 .md-typeset a:hover {
@@ -717,7 +717,7 @@
 }
 
 [data-md-color-scheme="slate"] .md-typeset a {
-  color: #ff7300;
+  color: var(--wso2-orange);
 }
 
 [data-md-color-scheme="slate"] .md-typeset a:hover {
@@ -728,17 +728,17 @@
 .md-nav__link--active,
 .md-nav__link:hover,
 .md-nav__link:focus {
-  color: #ff7300 !important;
+  color: var(--wso2-orange) !important;
 }
 
 .md-nav__item .md-nav__link--active {
-  color: #ff7300 !important;
+  color: var(--wso2-orange) !important;
 }
 
 [data-md-color-scheme="slate"] .md-nav__link--active,
 [data-md-color-scheme="slate"] .md-nav__link:hover,
 [data-md-color-scheme="slate"] .md-nav__link:focus {
-  color: #ff7300 !important;
+  color: var(--wso2-orange) !important;
 }
 
 /* ============================================
