@@ -32,12 +32,7 @@ hide:
   </div>
 </div>
 
-<div class="section-container secion-demo">
-  <!-- <div class="section-header">
-    <h2 class="section-title">Create agents from components</h2>
-    <p class="section-description">AFM lets you build AI agents out of individual pieces called markdown blocks. Create your own agent definitions combining role, instructions, and tools. Then deploy them across any platform.</p>
-  </div> -->
-
+<div class="section-container section-demo">
   <div class="code-demo-container">
     <div class="demo-code">
       <div class="demo-code-header">
@@ -156,23 +151,3 @@ examples. Acknowledge good practices.
     </div>
   </div>
 </div>
-
-<!-- <div class="section-container section-alt">
-  <div class="section-header">
-    <h2 class="section-title">Join a community building the future</h2>
-    <p class="section-description">AFM is open source and backed by WSO2. We're building a standard that empowers developers to create portable, interoperable AI agents.</p>
-  </div>
-
-  <div class="cta-container">
-    <div class="cta-card">
-      <h3>Ready to get started?</h3>
-      <p>Learn how AFM works and start building your first agent.</p>
-      <a href="specification" class="cta-button">Read the Specification</a>
-    </div>
-    <div class="cta-card">
-      <h3>Understand the philosophy</h3>
-      <p>Explore why we built AFM and how it compares to other approaches.</p>
-      <a href="why-afm/philosophy.md" class="cta-button">Why AFM?</a>
-    </div>
-  </div>
-</div> -->

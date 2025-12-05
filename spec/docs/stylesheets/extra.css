@@ -77,7 +77,6 @@
 }
 
 .hero-content {
-  /* max-width: 760px; */
   margin: 0 auto;
   position: relative;
   z-index: 1;
@@ -237,7 +236,7 @@
 /* ============================================
    Code Demo Container
    ============================================ */
-.secion-demo {
+.section-demo {
   padding: 0 2rem 5rem !important;
   background: none !important;
 }
@@ -516,7 +515,6 @@
 }
 
 .cta-content {
-  /* max-width: 900px; */
   margin: 0 auto;
   background: #f8f9fa;
   border: 1px solid var(--card-border-light);
