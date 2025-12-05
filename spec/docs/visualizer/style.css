@@ -25,6 +25,11 @@
 /* AFM Visualizer Styles */
 
 :root {
+    /* Brand Colors */
+    --wso2-orange: #ff7300;
+    --wso2-black: #000000;
+    --wso2-white: #ffffff;
+    
     --bg-primary: #f8f9fa;
     --bg-secondary: #ffffff;
     --bg-tertiary: #f8f9fa;
@@ -120,22 +125,22 @@ body.dark-mode .fw-bold {
 }
 
 .upload-area:hover {
-    border-color: #0d6efd;
-    background-color: #f8f9ff;
+    border-color: #ff7300;
+    background-color: #fff9f5;
 }
 
 body.dark-mode .upload-area:hover {
-    background-color: #1a2332;
+    background-color: #2a1f15;
 }
 
 .upload-area.drag-over {
-    border-color: #0d6efd;
-    background-color: #e7f1ff;
+    border-color: #ff7300;
+    background-color: #fff4eb;
     transform: scale(1.02);
 }
 
 body.dark-mode .upload-area.drag-over {
-    background-color: #1a2940;
+    background-color: #3a2818;
 }
 
 /* Hub and Spoke Visualization */
@@ -605,25 +610,25 @@ body.dark-mode .spoke-group-label {
 }
 
 .spoke-mcp {
-    border-color: #17a2b8;
-    background: linear-gradient(145deg, #ffffff 0%, #f8fdfe 100%);
+    border-color: #cc6200;
+    background: linear-gradient(145deg, #ffffff 0%, #fffaf5 100%);
 }
 
 .spoke-mcp:hover {
-    border-color: #138496;
-    background: linear-gradient(145deg, #f8fdfe 0%, #f0f9fb 100%);
-    box-shadow: 0 8px 24px rgba(23, 162, 184, 0.15), 0 4px 8px rgba(0, 0, 0, 0.08);
+    border-color: #b35600;
+    background: linear-gradient(145deg, #fffaf5 0%, #fff5eb 100%);
+    box-shadow: 0 8px 24px rgba(204, 98, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.08);
 }
 
 .spoke-a2a {
-    border-color: #28a745;
-    background: linear-gradient(145deg, #ffffff 0%, #f8fef9 100%);
+    border-color: #333333;
+    background: linear-gradient(145deg, #ffffff 0%, #fafafa 100%);
 }
 
 .spoke-a2a:hover {
-    border-color: #218838;
-    background: linear-gradient(145deg, #f8fef9 0%, #f0f9f3 100%);
-    box-shadow: 0 8px 24px rgba(40, 167, 69, 0.15), 0 4px 8px rgba(0, 0, 0, 0.08);
+    border-color: #1a1a1a;
+    background: linear-gradient(145deg, #fafafa 0%, #f5f5f5 100%);
+    box-shadow: 0 8px 24px rgba(51, 51, 51, 0.15), 0 4px 8px rgba(0, 0, 0, 0.08);
 }
 
 .spoke-interface {
@@ -641,25 +646,25 @@ body.dark-mode .spoke-group-label {
 
 /* Dark mode spoke styles */
 body.dark-mode .spoke-mcp {
-    border-color: #17a2b8;
-    background: linear-gradient(145deg, #2d2d2d 0%, #1f3a3f 100%);
+    border-color: #cc6200;
+    background: linear-gradient(145deg, #2d2d2d 0%, #3a2518 100%);
 }
 
 body.dark-mode .spoke-mcp:hover {
-    border-color: #20c0d8;
-    background: linear-gradient(145deg, #1f3a3f 0%, #1a3035 100%);
-    box-shadow: 0 8px 24px rgba(23, 162, 184, 0.25), 0 4px 8px rgba(0, 0, 0, 0.3);
+    border-color: #e67300;
+    background: linear-gradient(145deg, #3a2518 0%, #2f1e12 100%);
+    box-shadow: 0 8px 24px rgba(204, 98, 0, 0.25), 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 body.dark-mode .spoke-a2a {
-    border-color: #28a745;
-    background: linear-gradient(145deg, #2d2d2d 0%, #1f3a25 100%);
+    border-color: #4a4a4a;
+    background: linear-gradient(145deg, #2d2d2d 0%, #252525 100%);
 }
 
 body.dark-mode .spoke-a2a:hover {
-    border-color: #34d058;
-    background: linear-gradient(145deg, #1f3a25 0%, #1a301f 100%);
-    box-shadow: 0 8px 24px rgba(40, 167, 69, 0.25), 0 4px 8px rgba(0, 0, 0, 0.3);
+    border-color: #666666;
+    background: linear-gradient(145deg, #252525 0%, #1f1f1f 100%);
+    box-shadow: 0 8px 24px rgba(74, 74, 74, 0.25), 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 body.dark-mode .spoke-interface {
@@ -1064,4 +1069,39 @@ body.dark-mode footer {
 
 .navbar a.text-white:hover {
     opacity: 0.8;
+}
+
+/* Bootstrap Brand Color Overrides */
+.btn-primary {
+    background-color: var(--wso2-orange) !important;
+    border-color: var(--wso2-orange) !important;
+    color: var(--wso2-white) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: #e66800 !important;
+    border-color: #e66800 !important;
+    color: var(--wso2-white) !important;
+}
+
+.text-primary {
+    color: var(--wso2-orange) !important;
+}
+
+.alert-info {
+    background-color: rgba(255, 115, 0, 0.1) !important;
+    border-color: rgba(255, 115, 0, 0.3) !important;
+    color: var(--wso2-black) !important;
+}
+
+body.dark-mode .alert-info {
+    background-color: rgba(255, 115, 0, 0.15) !important;
+    border-color: rgba(255, 115, 0, 0.4) !important;
+    color: #f0f0f0 !important;
+}
+
+.alert-info .bi-info-circle {
+    color: var(--wso2-orange) !important;
 }
