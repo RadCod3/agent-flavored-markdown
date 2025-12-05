@@ -4,18 +4,46 @@ hide:
   - toc
 ---
 
-# Agent Flavored Markdown (AFM)
+<div class="hero-section">
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="badge-text">Open Source Specification</span>
+    </div>
+    <h1 class="hero-title">Agent Flavored Markdown</h1>
+    <p class="hero-subtitle">A simple, markdown-based format for defining AI agents. Write agents in plain text that any platform can understand and deploy.</p>
+    <div class="hero-buttons">
+      <a href="specification" class="hero-button hero-button-primary">Get Started</a>
+      <a href="visualizer/" class="hero-button hero-button-secondary">
+        <span class="button-icon">▶</span>
+        <span>Try the Visualizer</span>
+      </a>
+    </div>
+  </div>
+</div>
 
-A simple, markdown-based format for defining AI agents. Write agents in plain text that any platform can understand and deploy.
-<div class="side-by-side-container" markdown>
+<div class="section-container secion-demo">
+  <!-- <div class="section-header">
+    <h2 class="section-title">Create agents from components</h2>
+    <p class="section-description">AFM lets you build AI agents out of individual pieces called markdown blocks. Create your own agent definitions combining role, instructions, and tools. Then deploy them across any platform.</p>
+  </div> -->
 
-<div class="code-column" markdown>
+  <div class="code-demo-container">
+    <div class="demo-code">
+      <div class="demo-code-header">
+        <div class="window-controls">
+          <span class="control control-close"></span>
+          <span class="control control-minimize"></span>
+          <span class="control control-maximize"></span>
+        </div>
+        <span class="demo-file-name">code-review-assistant.md</span>
+      </div>
+      <div class="demo-code-content">
 
 ```markdown
 ---
 spec_version: "0.3.0"
 name: "Code Review Assistant"
-description: "An AI assistant that helps review code and suggests improvements"
+description: "AI assistant for code review and improvements"
 interface:
   type: service
   exposure:
@@ -32,171 +60,98 @@ tools:
 
 # Role
 
-You are a code review assistant focused on security, correctness, and best 
-practices. Provide constructive feedback.
+You are a code review assistant focused on security,
+correctness, and best practices.
 
 # Instructions
 
 Review code systematically:
 
-1. __Security__: Check for vulnerabilities (SQL injection, XSS, exposed secrets)
-2. __Correctness__: Find logic errors, edge cases, race conditions
-3. __Performance__: Identify inefficiencies and bottlenecks
-4. __Maintainability__: Flag unclear code and pattern violations
-5. __Testing__: Verify adequate test coverage
-
-For each issue, explain why it matters and suggest improvements with examples. 
-Acknowledge good practices.
+1. **Security**: Check for vulnerabilities
+2. **Correctness**: Find logic errors and edge cases
+3. **Performance**: Identify bottlenecks
+4. **Maintainability**: Flag unclear patterns
+5. **Testing**: Verify test coverage
 ```
 
 </div>
+    </div>
 
-<div class="visual-column" markdown>
+    <div class="demo-visual">
+      <img src="assets/afm-visualization.png" alt="AFM Visualization" class="demo-visualization-image">
+    </div>
 
-![AFM Visualization](assets/afm-visualization.png)
-
+  </div>
 </div>
 
+<div class="section-container section-alt section-why">
+  <div class="section-header">
+    <h2 class="section-title">Why AFM?</h2>
+    <p class="section-description">Agent Flavored Markdown provides a standardized way to define agents that is both human-readable and machine-parseable.</p>
+  </div>
+
+  <div class="feature-grid">
+    <div class="feature-item">
+      <div class="feature-icon-box">
+        <svg class="feature-icon-svg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      </div>
+      <h3 class="feature-title">Simple</h3>
+      <p class="feature-description">Write agents in plain markdown. No complex code or proprietary formats required.</p>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon-box">
+        <svg class="feature-icon-svg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+        </svg>
+      </div>
+      <h3 class="feature-title">Shareable</h3>
+      <p class="feature-description">AFM agents work across different platforms and tools. Write once, deploy anywhere.</p>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon-box">
+        <svg class="feature-icon-svg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      </div>
+      <h3 class="feature-title">Collaborative</h3>
+      <p class="feature-description">Build multi-agent systems where agents work together to solve complex problems.</p>
+    </div>
+  </div>
 </div>
 
-## Why AFM?
-
-<div class="grid cards" markdown>
-
-- :fontawesome-solid-feather: __Simple__
-
-    Write agents in plain markdown. No complex code or proprietary formats required.
-
-- :material-share-variant: __Shareable__
-
-    AFM agents work across different platforms and tools. Write once, deploy anywhere.
-
-- :material-account-group: __Collaborative__
-
-    Build multi-agent systems where agents work together to solve complex problems.
-
+<div class="cta-section">
+  <div class="cta-content">
+    <h2 class="section-title">Ready to get started?</h2>
+    <p class="section-description">Read the specification to learn how to write your own agents, or try the visualizer to see AFM in action.</p>
+    <div class="cta-buttons">
+      <a href="specification" class="cta-button-primary">
+        <svg class="button-icon-left" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+        <span>Read the Specification</span>
+      </a>
+    </div>
+  </div>
 </div>
 
-__Want to learn more?__ Check out [Why AFM?](why-afm/philosophy.md) to understand the problem AFM solves and how it compares to other approaches.
+<!-- <div class="section-container section-alt">
+  <div class="section-header">
+    <h2 class="section-title">Join a community building the future</h2>
+    <p class="section-description">AFM is open source and backed by WSO2. We're building a standard that empowers developers to create portable, interoperable AI agents.</p>
+  </div>
 
-<!-- ## The AFM Workflow
-
-The process is designed to be straightforward. Agents are defined in natural language, allowing everyone can contribute to the agent's capabilities. Once defined, these agents can be deployed and interacted with seamlessly. 
-    
-<div class="workflow-steps">
-    <span class="workflow-step">1. Write the agent in natural language</span>
-    <span class="workflow-arrow">→</span>
-    <span class="workflow-step">2. Deploy</span>
-    <span class="workflow-arrow">→</span>
-    <span class="workflow-step">3. Interact</span>
-</div>
-
-!!! warning "WIP"
-    Update this section with more detailed explanations and a diagram. -->
-
-## Get Started
-
-<div class="button-container">
-    <a href="specification" class="md-button md-button--primary">Read the Specification</a>
-    <a href="visualizer/" class="md-button">Try out the AFM Visualizer</a>
-</div>
-
-
-<style>
-  /* Workflow steps styling */
-  .workflow-steps {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-top: 1.5rem;
-  }
-  
-  .workflow-step {
-    display: inline-block;
-    padding: 0.4rem 0.8rem;
-    border-radius: 0.8rem;
-    background-color: var(--md-primary-fg-color--light);
-    color: var(--md-primary-bg-color);
-    font-size: 0.9rem;
-    font-weight: 500;
-  }
-  
-  .workflow-arrow {
-    font-size: 1.5rem;
-    color: var(--md-typeset-fg-color-light);
-  }
-  
-  /* Side-by-side layout */
-  .side-by-side-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    align-items: start;
-    margin: 2rem 0;
-  }
-  
-  .code-column {
-    overflow: hidden;
-  }
-  
-  .code-column pre code {
-    font-size: 0.55rem !important;
-    line-height: 1.3 !important;
-  }
-  
-  .code-column pre {
-    padding: 0.55rem !important;
-  }
-  
-  .visual-column {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .visual-column img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Responsive: stack on smaller screens */
-  @media (max-width: 960px) {
-    .side-by-side-container {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-  }
-  
-  /* Button container styling */
-  .button-container {
-    text-align: center;
-    margin-top: 1.5rem;
-  }
-  
-  /* Override button colors to use WSO2 branding */
-  .button-container .md-button--primary {
-    background-color: #000000 !important;
-    border-color: #000000 !important;
-    color: #ffffff !important;
-  }
-  
-  .button-container .md-button--primary:hover {
-    background-color: #1a1a1a !important;
-    border-color: #1a1a1a !important;
-  }
-  
-  .button-container .md-button:not(.md-button--primary) {
-    border: 2px solid #ff7300 !important;
-    color: #ff7300 !important;
-    background-color: transparent !important;
-  }
-  
-  .button-container .md-button:not(.md-button--primary):hover {
-    background-color: #ff7300 !important;
-    color: #ffffff !important;
-  }
-</style>
+  <div class="cta-container">
+    <div class="cta-card">
+      <h3>Ready to get started?</h3>
+      <p>Learn how AFM works and start building your first agent.</p>
+      <a href="specification" class="cta-button">Read the Specification</a>
+    </div>
+    <div class="cta-card">
+      <h3>Understand the philosophy</h3>
+      <p>Explore why we built AFM and how it compares to other approaches.</p>
+      <a href="why-afm/philosophy.md" class="cta-button">Why AFM?</a>
+    </div>
+  </div>
+</div> -->
