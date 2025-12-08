@@ -151,7 +151,7 @@ tools:
 
 You are a Code Review Assistant specializing in providing constructive feedback on code quality, best practices, and potential improvements.
 
-## Instructions
+# Instructions
 
 1. Analyze code for common issues and anti-patterns
 2. Suggest improvements with clear explanations
@@ -428,7 +428,7 @@ version: "1.0.0"
 
 Your agent's role description
 
-## Instructions
+# Instructions
 
 1. First instruction
 2. Second instruction</code></pre>
@@ -550,13 +550,20 @@ function renderVisualization() {
 }
 
 function parseMarkdownSections(markdown) {
-    const roleMatch = markdown.match(/#+\s*Role\s*\n([\s\S]*?)(?=\n#+\s*|$)/i);
-    const instructionsMatch = markdown.match(/#+\s*Instructions?\s*\n([\s\S]*?)(?=\n#+\s*|$)/i);
+    // Split by top-level headers (single # at line start, not ##)
+    const sections = markdown.split(/\n(?=# [^#])/);
     
-    return {
-        role: roleMatch ? roleMatch[1].trim() : '',
-        instructions: instructionsMatch ? instructionsMatch[1].trim() : ''
-    };
+    const result = { role: '', instructions: '' };
+    
+    for (const section of sections) {
+        if (section.startsWith('# Role')) {
+            result.role = section.replace(/^# Role\s*\n/, '').trim();
+        } else if (section.match(/^# Instructions?\b/)) {
+            result.instructions = section.replace(/^# Instructions?\s*\n/, '').trim();
+        }
+    }
+    
+    return result;
 }
 
 function convertMarkdownToHtml(text) {

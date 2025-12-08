@@ -456,7 +456,7 @@ This section is **OPTIONAL**.
 !!! warning "WIP"
     Work in progress: The schema for agent resources is still under development. This section will be updated in future versions of the AFM specification. -->
 
-### 5.4. Authentication {#authentication-object}
+### 5.4. Authentication {#54-authentication}
 
 This section defines the generic client authentication schema that can be reused across different parts of the AFM specification, including MCP server connections and webhook subscriptions.
 
