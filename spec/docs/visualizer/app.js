@@ -67,12 +67,14 @@ function renderMcpDetailsHtml(mcpServer) {
                     <div class="fw-semibold">Type:</div>
                     <div class="border rounded p-2 bg-white mt-1">${highlightVars(mcpServer.authentication.type || 'configured')}</div>
                 </div>
-                ${mcpServer.authentication.token ? `
-                <div class="mb-3">
-                    <div class="fw-semibold">Token:</div>
-                    <div class="border rounded p-2 bg-white mt-1">${highlightVars(mcpServer.authentication.token)}</div>
-                </div>
-                ` : ''}
+                ${Object.entries(mcpServer.authentication)
+                    .filter(([key]) => key !== 'type')
+                    .map(([key, value]) => `
+                        <div class="mb-3">
+                            <div class="fw-semibold">${escapeHtml(key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' '))}:</div>
+                            <div class="border rounded p-2 bg-white mt-1">${highlightVars(String(value))}</div>
+                        </div>
+                    `).join('')}
             </div>
             ` : ''}
 
@@ -876,9 +878,19 @@ function renderInterfaceDetails(interfaceConfig) {
                                 <div class="row mb-3">
                                     <label class="col-sm-3 col-form-label fw-bold">Authentication</label>
                                     <div class="col-sm-9">
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
-                                            <div class="form-control form-control-auto-height">${highlightVars(config.authentication.type || 'configured')}</div>
+                                        <div class="border rounded p-3 bg-white">
+                                            <div class="mb-2">
+                                                <div class="fw-semibold">Type:</div>
+                                                <div class="mt-1">${highlightVars(config.authentication.type || 'configured')}</div>
+                                            </div>
+                                            ${Object.entries(config.authentication)
+                                                .filter(([key]) => key !== 'type')
+                                                .map(([key, value]) => `
+                                                    <div class="mb-2">
+                                                        <div class="fw-semibold">${escapeHtml(key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' '))}:</div>
+                                                        <div class="mt-1">${highlightVars(String(value))}</div>
+                                                    </div>
+                                                `).join('')}
                                         </div>
                                     </div>
                                 </div>

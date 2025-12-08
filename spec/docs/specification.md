@@ -280,13 +280,14 @@ AFM implementations **SHALL** use this definition to generate the agent's callab
 
 **Subscription Object (webhook only):**
 
-| Field      | Type     | Required | Description |
-|------------|----------|----------|-------------|
-| `protocol` | `string` | Yes      | The subscription protocol (e.g., `websub`). |
-| `hub`      | `string` | Yes      | The subscription hub URL. |
-| `topic`    | `string` | No       | The topic to subscribe to (recommended for most webhook protocols). |
-| `callback` | `string` | No       | The callback URL where events should be delivered (optional, for dynamic or self-registration). |
-| `secret`   | `string` | No       | A secret used to sign or verify webhook payloads (optional, for security). |
+| Field            | Type     | Required | Description |
+|------------------|----------|----------|-------------|
+| `protocol`       | `string` | Yes      | The subscription protocol (e.g., `websub`). |
+| `hub`            | `string` | Yes      | The subscription hub URL. |
+| `topic`          | `string` | Yes      | The topic to subscribe to. |
+| `callback`       | `string` | No       | The callback URL where events should be delivered (optional, for dynamic or self-registration). |
+| `authentication` | `object` | No       | Optional authentication configuration for the webhook subscription. See [Section 5.4](#54-authentication) for the schema. |
+| `secret`         | `string` | No       | A secret used to sign or verify webhook payloads (optional, for security). |
 
 ##### Exposure Object {#exposure-object}
 
@@ -304,14 +305,14 @@ Contains configurations for `service` agents.
 | Field            | Type     | Required | Description                                                                 |
 |------------------|----------|----------|-----------------------------------------------------------------------------|
 | `path`           | `string` | Yes      | The URL path segment for the agent's HTTP endpoint (e.g., `/math-tutor`). |
-| `authentication` | `object` | No       | Optional authentication configuration for the HTTP endpoint. Uses the same schema as the MCP [Authentication Object](#authentication-object). |
+| `authentication` | `object` | No       | Optional authentication configuration for the HTTP endpoint. See [Section 5.4](#54-authentication) for the schema. |
 
 !!! note "HTTP Object Usage"
     The `http` object is applicable for agents of type `service`, `chat`, or `webhook`. It defines how the agent is exposed via a standard HTTP endpoint, allowing other systems to interact with it over the web.
 
     AFM does not define the HTTP methods (GET, POST, etc.) for the agent's endpoint. This is left to the implementation to decide based on the agent's functionality and requirements.
     
-    HTTP authentication follows the same pattern as MCP authentication, where the `type` field specifies the authentication scheme (e.g., `oauth2`, `api_key`), and the agent's host environment is responsible for managing the actual credentials and authentication flow.
+    HTTP authentication uses the generic authentication schema defined in [Section 5.4](#54-authentication), where the `type` field specifies the authentication scheme (e.g., `oauth2`, `api_key`), and the rest of the fields provide the configuration.
 
 
 #### 5.2.3. Example Usages
@@ -455,6 +456,71 @@ This section is **OPTIONAL**.
 !!! warning "WIP"
     Work in progress: The schema for agent resources is still under development. This section will be updated in future versions of the AFM specification. -->
 
+### 5.4. Authentication {#authentication-object}
+
+This section defines the generic client authentication schema that can be reused across different parts of the AFM specification, including MCP server connections and webhook subscriptions.
+
+The authentication object is **OPTIONAL** and specifies authentication configuration for connections.
+
+#### 5.4.1. Schema Overview
+
+```yaml
+authentication:
+  type: string         # Authentication scheme (bearer, jwt, oauth2, api_key, basic, etc.)
+  # Additional fields depend on the type
+  # Examples:
+  # - For bearer: token
+  # - For basic: username, password
+  # - For oauth2: a grant_type field and client_id, client_secret, token_url, etc.
+```
+
+#### 5.4.2. Field Definitions
+
+<a id="authentication-object"></a>**Authentication Object:**
+
+| Key    | Type   | Required | Description                                                                                                                                                    |
+| ------ | ------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type` | String | Yes      | Authentication scheme (e.g., `bearer`, `jwt`, `oauth2`, `basic`).<br>Determines which additional fields are required or supported. |
+| `*`    | Various | Varies   | Additional fields are authentication-type specific. See examples below for common patterns.<br>Values **SHOULD** use [variable substitution](#7-variable-substitution) to reference credentials securely. |
+
+!!! note "Authentication Field Structure"
+    The authentication object uses a type-specific structure where the `type` field determines which additional fields are needed:
+    
+    - **bearer**: Requires `token` field
+    - **basic**: Requires `username` and `password` fields
+    - **oauth2**: May require a `grant_type` field and fields like `client_id`, `client_secret`, `token_url`, `scope`, etc.
+    
+    The exact set of fields and their semantics are implementation-specific, but implementations **SHOULD** follow common authentication patterns for each type.
+
+!!! warning "Security Best Practices"
+    Sensitive credentials (tokens, passwords, secrets, keys) **SHOULD NOT** be hardcoded in AFM files. Instead:
+    
+    - Use [variable substitution](#7-variable-substitution) to reference credentials from secure sources
+    - Let the agent's host environment manage actual credential storage and retrieval
+    - Keep credentials out of version control systems
+
+#### 5.4.3. Example Usage
+
+```yaml
+# Bearer token authentication
+authentication:
+  type: bearer
+  token: "${API_TOKEN}"
+
+# Basic authentication
+authentication:
+  type: basic
+  username: "${API_USERNAME}"
+  password: "${API_PASSWORD}"
+
+# OAuth2 authentication
+authentication:
+  type: oauth2
+  client_id: "${OAUTH_CLIENT_ID}"
+  client_secret: "${OAUTH_CLIENT_SECRET}"
+  token_url: "https://auth.example.com/oauth/token"
+  scope: "read:data write:data"
+```
 
 ## 6. Protocol Extensions
 
@@ -475,7 +541,7 @@ mcp:
         url: string          # URL endpoint (for http_sse and streamable_http)
         command: string      # Shell command (for stdio)
       authentication:        # Optional
-        type: string         # Authentication scheme (oauth2, api_key, etc.)
+        type: string         # Authentication scheme (bearer, jwt, oauth2, etc.)
       tool_filter:           # Optional
         allow: [string]      # Whitelist of tools in "tool_name" format
         deny: [string]       # Blacklist of tools in "tool_name" format
@@ -493,7 +559,7 @@ mcp:
 | ---------------- | ------ | -------- | ------------------------------------------------------------------------------------------------------------------ |
 | `name`           | String | Yes      | A unique, human-readable identifier for the connection.                                                            |
 | `transport`      | Object | Yes      | An object defining the communication mechanism. See [Transport Object](#transport-object) below.                   |
-| `authentication` | Object | No       | An object declaring the required authentication scheme. See [Authentication Object](#authentication-object) below. |
+| `authentication` | Object | No       | An object declaring the required authentication scheme. See [Section 5.4](#54-authentication) for the schema. |
 | `tool_filter`    | Object | No       | Filter configuration for tools from this server. See [Tool Filter Object](#tool-filter-object) below.              |
 
 **<a id="transport-object"></a>Transport Object:**
@@ -503,12 +569,6 @@ mcp:
 | `type`    | String | Yes            | Transport mechanism, which must be one of:<br>- `http_sse`: Server-Sent Events over HTTP<br>- `stdio`: Standard input/output for local processes<br>- `streamable_http`: HTTP with streaming capabilities |
 | `url`     | String | For HTTP types | The URL endpoint of the remote MCP server.                                                                                                                                                                |
 | `command` | String | For stdio      | The shell command used to start the local MCP server process.                                                                                                                                             |
-
-**<a id="authentication-object"></a>Authentication Object:**
-
-| Key    | Type   | Required | Description                                                                                                                                                    |
-| ------ | ------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `type` | String | Yes      | Authentication scheme (e.g., `oauth2`, `api_key`).<br>The agent's host environment is responsible for managing the actual credentials and authentication flow. |
 
 **<a id="tool-filter-object"></a>Tool Filter Object:**
 
