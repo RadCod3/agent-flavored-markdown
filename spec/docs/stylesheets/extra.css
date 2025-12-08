@@ -11,7 +11,7 @@
   --wso2-orange: #ff7300;
   --wso2-black: #000000;
   --wso2-white: #ffffff;
-  
+
   /* Light Mode Colors */
   --hero-bg-light: #f9f9f9;
   --hero-text-light: var(--wso2-black);
@@ -120,7 +120,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.25rem 0.5rem;
+  padding: 0.75rem 1.5rem;
   font-size: 14px;
   font-weight: 500;
   border-radius: 0.5rem;
@@ -223,7 +223,7 @@
 }
 
 .section-description {
-  font-size: 0.8rem !important;
+  font-size: 1rem !important;
   line-height: 1.7;
   color: var(--hero-subtitle-light);
   margin: 0;
@@ -484,7 +484,7 @@
 }
 
 .feature-title {
-  font-size: 0.9rem !important;
+  font-size: 1rem !important;
   font-weight: 700 !important;
   color: var(--hero-text-light);
   margin: 0 0 0.75rem;
@@ -495,7 +495,7 @@
 }
 
 .feature-description {
-  font-size: 0.7rem;
+  font-size: 0.875rem;
   line-height: 1.6;
   color: var(--hero-subtitle-light);
   margin: 0;
@@ -570,7 +570,7 @@
   border-radius: 0.5rem;
   text-decoration: none;
   transition: all 0.2s ease;
-  padding: 0.25rem 0.5rem;
+  padding: 0.75rem 1.5rem;
   font-size: 14px;
   font-weight: 500;
 }
@@ -746,7 +746,7 @@
 .md-footer-meta {
   background-color: #1a1a1a;
   padding: 0.5rem 0;
-  font-size: 0.7rem;
+  font-size: 0.875rem;
 }
 
 [data-md-color-scheme="slate"] .md-footer-meta {
@@ -756,7 +756,7 @@
 .md-footer-copyright {
   flex: 1;
   padding: 0;
-  font-size: 0.7rem;
+  font-size: 0.875rem;
 }
 
 .md-footer-copyright a {
@@ -780,7 +780,7 @@
 }
 
 .md-footer-meta__inner > * {
-  font-size: 0.7rem;
+  font-size: 0.875rem;
   line-height: 1.4;
 }
 

@@ -25,11 +25,8 @@
 /* AFM Visualizer Styles */
 
 :root {
-    /* Brand Colors */
-    --wso2-orange: #ff7300;
-    --wso2-black: #000000;
-    --wso2-white: #ffffff;
-    
+    /* Brand Colors are defined in spec/docs/stylesheets/extra.css */
+
     --bg-primary: #f8f9fa;
     --bg-secondary: #ffffff;
     --bg-tertiary: #f8f9fa;
