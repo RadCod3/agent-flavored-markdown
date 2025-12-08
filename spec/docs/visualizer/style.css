@@ -150,7 +150,8 @@ body.dark-mode .upload-area.drag-over {
 
 /* Details panel height matching */
 #spoke-details-content {
-    max-height: none;
+    height: 850px;
+    overflow-y: auto;
     overflow-x: hidden;
 }
 
@@ -1014,12 +1015,14 @@ body.dark-mode .table th {
 
 /* Markdown content containers */
 .markdown-role-content {
-    height: 280px;
+    min-height: 100px;
+    max-height: 400px;
     overflow-y: auto;
 }
 
 .markdown-instructions-content {
-    height: 320px;
+    min-height: 150px;
+    max-height: 600px;
     overflow-y: auto;
 }
 

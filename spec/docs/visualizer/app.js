@@ -30,18 +30,18 @@ function renderMcpDetailsHtml(mcpServer) {
                 <h6 class="fw-bold mb-2">Transport</h6>
                 <div class="mb-3">
                     <div class="fw-semibold">Type:</div>
-                    <div class="border rounded p-2 bg-white mt-1">${escapeHtml(mcpServer.transport?.type || 'stdio')}</div>
+                    <div class="form-control form-control-auto-height mt-1">${escapeHtml(mcpServer.transport?.type || 'stdio')}</div>
                 </div>
                 ${mcpServer.transport?.command ? `
                 <div class="mb-3">
                     <div class="fw-semibold">Command:</div>
-                    <div class="border rounded p-2 bg-white mt-1">${highlightVars(mcpServer.transport.command)}</div>
+                    <div class="form-control form-control-auto-height mt-1">${highlightVars(mcpServer.transport.command)}</div>
                 </div>
                 ` : ''}
                 ${mcpServer.transport?.url ? `
                 <div class="mb-3">
                     <div class="fw-semibold">URL:</div>
-                    <div class="border rounded p-2 bg-white mt-1">${highlightVars(mcpServer.transport.url)}</div>
+                    <div class="form-control form-control-auto-height mt-1">${highlightVars(mcpServer.transport.url)}</div>
                 </div>
                 ` : ''}
             </div>
@@ -53,7 +53,7 @@ function renderMcpDetailsHtml(mcpServer) {
                     ${mcpServer.transport.args.map((arg, idx) => `
                         <div class="mb-3">
                             <div class="fw-semibold">${idx}</div>
-                            <div class="border rounded p-2 bg-white mt-1"><code class="arg-value">${highlightVars(arg)}</code></div>
+                            <div class="form-control form-control-auto-height mt-1"><code class="arg-value">${highlightVars(arg)}</code></div>
                         </div>
                     `).join('')}
                 </div>
@@ -65,14 +65,14 @@ function renderMcpDetailsHtml(mcpServer) {
                 <h6 class="fw-bold mb-2">Authentication</h6>
                 <div class="mb-3">
                     <div class="fw-semibold">Type:</div>
-                    <div class="border rounded p-2 bg-white mt-1">${highlightVars(mcpServer.authentication.type || 'configured')}</div>
+                    <div class="form-control form-control-auto-height mt-1">${highlightVars(mcpServer.authentication.type || 'configured')}</div>
                 </div>
                 ${Object.entries(mcpServer.authentication)
                     .filter(([key]) => key !== 'type')
                     .map(([key, value]) => `
                         <div class="mb-3">
                             <div class="fw-semibold">${escapeHtml(key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' '))}:</div>
-                            <div class="border rounded p-2 bg-white mt-1">${highlightVars(String(value))}</div>
+                            <div class="form-control form-control-auto-height mt-1">${highlightVars(String(value))}</div>
                         </div>
                     `).join('')}
             </div>
@@ -888,14 +888,14 @@ function renderInterfaceDetails(interfaceConfig) {
                                         <div class="border rounded p-3 bg-white">
                                             <div class="mb-2">
                                                 <div class="fw-semibold">Type:</div>
-                                                <div class="mt-1">${highlightVars(config.authentication.type || 'configured')}</div>
+                                                <div class="form-control form-control-auto-height mt-1">${highlightVars(config.authentication.type || 'configured')}</div>
                                             </div>
                                             ${Object.entries(config.authentication)
                                                 .filter(([key]) => key !== 'type')
                                                 .map(([key, value]) => `
                                                     <div class="mb-2">
                                                         <div class="fw-semibold">${escapeHtml(key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' '))}:</div>
-                                                        <div class="mt-1">${highlightVars(String(value))}</div>
+                                                        <div class="form-control form-control-auto-height mt-1">${highlightVars(String(value))}</div>
                                                     </div>
                                                 `).join('')}
                                         </div>
