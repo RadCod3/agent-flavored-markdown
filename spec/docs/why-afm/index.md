@@ -1,3 +1,7 @@
+---
+title: Why AFM?
+---
+
 # Why AFM
 
 Explore in-depth articles about various aspects of AFM:

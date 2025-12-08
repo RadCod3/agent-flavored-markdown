@@ -99,6 +99,8 @@ const UI_CONSTANTS = {
     SPOKE_GROUP_LABEL_TOP: 140,
     INTERFACE_SPOKE_TOP: 80,
     INTERFACE_LABEL_TOP: 30,
+    EXECUTION_SPOKE_TOP: 280,
+    EXECUTION_LABEL_TOP: 230,
     // Text truncation
     DESCRIPTION_MAX_LENGTH: 85,
     HUB_CONTENT_MAX_LENGTH: 110
@@ -122,6 +124,7 @@ description: \"An AI assistant that helps review code and suggests improvements\
 version: \"1.0.0\"
 namespace: \"development-tools\"
 author: \"Sample Author <author@example.com>\"
+max_iterations: 25
 interface:
   type: service
   exposure:
@@ -598,6 +601,7 @@ function renderHubSpoke(metadata, markdownBody) {
     const mcpServers = metadata.tools?.mcp?.servers || [];
     const hasInterface = metadata.interface;
     const interfaceType = metadata.interface?.type || 'function';
+    const hasExecutionConfig = metadata.max_iterations !== undefined;
 
     const escapedName = escapeHtml(metadata.name || 'Unnamed Agent');
     const escapedDescription = escapeHtml(metadata.description || 'No description');
@@ -612,6 +616,7 @@ function renderHubSpoke(metadata, markdownBody) {
         <div class="hub-spoke-visual">
             <svg class="connections-svg" viewBox="0 0 1200 900">
                 ${hasInterface ? '<line x1="600" y1="450" x2="1010" y2="180" class="connection-line-interface" stroke-width="2.5" />' : ''}
+                ${hasExecutionConfig ? '<line x1="600" y1="450" x2="1010" y2="380" class="connection-line-interface" stroke-width="2.5" />' : ''}
                 ${mcpServers.map((_, idx) => 
                     `<line x1="600" y1="450" x2="190" y2="${300 + (idx * 160)}" class="connection-line-mcp" stroke-width="2.5" />`
                 ).join('')}
@@ -661,8 +666,16 @@ function renderHubSpoke(metadata, markdownBody) {
                         ${interfaceType === 'chat' ? '<i class="bi bi-chat-dots"></i>' : ''}
                         ${interfaceType === 'webhook' ? '<i class="bi bi-broadcast"></i>' : ''}
                     </div>
-                    <div class="spoke-title">Interface</div>
                     <div class="spoke-subtitle">${escapedInterfaceType}</div>
+                </div>
+                ` : ''}
+                ${hasExecutionConfig ? `
+                <div class="spoke-group-label" style="position: absolute; top: ${UI_CONSTANTS.EXECUTION_LABEL_TOP}px; right: 30px;">Execution</div>
+                <div class="spoke spoke-execution" data-spoke-type="execution" style="position: absolute; top: ${UI_CONSTANTS.EXECUTION_SPOKE_TOP}px; right: 30px;">
+                    <div class="spoke-icon">
+                        <i class="bi bi-gear-fill"></i>
+                    </div>
+                    <div class="spoke-subtitle">max_iterations: ${metadata.max_iterations}</div>
                 </div>
                 ` : ''}
                 ${mcpServers.length > 0 ? `
@@ -748,6 +761,30 @@ function renderMcpDetails(mcpServer) {
     return {
         title: `<i class="bi bi-diagram-3 me-2"></i>MCP Server: ${escapeHtml(mcpServer.name)}`,
         html: renderMcpDetailsHtml(mcpServer)
+    };
+}
+
+function renderExecutionConfigDetails(metadata) {
+    const maxIterations = metadata.max_iterations;
+    
+    return {
+        title: '<i class="bi bi-gear-fill me-2"></i>Execution Configuration',
+        html: `
+            <div class="detail-form">
+                <h6 class="text-muted mb-3">Runtime Control Settings</h6>
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label fw-bold">Max Iterations</label>
+                    <div class="col-sm-8">
+                        <div class="form-control form-control-auto-height">${maxIterations !== undefined ? escapeHtml(String(maxIterations)) : '<span class="text-muted">Not set (unlimited)</span>'}</div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    The max_iterations setting prevents infinite loops by limiting how many iteration cycles the agent can perform in a single invocation. If not set, implementations may allow unlimited iterations or apply their own default limits.
+                </div>
+            </div>
+        `
     };
 }
 
@@ -971,6 +1008,10 @@ function showSpokeDetails(spokeType, spokeIndex) {
         }
         case 'interface': {
             result = renderInterfaceDetails(metadata.interface);
+            break;
+        }
+        case 'execution': {
+            result = renderExecutionConfigDetails(metadata);
             break;
         }
         default: {

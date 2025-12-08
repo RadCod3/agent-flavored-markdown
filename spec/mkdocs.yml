@@ -103,7 +103,7 @@ extra:
 nav:
   - Home: index.md
   - Why AFM?:
-      - Introduction: why-afm/index.md
+      - Why AFM?: why-afm/index.md
       - Philosophy: why-afm/philosophy.md
       - Connected Agents: why-afm/afm-connected-agent.md
   - Specification: specification.md
