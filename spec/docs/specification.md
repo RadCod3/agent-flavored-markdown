@@ -81,7 +81,6 @@ This section contains metadata about the agent. These metadata fields are **OPTI
 | [Agent Interface](#52-agent-interface)   | Defines how the agent is invoked and its input/output signature.                 |
 | [Agent Tools](#53-tools) | Defines external tools available to the agent (e.g., via MCP).                  |
 | [Execution Configuration](#54-execution-configuration) | Runtime execution control settings like iteration limits. |
-| Agent Resources   | Coming soon                                                                      |
 
 Refer to the [AFM Schema](#5-schema-definitions) for a complete list of fields and their meanings.
 
