@@ -1,5 +1,5 @@
 ---
-title: AFM Specification
+title: Specification
 description: The AFM specification defines a structured, markdown-based format for AI agents, enabling easy sharing, deployment, and understanding across platforms.
 hide:
   - navigation
@@ -80,6 +80,7 @@ This section contains metadata about the agent. These metadata fields are **OPTI
 | [Agent Details](#51-about-the-agent)     | Information about the agent, such as its name, description, version, and author. |
 | [Agent Interface](#52-agent-interface)   | Defines how the agent is invoked and its input/output signature.                 |
 | [Agent Tools](#53-tools) | Defines external tools available to the agent (e.g., via MCP).                  |
+| [Execution Configuration](#54-execution-configuration) | Runtime execution control settings like iteration limits. |
 | Agent Resources   | Coming soon                                                                      |
 
 Refer to the [AFM Schema](#5-schema-definitions) for a complete list of fields and their meanings.
@@ -286,7 +287,7 @@ AFM implementations **SHALL** use this definition to generate the agent's callab
 | `hub`            | `string` | Yes      | The subscription hub URL. |
 | `topic`          | `string` | Yes      | The topic to subscribe to. |
 | `callback`       | `string` | No       | The callback URL where events should be delivered (optional, for dynamic or self-registration). |
-| `authentication` | `object` | No       | Optional authentication configuration for the webhook subscription. See [Section 5.4](#54-authentication) for the schema. |
+| `authentication` | `object` | No       | Optional authentication configuration for the webhook subscription. See [Section 5.5](#55-authentication) for the schema. |
 | `secret`         | `string` | No       | A secret used to sign or verify webhook payloads (optional, for security). |
 
 ##### Exposure Object {#exposure-object}
@@ -305,14 +306,14 @@ Contains configurations for `service` agents.
 | Field            | Type     | Required | Description                                                                 |
 |------------------|----------|----------|-----------------------------------------------------------------------------|
 | `path`           | `string` | Yes      | The URL path segment for the agent's HTTP endpoint (e.g., `/math-tutor`). |
-| `authentication` | `object` | No       | Optional authentication configuration for the HTTP endpoint. See [Section 5.4](#54-authentication) for the schema. |
+| `authentication` | `object` | No       | Optional authentication configuration for the HTTP endpoint. See [Section 5.5](#55-authentication) for the schema. |
 
 !!! note "HTTP Object Usage"
     The `http` object is applicable for agents of type `service`, `chat`, or `webhook`. It defines how the agent is exposed via a standard HTTP endpoint, allowing other systems to interact with it over the web.
 
     AFM does not define the HTTP methods (GET, POST, etc.) for the agent's endpoint. This is left to the implementation to decide based on the agent's functionality and requirements.
     
-    HTTP authentication uses the generic authentication schema defined in [Section 5.4](#54-authentication), where the `type` field specifies the authentication scheme (e.g., `oauth2`, `api_key`), and the rest of the fields provide the configuration.
+    HTTP authentication uses the generic authentication schema defined in [Section 5.5](#55-authentication), where the `type` field specifies the authentication scheme (e.g., `oauth2`, `api_key`), and the rest of the fields provide the configuration.
 
 
 #### 5.2.3. Example Usages
@@ -456,7 +457,29 @@ This section is **OPTIONAL**.
 !!! warning "WIP"
     Work in progress: The schema for agent resources is still under development. This section will be updated in future versions of the AFM specification. -->
 
-### 5.4. Authentication {#54-authentication}
+### 5.4. Execution Configuration
+
+This section defines execution control and runtime behavior settings for the agent. These settings are **OPTIONAL** and help AFM implementations manage agent execution safely and efficiently.
+
+#### 5.4.1. Schema Overview
+
+```yaml
+max_iterations: int    # Maximum number of iterations to prevent infinite loops
+```
+
+#### 5.4.2. Field Definitions
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| <a id="field-max-iterations"></a>[`max_iterations`](#field-max-iterations) | `integer` | No | Maximum number of iterations the agent can perform in a single invocation.<br>This helps prevent infinite loops or runaway execution.<br>Default: Implementation-specific (typically unlimited or a high value like 100).<br>AFM implementations **SHOULD** respect this limit and gracefully terminate agent execution when the limit is reached. |
+
+#### 5.4.3. Example Usage
+
+```yaml
+max_iterations: 50
+```
+
+### 5.5. Authentication {#55-authentication}
 
 This section defines the generic client authentication schema that can be reused across different parts of the AFM specification, including MCP server connections and webhook subscriptions.
 
@@ -559,7 +582,7 @@ mcp:
 | ---------------- | ------ | -------- | ------------------------------------------------------------------------------------------------------------------ |
 | `name`           | String | Yes      | A unique, human-readable identifier for the connection.                                                            |
 | `transport`      | Object | Yes      | An object defining the communication mechanism. See [Transport Object](#transport-object) below.                   |
-| `authentication` | Object | No       | An object declaring the required authentication scheme. See [Section 5.4](#54-authentication) for the schema. |
+| `authentication` | Object | No       | An object declaring the required authentication scheme. See [Section 5.5](#55-authentication) for the schema. |
 | `tool_filter`    | Object | No       | Filter configuration for tools from this server. See [Tool Filter Object](#tool-filter-object) below.              |
 
 **<a id="transport-object"></a>Transport Object:**
