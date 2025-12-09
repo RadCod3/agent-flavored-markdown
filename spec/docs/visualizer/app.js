@@ -519,11 +519,91 @@ function parseAfmFile(content) {
     if (!markdownBody) {
         console.warn('AFM file has no markdown content');
     }
+
+    // Validate markdown body sections (SHOULD contain Role and Instructions)
+    const sections = parseMarkdownSections(markdownBody);
+    if (!sections.role && !sections.instructions) {
+        console.warn('AFM file should contain # Role and # Instructions sections in the markdown body');
+    } else if (!sections.role) {
+        console.warn('AFM file should contain a # Role section in the markdown body');
+    } else if (!sections.instructions) {
+        console.warn('AFM file should contain an # Instructions section in the markdown body');
+    }
+
+    // Apply spec defaults
+    metadata = applySpecDefaults(metadata, markdownBody);
+
     return {
         metadata,
         markdownBody,
         rawContent: content
     };
+}
+
+/**
+ * Apply AFM specification defaults to metadata
+ */
+function applySpecDefaults(metadata, markdownBody) {
+    const defaults = { ...metadata };
+
+    // Default: name inferred from filename (handled by caller, but fallback to "Unnamed Agent")
+    if (!defaults.name) {
+        defaults.name = 'Unnamed Agent';
+    }
+
+    // Default: description inferred from markdown body # Role section
+    if (!defaults.description && markdownBody) {
+        const sections = parseMarkdownSections(markdownBody);
+        if (sections.role) {
+            // Take first sentence or first 100 characters
+            const firstLine = sections.role.split('\n')[0];
+            defaults.description = firstLine.length > 100
+                ? firstLine.substring(0, 97) + '...'
+                : firstLine;
+        }
+    }
+
+    // Default: version is "0.0.0"
+    if (!defaults.version) {
+        defaults.version = '0.0.0';
+    }
+
+    // Default: namespace is "default"
+    if (!defaults.namespace) {
+        defaults.namespace = 'default';
+    }
+
+    // Default: interface type is "function" with string input/output signature
+    if (!defaults.interface) {
+        defaults.interface = {
+            type: 'function',
+            signature: {
+                input: {
+                    type: 'string'
+                },
+                output: {
+                    type: 'string'
+                }
+            }
+        };
+    } else if (defaults.interface && !defaults.interface.signature) {
+        // If interface exists but no signature, apply default signature based on type
+        const ifaceType = defaults.interface.type || 'function';
+
+        // For function, chat, and service: default is string input/output
+        if (ifaceType !== 'webhook') {
+            defaults.interface.signature = {
+                input: {
+                    type: 'string'
+                },
+                output: {
+                    type: 'string'
+                }
+            };
+        }
+    }
+
+    return defaults;
 }
 
 function showUploadSection() {

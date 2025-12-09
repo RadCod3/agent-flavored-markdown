@@ -208,7 +208,7 @@ license: "MIT"
 
 This section defines how an agent can be interacted with or triggered. It includes the agent's public API, function signature, or service endpoint. It is **OPTIONAL** and specifies how the agent receives inputs and produces outputs.
 
-If the `interface` field is not explicitly defined in the front matter, AFM implementations **MUST** assume a default interface of type `function`. In this default mode, the agent **SHALL** be invoked as a stateless, single-invocation callable: it **MUST** accept a single string input parameter named `user_prompt` and **MUST** produce a single string output parameter named `response`. After processing the input, the agent **SHALL** complete execution and return the output.
+If the `interface` field is not explicitly defined in the front matter, AFM implementations **MUST** assume a default interface of type `function`. In this default mode, the agent **SHALL** be invoked as a stateless, single-invocation callable: it **MUST** accept a single string input and **MUST** produce a single string output. After processing the input, the agent **SHALL** complete execution and return the output.
 
 Users can override these defaults by specifying the `interface` field in the front matter. AFM implementations **SHALL** use this definition to generate the agent's callable interface and to ensure consistent behavior across different platforms.
 
@@ -231,8 +231,8 @@ Each interface type defines how the agent is triggered and interacted with. Impl
 interface:
   type: function | service | chat | webhook
   signature:
-    input: [object]      # A list of input parameter objects.
-    output: [object]     # A list of output parameter objects.
+    input: object      # JSON Schema object defining input parameters
+    output: object     # JSON Schema object defining output parameters
   # Optional, depending on type:
   exposure:              # For service/chat/webhook types
     http: object         # Configuration for exposing as an HTTP endpoint.
@@ -261,7 +261,19 @@ Defines the data contract for the agent. The `input` and `output` fields MUST co
 - Complex, structured objects with named properties
 - Full expressiveness of JSON Schema for validation and documentation
 
-**Recommended Documentation for Object Schemas:**
+**Examples:**
+
+*Single string input/output (default):*
+```yaml
+signature:
+  input:
+    type: string
+  output:
+    type: string
+```
+
+*Complex object with properties:*
+
 When `input` or `output` is an object type, it is RECOMMENDED to document the properties using a table with the following columns:
 
 | Name | Type | Description | Required |
@@ -292,17 +304,6 @@ signature:
         type: number
         description: "Confidence score for the response"
     required: [response]
-```
-
-**Other Examples:**
-
-*Single string input/output:*
-```yaml
-signature:
-  input:
-    type: string
-  output:
-    type: string
 ```
 
 *Array input/output:*
@@ -365,7 +366,18 @@ Applies to agents of type `service`, `chat`, and `webhook`, and defines how the 
 
 #### 5.2.3. Example Usages
 
-**Function agent (default):**
+**Function agent (default simple string):**
+```yaml
+interface:
+  type: function
+  signature:
+    input:
+      type: string
+    output:
+      type: string
+```
+
+**Function agent (custom with structured input/output):**
 ```yaml
 interface:
   type: function
@@ -376,6 +388,9 @@ interface:
         user_prompt:
           type: string
           description: "The user's query or request"
+        context:
+          type: object
+          description: "Additional context for the request"
       required: [user_prompt]
     output:
       type: object
@@ -383,6 +398,9 @@ interface:
         response:
           type: string
           description: "The agent's response to the user prompt"
+        confidence:
+          type: number
+          description: "Confidence score for the response"
       required: [response]
 ```
 
