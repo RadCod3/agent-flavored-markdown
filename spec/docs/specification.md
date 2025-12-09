@@ -291,7 +291,7 @@ AFM implementations **SHALL** use this definition to generate the agent's callab
 
 ##### Exposure Object {#exposure-object}
 
-Contains configurations for `service` agents.
+Applies to agents of type `service`, `chat`, and `webhook`, and defines how the corresponding services are exposed.
 
 | Field  | Type     | Required | Description                                                          |
 |--------|----------|----------|----------------------------------------------------------------------|
