@@ -481,25 +481,25 @@ function parseAfmFile(content) {
         if (!iface.type || !allowedTypes.includes(iface.type)) {
             throw new Error(`interface.type must be one of: ${allowedTypes.join(', ')}`);
         }
-        if (iface.type === 'function') {
-            if (!iface.signature || typeof iface.signature !== 'object' || Array.isArray(iface.signature)) {
-                throw new Error('interface.signature is required and must be an object for function type');
-            }
-            if (!Array.isArray(iface.signature.input) || iface.signature.input.length === 0) {
-                throw new Error('interface.signature.input must be a non-empty array for function type');
-            }
-            if (!Array.isArray(iface.signature.output) || iface.signature.output.length === 0) {
-                throw new Error('interface.signature.output must be a non-empty array for function type');
-            }
-        } else if (iface.signature !== undefined) {
+        if (iface.signature !== undefined) {
             if (typeof iface.signature !== 'object' || Array.isArray(iface.signature)) {
                 throw new Error('interface.signature must be an object if present');
             }
-            if (iface.signature.input !== undefined && (!Array.isArray(iface.signature.input) || iface.signature.input.length === 0)) {
-                throw new Error('interface.signature.input must be a non-empty array if present');
-            }
-            if (iface.signature.output !== undefined && (!Array.isArray(iface.signature.output) || iface.signature.output.length === 0)) {
-                throw new Error('interface.signature.output must be a non-empty array if present');
+            // For webhook, input MAY be omitted
+            if (iface.type !== 'webhook') {
+                if (!iface.signature.input || typeof iface.signature.input !== 'object') {
+                    throw new Error('interface.signature.input must be an object for function, chat, and service types');
+                }
+                if (!iface.signature.output || typeof iface.signature.output !== 'object') {
+                    throw new Error('interface.signature.output must be an object for function, chat, and service types');
+                }
+            } else {
+                if (iface.signature.input !== undefined && typeof iface.signature.input !== 'object') {
+                    throw new Error('interface.signature.input must be an object if present for webhook type');
+                }
+                if (!iface.signature.output || typeof iface.signature.output !== 'object') {
+                    throw new Error('interface.signature.output must be an object for webhook type');
+                }
             }
         }
         if (iface.type === 'webhook') {
@@ -795,11 +795,127 @@ function highlightVars(val) {
 }
 
 
+function renderSchemaDetails(schema, isNested = false) {
+    if (!schema) return '<span class="text-muted">No schema</span>';
+    if ((schema.type === 'object' && schema.properties) || schema.properties) {
+        const req = Array.isArray(schema.required) ? schema.required : [];
+        return `
+            ${!isNested ? `
+            <div class="row mb-3">
+                <label class="col-sm-3 col-form-label fw-bold">Type</label>
+                <div class="col-sm-9">
+                    <div class="form-control form-control-auto-height">${escapeHtml(schema.type || 'object')}</div>
+                </div>
+            </div>
+            ` : ''}
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr><th>Name</th><th>Type</th><th>Required</th><th>Description</th></tr>
+                    </thead>
+                    <tbody>
+                        ${Object.entries(schema.properties).map(([propName, propSchema]) => {
+                            const constraints = renderPropertyConstraints(propSchema);
+                            return `
+                            <tr>
+                                <td><code>${escapeHtml(propName)}</code></td>
+                                <td>${escapeHtml(propSchema.type || typeof propSchema)}${constraints ? `<br><small class="text-muted">${constraints}</small>` : ''}</td>
+                                <td>${req.includes(propName) ? '<span class="badge bg-danger">Required</span>' : '<span class="badge bg-secondary">Optional</span>'}</td>
+                                <td>${escapeHtml(propSchema.description || '-')}</td>
+                            </tr>
+                        `}).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+    
+    if (schema.type === 'array') {
+        const itemsSchema = schema.items;
+
+        if (!itemsSchema) {
+            return `
+                <div class="row mb-3">
+                    <label class="col-sm-3 col-form-label fw-bold">Type</label>
+                    <div class="col-sm-9">
+                        <div class="form-control form-control-auto-height">${escapeHtml(schema.type)}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        const itemType = itemsSchema.type || 'unknown';
+        const itemConstraints = renderPropertyConstraints(itemsSchema);
+
+        // If items is an object with properties, show them in a nested table
+        if ((itemType === 'object' && itemsSchema.properties) || itemsSchema.properties) {
+            return `
+                <div class="row mb-3">
+                    <label class="col-sm-3 col-form-label fw-bold">Type</label>
+                    <div class="col-sm-9">
+                        <div class="form-control form-control-auto-height">
+                            ${escapeHtml(schema.type)}
+                            <div class="mt-2 pt-2 border-top">
+                                <div class="fw-semibold mb-2">Member Type: ${escapeHtml(itemType)}</div>
+                                ${renderSchemaDetails(itemsSchema, true)}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Simple item type (string, number, etc.)
+        return `
+            <div class="row mb-3">
+                <label class="col-sm-3 col-form-label fw-bold">Type</label>
+                <div class="col-sm-9">
+                    <div class="form-control form-control-auto-height">
+                        ${escapeHtml(schema.type)}
+                        <div class="mt-2 pt-2 border-top">
+                            <div class="fw-semibold mb-1">Member Type</div>
+                            <div>${escapeHtml(itemType)}${itemConstraints ? `<br><small class="text-muted">${itemConstraints}</small>` : ''}</div>
+                            ${itemsSchema.description ? `<div class="mt-1"><small class="text-muted">${escapeHtml(itemsSchema.description)}</small></div>` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    // Primitive type or unknown
+    const constraints = renderPropertyConstraints(schema);
+    return `
+        <div class="row mb-3">
+            <label class="col-sm-3 col-form-label fw-bold">Type</label>
+            <div class="col-sm-9">
+                <div class="form-control form-control-auto-height">${escapeHtml(schema.type || typeof schema)}${constraints ? `<br><small class="text-muted">${constraints}</small>` : ''}</div>
+            </div>
+        </div>
+    `;
+}
+
+// Helper to render property constraints
+function renderPropertyConstraints(schema) {
+    const constraints = [];
+    const skipKeys = new Set(['type', 'description', 'properties', 'items', 'required']);
+    for (const key in schema) {
+        if (skipKeys.has(key)) continue;
+        let value = schema[key];
+        if (Array.isArray(value)) {
+            value = value.map(v => typeof v === 'object' ? JSON.stringify(v) : String(v)).join(', ');
+        } else if (typeof value === 'object') {
+            value = JSON.stringify(value);
+        }
+        constraints.push(`<strong>${escapeHtml(key)}:</strong> <code>${escapeHtml(value)}</code>`);
+    }
+    return constraints.length ? constraints.join(' | ') : '';
+}
+
 function renderInterfaceDetails(interfaceConfig) {
     const interfaceExposure = interfaceConfig?.exposure || {};
     const interfaceSignature = interfaceConfig?.signature;
     const interfaceTypeValue = interfaceConfig?.type || 'function';
-    
+
     let subscriptionHtml = '';
     if (interfaceTypeValue === 'webhook' && interfaceConfig.subscription) {
         const sub = interfaceConfig.subscription;
@@ -833,58 +949,14 @@ function renderInterfaceDetails(interfaceConfig) {
                 ${interfaceSignature ? `
                     <hr class="my-4">
                     <h6 class="text-muted mb-3">Signature</h6>
-                    ${interfaceSignature.input && interfaceSignature.input.length > 0 ? `
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Input Parameters</label>
-                            <div class="table-responsive">
-                                <table class="table table-sm table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Type</th>
-                                            <th>Required</th>
-                                            <th>Description</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${interfaceSignature.input.map(param => `
-                                            <tr>
-                                                <td><code>${escapeHtml(param.name)}</code></td>
-                                                <td><span class="badge bg-secondary">${escapeHtml(param.type || 'string')}</span></td>
-                                                <td>${param.required ? '<span class="badge bg-danger">Required</span>' : '<span class="badge bg-secondary">Optional</span>'}</td>
-                                                <td>${escapeHtml(param.description || '-')}</td>
-                                            </tr>
-                                        `).join('')}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    ` : ''}
-                    ${interfaceSignature.output && interfaceSignature.output.length > 0 ? `
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Output Parameters</label>
-                            <div class="table-responsive">
-                                <table class="table table-sm table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Type</th>
-                                            <th>Description</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${interfaceSignature.output.map(param => `
-                                            <tr>
-                                                <td><code>${escapeHtml(param.name)}</code></td>
-                                                <td><span class="badge bg-secondary">${escapeHtml(param.type || 'string')}</span></td>
-                                                <td>${escapeHtml(param.description || '-')}</td>
-                                            </tr>
-                                        `).join('')}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    ` : ''}
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Input</label>
+                        ${renderSchemaDetails(interfaceSignature.input)}
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Output</label>
+                        ${renderSchemaDetails(interfaceSignature.output)}
+                    </div>
                 ` : ''}
                 ${subscriptionHtml}
                 ${Object.keys(interfaceExposure).length > 0 ? `

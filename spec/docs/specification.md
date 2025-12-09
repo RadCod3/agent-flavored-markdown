@@ -255,26 +255,74 @@ interface:
 
 ##### Signature Object {#signature-object}
 
-Defines the data contract for the agent.
+Defines the data contract for the agent. The `input` and `output` fields MUST conform to the [JSON Schema](https://json-schema.org/) specification, but MAY be expressed in YAML syntax (as is common in OpenAPI and similar specifications). This allows for:
 
-| Field    | Type    | Required | Description                                                                                                |
-|----------|---------|----------|------------------------------------------------------------------------------------------------------------|
-| `input`  | `array` | Yes      | An array of objects, each defining a named input parameter. The dynamic "user prompt" should be defined here. |
-| `output` | `array` | Yes      | An array of objects, each defining a named output parameter.                                                      |
+- Simple signatures (e.g., a single string, number, boolean, or array)
+- Complex, structured objects with named properties
+- Full expressiveness of JSON Schema for validation and documentation
 
-Each `input` or `output` object has the following structure:
+**Recommended Documentation for Object Schemas:**
+When `input` or `output` is an object type, it is RECOMMENDED to document the properties using a table with the following columns:
 
-| Key           | Type      | Description                                     |
-|---------------|-----------|-------------------------------------------------|
-| `name`        | `string`  | The name of the parameter (e.g., `user_prompt`). |
-| `type`        | `string`  | The data type. Common types include: `string`, `number`, `boolean`, `json`, `array`, `file`. The full set of supported types is implementation-specific. |
-| `description` | `string`  | A brief explanation of the parameter.           |
-| `required`    | `boolean` | (For `input` only) Whether the parameter is mandatory. |
+| Name | Type | Description | Required |
+|------|------|-------------|----------|
+| property name | JSON Schema type | Description of the property | true/false |
 
+This table maps directly to the `properties`, `type`, `description`, and `required` fields in JSON Schema. For example:
+
+```yaml
+signature:
+  input:
+    type: object
+    properties:
+      user_prompt:
+        type: string
+        description: "The user's query or request"
+      context:
+        type: object
+        description: "Additional context for the request"
+    required: [user_prompt]
+  output:
+    type: object
+    properties:
+      response:
+        type: string
+        description: "The agent's response to the user prompt"
+      confidence:
+        type: number
+        description: "Confidence score for the response"
+    required: [response]
+```
+
+**Other Examples:**
+
+*Single string input/output:*
+```yaml
+signature:
+  input:
+    type: string
+  output:
+    type: string
+```
+
+*Array input/output:*
+```yaml
+signature:
+  input:
+    type: array
+    items:
+      type: string
+  output:
+    type: array
+    items:
+      type: string
+```
 
 **Default Behavior:**
-- The default `type` is `function`.
-- The default `signature` includes one string input parameter named `user_prompt` and one string output parameter named `response`.
+
+Default signature behavior:
+- For `function`, `chat`, and `service` types: the default `signature` is string input and string output.
+- For `webhook` type: the `input` field MAY be omitted, as the webhook provider determines the input payload structure.
 
 AFM implementations **SHALL** use this definition to generate the agent's callable interface and to ensure consistent behavior across different platforms.
 
@@ -323,14 +371,19 @@ interface:
   type: function
   signature:
     input:
-      - name: user_prompt
-        type: string
-        description: "The user's query or request"
-        required: true
+      type: object
+      properties:
+        user_prompt:
+          type: string
+          description: "The user's query or request"
+      required: [user_prompt]
     output:
-      - name: response
-        type: string
-        description: "The agent's response to the user prompt"
+      type: object
+      properties:
+        response:
+          type: string
+          description: "The agent's response to the user prompt"
+      required: [response]
 ```
 
 **Service agent:**
@@ -339,21 +392,25 @@ interface:
   type: service
   signature:
     input:
-      - name: user_prompt
-        type: string
-        description: "The user's query or request"
-        required: true
-      - name: context
-        type: json
-        description: "Additional context for the request"
-        required: false
+      type: object
+      properties:
+        user_prompt:
+          type: string
+          description: "The user's query or request"
+        context:
+          type: object
+          description: "Additional context for the request"
+      required: [user_prompt]
     output:
-      - name: response
-        type: string
-        description: "The agent's response to the user prompt"
-      - name: confidence
-        type: number
-        description: "Confidence score for the response"
+      type: object
+      properties:
+        response:
+          type: string
+          description: "The agent's response to the user prompt"
+        confidence:
+          type: number
+          description: "Confidence score for the response"
+      required: [response]
   exposure:
     http:
       path: "/research-assistant"
@@ -365,14 +422,19 @@ interface:
   type: chat
   signature:
     input:
-      - name: message
-        type: string
-        description: "The user's chat message"
-        required: true
+      type: object
+      properties:
+        message:
+          type: string
+          description: "The user's chat message"
+      required: [message]
     output:
-      - name: reply
-        type: string
-        description: "The agent's chat reply"
+      type: object
+      properties:
+        reply:
+          type: string
+          description: "The agent's chat reply"
+      required: [reply]
   exposure:
     http:
       path: "/chatbot"
@@ -384,18 +446,22 @@ interface:
   type: webhook
   signature:
     input:
-      - name: event
-        type: string
-        description: "The event type received by the webhook"
-        required: true
-      - name: payload
-        type: json
-        description: "The event payload"
-        required: true
+      type: object
+      properties:
+        event:
+          type: string
+          description: "The event type received by the webhook"
+        payload:
+          type: object
+          description: "The event payload"
+      required: [event, payload]
     output:
-      - name: result
-        type: string
-        description: "The agent's response to the webhook event"
+      type: object
+      properties:
+        result:
+          type: string
+          description: "The agent's response to the webhook event"
+      required: [result]
   subscription:
     protocol: "websub"
     hub: "https://example.com/websub-hub"
