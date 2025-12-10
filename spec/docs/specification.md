@@ -9,9 +9,7 @@ hide:
 
 ## 1. Introduction
 
-AFM (Agent Flavored Markdown) provides a structured, markdown-based format for defining the capabilities, behaviors, and knowledge of AI agents. The goal is to create a universal standard that allows agents to be easily defined, shared, and deployed.
-
-AFM is designed to be composable. It supports not only the definition of individual agents but also complex, multi-agent systems where agents can expose services for other agents to consume.
+AFM (Agent Flavored Markdown) is a markdown-based format to define AI agents. It allows agents to be written in text once and reused across different platforms.
 
 This document details the AFM file format, its syntax, and the schema for defining an agent.
 
@@ -22,43 +20,26 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 AFM addresses the current fragmentation in the AI agent ecosystem by providing a unified standard for agent definition and interoperability:
 
-- **Simple Syntax**: Move away from complex, imperative code. AFM allows developers to *declare* an agent's properties, tools, and configurations in a simple, text-based format.
-- **Human-Readability**: AFM uses a simple, elegant markdown-based syntax that is intuitive for both developers and non-technical stakeholders to read, write, and understand.
+- **Simple Syntax**: AFM allows developers to *declare* an agent's instructions, tools, and configuration in a simple, text-based format, moving away from complex, imperative code.
+- **Human-Readability**: AFM uses a simple markdown-based syntax that is intuitive for both developers and non-technical stakeholders to read, write, and understand.
 - **Adaptable**: AFM is designed to be flexible and extensible, allowing the standard to evolve as AI technologies and requirements change.
-- **Unified Experience**: Provide a clean, declarative model that works seamlessly for both developers writing code and those using visual, low-code interfaces. The same AFM file can power both experiences.
-**Agent Duality**: Natively support the dual nature of agents as both callable functions (e.g., within an application or as a scheduled task) and as exposable services (e.g., chat agents) for interoperability.
+- **Unified Experience**: AFM provides a clean, declarative model that works seamlessly for both developers writing code and those using visual, low-code interfaces. The same AFM file can power both experiences.
 - **Interoperability**: AFM provides a standard, unambiguous syntax for agent definition, ensuring that diverse platforms and tools can consistently use the same agent blueprint.
-
 
 ## 2. Core Concepts
 
 AFM is built around several core concepts that define how agents are structured and interact:
 
 - **Agent**: The primary entity defined in AFM, representing an AI agent with specific capabilities and behaviors.
-- **Role**: The set of responsibilities or tasks an agent is designed to perform, described in clear, natural language to define its purpose within a given context.
-- **Instructions**: Explicit, natural language directives that shape the agent's behavior and guide its actions, typically forming the core of the system prompt.
-- **Agent Details**: Programmatic metadata that describes the agent, including name, version, author, and other identifying information.
-- **Tools**: External tools and services available to the agent (via MCP).
-- **Interface**: Specifications for how agents expose themselves to the outside world, defining their callable signature and service endpoints.
+- **Role**: The responsibilities or tasks an agent is designed to perform, defining its purpose within a given context.
+- **Instructions**: Explicit directives in natural language that shape the agent's behavior and guide its actions, typically forming the core of the system prompt.
+- **Agent Details**: Programmatic metadata describing the agent, including name, version, author, and other identifying information.
+- **Tools**: External tools and services available to the agent (e.g., via MCP).
+- **Interface**: The specification for how an agent exposes itself to the outside world, defining its callable signature and endpoints.
 
 ## 3. File Format and Content
 
 An agent definition file must use the `*.afm.md` or `.afm` extension. 
-
-The filename (without extension) serves as the **Agent Identifier** - a unique identifier for the agent within its [namespace](#field-namespace). This identifier is **REQUIRED**.
-
-**Agent Identifier Rules:**
-
-- The identifier **MUST NOT** start with special characters, numbers, or whitespace.
-- It **MUST** be unique within its namespace to avoid conflicts.
-
-The file content must be encoded in UTF-8.
-
-!!! tip "Recommendation for Naming AFM Files"
-  When naming your AFM files, it is **RECOMMENDED** to:
-  
-  - Use lowercase letters and numbers, with hyphens to separate words.
-  - Avoid spaces and special characters to ensure compatibility across different systems.
 
 ## 4. Syntax Overview
 
@@ -78,24 +59,24 @@ This section contains metadata about the agent. These metadata fields are **OPTI
 | Section           | Description                                                                      |
 | ----------------- | -------------------------------------------------------------------------------- |
 | [Agent Details](#51-about-the-agent)     | Information about the agent, such as its name, description, version, and author. |
-| [Agent Model](#52-agent-model)   | Defines the AI model that powers the agent, including endpoint and authentication. |
+| [Agent Model](#52-agent-model)   | Defines the AI model that powers the agent. |
 | [Agent Interface](#53-agent-interface)   | Defines how the agent is invoked and its input/output signature.                 |
 | [Agent Tools](#54-tools) | Defines external tools available to the agent (e.g., via MCP).                  |
-| [Agent Execution](#55-agent-execution) | Runtime execution control settings like iteration limits. |
+| [Agent Execution](#55-agent-execution) | Runtime execution configuration like iteration limits. |
 
 Refer to the [AFM Schema](#5-schema-definitions) for a complete list of fields and their meanings.
 
 
-### 4.3.  Markdown Body
+### 4.3. Markdown Body
 
 This section contains the detailed, natural language instructions that guide the agent's behavior.
 
 Users can use markdown syntax to format the text, including headings, lists, links, and code blocks.
 
-The Markdown body **SHOULD** contain the following headings, with corresponding content
+The Markdown body **MUST** contain the following headings, with corresponding content.
 
- - `# Role`: A description of the agent's role.
- - `# Instructions`: The explicit, natural language directives that define the agent's behavior, capabilities, and operational guidelines.
+ - `# Role`: Defines the agent's purpose and responsibilities. This section describes what the agent does and the context in which it operates. This content typically forms the opening context of the system prompt.
+ - `# Instructions`: Provides directives that shape the agent's behavior, capabilities, and operational guidelines. This section contains the core logic and rules that govern how the agent processes inputs and generates outputs.
 
 ### 4.4. Example
 
@@ -108,7 +89,6 @@ The Markdown body **SHOULD** contain the following headings, with corresponding 
     name: "Math Tutor"
     description: "An AI assistant that helps with mathematics problems"
     version: "1.0.0"
-    namespace: "education"
     authors:
       - "Jane Smith <jane@example.com>"
     license: "MIT"
@@ -142,19 +122,17 @@ AFM implementations **SHALL** use this section to display the agent's metadata i
 The agent metadata fields are specified in the YAML frontmatter of an AFM file:
 
 ```yaml
-# Agent metadata schema
 spec_version: string   # AFM specification version (e.g., "0.3.0")
 name: string           # The name of the agent
 description: string    # Brief description of the agent's purpose and functionality
 version: string        # Semantic version (e.g., "1.0.0")
-namespace: string      # Logical grouping category for the agent
 author: string         # Single author in format "Name <Email>"
 authors:               # Takes precedence over the 'author' field if both exist
   - string             # Multiple authors, each in format "Name <Email>"
 provider: object       # Agent provider
-  organization: string # Name of the organization
+  name: string         # Name of the organization
   url: string          # URL to the organization's website
-iconUrl: string        # URL to an icon representing the agent
+icon_url: string       # URL to an icon representing the agent
 license: string        # License under which the agent is released
 ```
 
@@ -168,10 +146,9 @@ Each field serves a specific purpose in defining and organizing the agent:
 | <a id="field-name"></a>[`name`](#field-name) | `string` | No | Identifies the agent in human-readable form.<br>Default: inferred from the filename of the AFM file.<br>AFM implementations **SHALL** use this field to display the agent's name in user interfaces. |
 | <a id="field-description"></a>[`description`](#field-description) | `string` | No | Provides a concise summary of what the agent does.<br>Default: inferred from the markdown body `# Role` section.<br>AFM implementations **SHALL** use this field to display the agent's description in user interfaces. |
 | <a id="field-version"></a>[`version`](#field-version) | `string` | No | [Semantic version](https://semver.org/) of the agent definition (MAJOR.MINOR.PATCH).<br>Default: "0.0.0".<br>AFM implementations **SHALL** use this field to display the agent's version in user interfaces. |
-| <a id="field-namespace"></a>[`namespace`](#field-namespace) | `string` | No | Logical grouping category for the agent.<br>Default: "default".<br>AFM implementations **SHALL** use this field to organize agents into logical groups or categories. |
 | <a id="field-author"></a>[`author`](#field-author) | `string` | No | Single author in format `Name <Email>`.<br>Credits the creator of the agent definition. If both `author` and `authors` fields are provided, `authors` takes precedence. |
 | <a id="field-authors"></a>[`authors`](#field-authors) | `string[]` | No | Multiple authors, each in format `Name <Email>`.<br>Credits the creators of the agent definition. Takes precedence over `author` if both exist. |
-| <a id="field-iconurl"></a>[`iconUrl`](#field-iconurl) | `string` | No | URL to an icon representing the agent.<br>This is **OPTIONAL** but recommended for visual representation in user interfaces.<br>AFM implementations **SHALL** use this field to display the agent's icon in user interfaces. |
+| <a id="field-icon-url"></a>[`icon-url`](#field-icon-url) | `string` | No | URL to an icon representing the agent.<br>This is **OPTIONAL** but recommended for visual representation in user interfaces.<br>AFM implementations **SHALL** use this field to display the agent's icon in user interfaces. |
 | <a id="field-provider"></a>[`provider`](#field-provider) | `object` | No | Information about the organization providing the agent.<br>This is **OPTIONAL** but recommended for attribution.<br>See the [Provider Object](#provider-object) below for details. |
 | <a id="field-license"></a>[`license`](#field-license) | `string` | No | License under which the agent definition is released.<br>This is **OPTIONAL** but recommended for clarity. |
 
@@ -179,7 +156,7 @@ Each field serves a specific purpose in defining and organizing the agent:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| <a id="field-provider-organization"></a>[`provider.organization`](#field-provider-organization) | `string` | No | Name of the organization providing the agent. |
+| <a id="field-provider-name"></a>[`provider.name`](#field-provider-name) | `string` | No | Name of the organization providing the agent. |
 | <a id="field-provider-url"></a>[`provider.url`](#field-provider-url) | `string` | No | URL to the organization's website. |
 
 #### 5.1.3. Example Usage
@@ -192,18 +169,16 @@ spec_version: "0.3.0"
 name: "Math Tutor"
 description: "An AI assistant that helps with mathematics problems"
 version: "1.2.0"
-namespace: "education"
 authors:
   - "Jane Smith <jane@example.com>"
   - "John Doe <john@example.com>"
 provider:
-  organization: "Example AI Solutions"
+  name: "Example AI Solutions"
   url: "https://example.com"
-iconUrl: "https://example.com/icons/math-tutor.png"
+icon-url: "https://example.com/icons/math-tutor.png"
 license: "MIT"
 ---
 ```
-
 
 ### 5.2. Agent Model {#52-agent-model}
 
@@ -213,7 +188,7 @@ This section specifies the AI model or language model that powers the agent. It 
 
 | Field            | Type     | Required | Description                                                                 |
 |------------------|----------|----------|-----------------------------------------------------------------------------|
-| `name`           | `string` | No       | Model identifier or name (e.g., "claude-3-sonnet-20240229", "gpt-4"). |
+| `name`           | `string` | No       | Model identifier or name. |
 | `url`            | `string` | No       | The URL endpoint for the model service. |
 | `authentication` | `object` | No       | Authentication configuration for accessing the model. See [Section 5.6](#56-authentication) for the schema. |
 
@@ -228,34 +203,14 @@ model:
 
 #### 5.2.3. Example Usage
 
-**API-based model:**
-```yaml
-model:
-  url: "https://api.anthropic.com/v1/messages"
-  authentication:
-    type: "api_key"
-    key: "${ANTHROPIC_API_KEY}"
-```
-
-**Named model:**
-```yaml
-model:
-  name: "claude-3-sonnet-20240229"
-  authentication:
-    type: "api_key"
-    key: "${ANTHROPIC_API_KEY}"
-```
-
-**Model with both name and URL:**
 ```yaml
 model:
   name: "gpt-4-turbo"
   url: "https://api.openai.com/v1/chat/completions"
   authentication:
     type: "bearer"
-    token: "${OPENAI_API_KEY}"
+    token: "${env:OPENAI_API_KEY}"
 ```
-
 
 ### 5.3. Agent Interface {#53-agent-interface}
 
@@ -538,7 +493,7 @@ interface:
     hub: "https://example.com/websub-hub"
     topic: "https://example.com/events/agent"
     callback: "https://myagent.example.com/webhook-callback"
-    secret: "${WEBHOOK_SECRET}"
+    secret: "${env:WEBHOOK_SECRET}"
   exposure:
     http:
       path: "/webhook-handler"
@@ -554,7 +509,7 @@ The tools fields are specified in the YAML frontmatter of an AFM file:
 
 ```yaml
 tools:
-  mcp: object         # Configuration for connecting to MCP tools.
+  mcp: array         # List of MCP servers to connect to.
 ```
 
 #### 5.4.2. Field Definitions
@@ -562,13 +517,7 @@ tools:
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `tools` | `object` | No | Container for protocol-specific tool connection configurations. |
-| `tools.mcp` | `object` | No | Configuration for Model Context Protocol. See [Section 6.1](#61-model-context-protocol-mcp) for details. |
-
-**MCP Object:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `servers` | `array` | Yes | List of MCP servers to connect to. See [Section 6.1](#61-model-context-protocol-mcp) for detailed schema. |
+| `tools.mcp` | `array` | No | List of MCP servers to connect to. See [Section 6.1](#61-model-context-protocol-mcp) for detailed schema. |
 
 #### 5.4.3. Example Usage
 
@@ -577,21 +526,14 @@ Here's a simple example of tools in an AFM file:
 ```yaml
 tools:
   mcp:
-    servers:
-      - name: "github_api"
-        transport:
-          type: "http_sse"
-          url: "https://mcp.github.com/api"
+    - name: "github_api"
+      transport:
+        type: "http"
+        url: "https://api.githubcopilot.com/mcp/"
+        authentication:
+          type: "bearer"
+          token: "${env:GITHUB_TOKEN}"
 ```
-
-<!-- ### 5.4. Agent Resources
-
-This section defines the schema for resources that an agent can access or utilize from the implementation environment. These resources can be models, memory or other data sources that the agent can leverage to perform its tasks.
-
-This section is **OPTIONAL**. 
-
-!!! warning "WIP"
-    Work in progress: The schema for agent resources is still under development. This section will be updated in future versions of the AFM specification. -->
 
 ### 5.5. Agent Execution {#55-agent-execution}
 
@@ -639,7 +581,7 @@ authentication:
 
 | Key    | Type   | Required | Description                                                                                                                                                    |
 | ------ | ------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `type` | String | Yes      | Authentication scheme (e.g., `bearer`, `jwt`, `oauth2`, `basic`).<br>Determines which additional fields are required or supported. |
+| `type` | String | Yes      | Authentication scheme (e.g., `bearer`, `basic`, `jwt`, `oauth2`).<br>Determines which additional fields are required or supported. |
 | `*`    | Various | Varies   | Additional fields are authentication-type specific. See examples below for common patterns.<br>Values **SHOULD** use [variable substitution](#7-variable-substitution) to reference credentials securely. |
 
 !!! note "Authentication Field Structure"
@@ -664,21 +606,13 @@ authentication:
 # Bearer token authentication
 authentication:
   type: bearer
-  token: "${API_TOKEN}"
+  token: "${env:API_TOKEN}"
 
 # Basic authentication
 authentication:
   type: basic
-  username: "${API_USERNAME}"
-  password: "${API_PASSWORD}"
-
-# OAuth2 authentication
-authentication:
-  type: oauth2
-  client_id: "${OAUTH_CLIENT_ID}"
-  client_secret: "${OAUTH_CLIENT_SECRET}"
-  token_url: "https://auth.example.com/oauth/token"
-  scope: "read:data write:data"
+  username: "${env:API_USERNAME}"
+  password: "${env:API_PASSWORD}"
 ```
 
 ## 6. Protocol Extensions
@@ -693,41 +627,36 @@ The Model Context Protocol (MCP) enables agents to connect to external tools and
 
 ```yaml
 mcp:
-  servers:
-    - name: string           # Unique identifier for the server connection
-      transport:
-        type: string         # Transport mechanism (http_sse, stdio, streamable_http)
-        url: string          # URL endpoint (for http_sse and streamable_http)
-        command: string      # Shell command (for stdio)
-      authentication:        # Optional
-        type: string         # Authentication scheme (bearer, jwt, oauth2, etc.)
-      tool_filter:           # Optional
-        allow: [string]      # Whitelist of tools in "tool_name" format
-        deny: [string]       # Blacklist of tools in "tool_name" format
+  - name: string           # Unique identifier for the server connection
+    transport:
+      type: string         # Transport mechanism (must be "http")
+      url: string          # URL endpoint for the MCP server
+      authentication:      # Optional authentication configuration
+        type: string       # Authentication scheme (bearer, jwt, oauth2, etc.)
+    tool_filter:           # Optional
+      allow: [string]      # Whitelist of tools in "tool_name" format
+      deny: [string]       # Blacklist of tools in "tool_name" format
 ```
 
 #### 6.1.2. Field Definitions
 
-| Key | Type | Required | Description |
-|-----|------|----------|-------------|
-| `servers` | Array | Yes | Specifies the MCP servers that the agent can connect to. Each server entry must have a unique `name` that identifies the connection. |
+The `mcp` field is an array where each element represents an MCP server connection. Each server entry must have a unique `name` that identifies the connection.
 
-**Server Object:**
+**MCP Server Object:**
 
 | Key              | Type   | Required | Description                                                                                                        |
 | ---------------- | ------ | -------- | ------------------------------------------------------------------------------------------------------------------ |
 | `name`           | String | Yes      | A unique, human-readable identifier for the connection.                                                            |
 | `transport`      | Object | Yes      | An object defining the communication mechanism. See [Transport Object](#transport-object) below.                   |
-| `authentication` | Object | No       | An object declaring the required authentication scheme. See [Section 5.6](#56-authentication) for the schema. |
 | `tool_filter`    | Object | No       | Filter configuration for tools from this server. See [Tool Filter Object](#tool-filter-object) below.              |
 
 **<a id="transport-object"></a>Transport Object:**
 
-| Key       | Type   | Required       | Description                                                                                                                                                                                               |
-| --------- | ------ | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `type`    | String | Yes            | Transport mechanism, which must be one of:<br>- `http_sse`: Server-Sent Events over HTTP<br>- `stdio`: Standard input/output for local processes<br>- `streamable_http`: HTTP with streaming capabilities |
-| `url`     | String | For HTTP types | The URL endpoint of the remote MCP server.                                                                                                                                                                |
-| `command` | String | For stdio      | The shell command used to start the local MCP server process.                                                                                                                                             |
+| Key              | Type   | Required | Description                                                                                           |
+| ---------------- | ------ | -------- | ----------------------------------------------------------------------------------------------------- |
+| `type`           | String | Yes      | Transport mechanism. Must be `http`.                                                                  |
+| `url`            | String | Yes      | The URL endpoint of the MCP server.                                                                   |
+| `authentication` | Object | No       | Authentication configuration for the connection. See [Section 5.6](#56-authentication) for the schema.|
 
 **<a id="tool-filter-object"></a>Tool Filter Object:**
 
@@ -744,37 +673,37 @@ mcp:
 
 #### 6.1.3. Example Implementation
 
-This example defines tool connections to a remote GitHub MCP server (requiring OAuth 2.0) and a local filesystem server. Each server has its own tool filter configuration. Note the use of [variable substitution](#7-variable-substitution) for sensitive and/or variable input.
+This example defines tool connections to remote MCP servers with authentication and tool filtering. Note the use of [variable substitution](#7-variable-substitution) for sensitive and/or variable input.
 
 ```yaml
 tools:
   mcp:
-    servers:
-      - name: github_mcp_server
-        transport:
-          type: http_sse
-          url: "${GITHUB_MCP_URL}"
+    - name: github_mcp_server
+      transport:
+        type: http
+        url: "${env:GITHUB_MCP_URL}"
         authentication:
           type: bearer
-          token: "${GITHUB_OAUTH_TOKEN}"
-        tool_filter:
-          allow:
-            - "issues.create"
-            - "repos.list"
+          token: "${env:GITHUB_OAUTH_TOKEN}"
+      tool_filter:
+        allow:
+          - "issues.create"
+          - "repos.list"
 
-      - name: local_filesystem_server
-        transport:
-          type: stdio
-          command: "npx -y @modelcontextprotocol/server-filesystem ${WORKSPACE_PATH}"
-        tool_filter:
-          allow:
-            - "read_file"
-            - "list_directory"
-            - "stat"
-          deny:
-            - "write_file"
-            - "delete_file"
-            - "create_file"
+    - name: database_server
+      transport:
+        type: http
+        url: "${env:DATABASE_MCP_URL}"
+        authentication:
+          type: bearer
+          token: "${env:DATABASE_API_KEY}"
+      tool_filter:
+        allow:
+          - "query"
+          - "search"
+        deny:
+          - "delete"
+          - "drop_table"
 ```
 
 ### 6.2. Agent-to-Agent (A2A)
@@ -792,20 +721,19 @@ Variable resolution commonly occurs before the agent is made available for use, 
 
 ### 7.1. Example Usage
 
+Implementations MAY adopt and support prefixes to specify the source of variable values:
+
 ```yaml
 authentication:
   type: "bearer"
-  token: "${API_TOKEN}"
+  token: "${env:API_TOKEN}"        # Environment variable
 transport:
-  url: "${BASE_URL}/mcp/v1"
-```
+  url: "${file:api.baseUrl}"        # From external config file
 
-Implementations MAY adopt and support prefixes. E.g.,
-
-```yaml
-token: "${env:API_TOKEN}" # Environment variable
-url: "${file:api.baseUrl}" # From external config file
-password: "${secret:DB_PASSWORD}" # From secrets manager
+model:
+  authentication:
+    type: "bearer"
+    token: "${secret:MODEL_API_KEY}" # From secrets manager
 ```
 
 ## 8. Future Work
@@ -813,4 +741,3 @@ password: "${secret:DB_PASSWORD}" # From secrets manager
 This section outlines potential future enhancements to the AFM specification, including:
 
 - Exposing agents via the Agent-to-Agent (A2A) protocol.
-- Specifying the Large Language Model (LLM) configuration for agents.
