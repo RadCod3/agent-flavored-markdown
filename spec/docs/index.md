@@ -57,11 +57,13 @@ interface:
       path: "/code-review"
 tools:
   mcp:
-    servers:
-      - name: "github"
-        transport:
-          type: "stdio"
-          command: "npx -y @modelcontextprotocol/server-github"
+    - name: "github"
+      transport:
+        type: "http"
+        url: "${env:GITHUB_MCP_URL}"
+        authentication:
+          type: "bearer"
+          token: "${env:GITHUB_TOKEN}"
 ---
 
 # Role
@@ -79,7 +81,7 @@ Review code systematically:
 4. **Maintainability**: Flag unclear patterns
 5. **Testing**: Verify test coverage
 
-For each issue, explain why it matters and suggest improvements with 
+For each issue, explain why it matters and suggest improvements with
 examples. Acknowledge good practices.
 ```
 

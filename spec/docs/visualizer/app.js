@@ -30,51 +30,52 @@ function renderMcpDetailsHtml(mcpServer) {
                 <h6 class="fw-bold mb-2">Transport</h6>
                 <div class="mb-3">
                     <div class="fw-semibold">Type:</div>
-                    <div class="form-control form-control-auto-height mt-1">${escapeHtml(mcpServer.transport?.type || 'stdio')}</div>
+                    <div class="form-control form-control-auto-height mt-1">${escapeHtml(mcpServer.transport?.type || 'http')}</div>
                 </div>
-                ${mcpServer.transport?.command ? `
-                <div class="mb-3">
-                    <div class="fw-semibold">Command:</div>
-                    <div class="form-control form-control-auto-height mt-1">${highlightVars(mcpServer.transport.command)}</div>
-                </div>
-                ` : ''}
                 ${mcpServer.transport?.url ? `
                 <div class="mb-3">
                     <div class="fw-semibold">URL:</div>
                     <div class="form-control form-control-auto-height mt-1">${highlightVars(mcpServer.transport.url)}</div>
                 </div>
                 ` : ''}
-            </div>
-
-            ${mcpServer.transport?.args && mcpServer.transport.args.length > 0 ? `
-            <div class="mb-4 border rounded p-3">
-                <h6 class="fw-bold mb-2">Arguments</h6>
-                <div id="transport-args">
-                    ${mcpServer.transport.args.map((arg, idx) => `
-                        <div class="mb-3">
-                            <div class="fw-semibold">${idx}</div>
-                            <div class="form-control form-control-auto-height mt-1"><code class="arg-value">${highlightVars(arg)}</code></div>
-                        </div>
-                    `).join('')}
+                ${mcpServer.transport?.authentication ? `
+                <div class="mb-4 mt-3">
+                    <h6 class="fw-bold mb-2">Authentication</h6>
+                    <div class="mb-3">
+                        <div class="fw-semibold">Type:</div>
+                        <div class="form-control form-control-auto-height mt-1">${highlightVars(mcpServer.transport.authentication.type || 'configured')}</div>
+                    </div>
+                    ${Object.entries(mcpServer.transport.authentication)
+                        .filter(([key]) => key !== 'type')
+                        .map(([key, value]) => `
+                            <div class="mb-3">
+                                <div class="fw-semibold">${escapeHtml(key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' '))}:</div>
+                                <div class="form-control form-control-auto-height mt-1">${highlightVars(String(value))}</div>
+                            </div>
+                        `).join('')}
                 </div>
+                ` : ''}
             </div>
-            ` : ''}
 
-            ${mcpServer.authentication ? `
+            ${mcpServer.tool_filter ? `
             <div class="mb-4 border rounded p-3">
-                <h6 class="fw-bold mb-2">Authentication</h6>
+                <h6 class="fw-bold mb-2">Tool Filter</h6>
+                ${mcpServer.tool_filter.allow ? `
                 <div class="mb-3">
-                    <div class="fw-semibold">Type:</div>
-                    <div class="form-control form-control-auto-height mt-1">${highlightVars(mcpServer.authentication.type || 'configured')}</div>
+                    <div class="fw-semibold mb-2">Allowed Tools:</div>
+                    <div class="d-flex flex-wrap gap-2">
+                        ${mcpServer.tool_filter.allow.map(tool => `<span class="badge bg-success">${escapeHtml(tool)}</span>`).join('')}
+                    </div>
                 </div>
-                ${Object.entries(mcpServer.authentication)
-                    .filter(([key]) => key !== 'type')
-                    .map(([key, value]) => `
-                        <div class="mb-3">
-                            <div class="fw-semibold">${escapeHtml(key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' '))}:</div>
-                            <div class="form-control form-control-auto-height mt-1">${highlightVars(String(value))}</div>
-                        </div>
-                    `).join('')}
+                ` : ''}
+                ${mcpServer.tool_filter.deny ? `
+                <div class="mb-3">
+                    <div class="fw-semibold mb-2">Denied Tools:</div>
+                    <div class="d-flex flex-wrap gap-2">
+                        ${mcpServer.tool_filter.deny.map(tool => `<span class="badge bg-danger">${escapeHtml(tool)}</span>`).join('')}
+                    </div>
+                </div>
+                ` : ''}
             </div>
             ` : ''}
 
@@ -132,19 +133,21 @@ interface:
       path: \"/code-review\"
 tools:
   mcp:
-    servers:
-      - name: \"github\"
-        transport:
-          type: \"stdio\"
-          command: \"npx -y @modelcontextprotocol/server-github\"
-      - name: \"filesystem\"
-        transport:
-          type: \"stdio\"
-          command: \"npx -y @modelcontextprotocol/server-filesystem\"
-      - name: \"code-analysis-api\"
-        transport:
-          type: \"streamable_http\"
-          url: \"\${BASE_URL}/mcp/v1\"
+    - name: \"github\"
+      transport:
+        type: \"http\"
+        url: \"\${env:GITHUB_MCP_URL}\"
+        authentication:
+          type: \"bearer\"
+          token: \"\${env:GITHUB_TOKEN}\"
+      tool_filter:
+        allow:
+          - \"issues.create\"
+          - \"repos.list\"
+    - name: \"code-analysis-api\"
+      transport:
+        type: \"http\"
+        url: \"\${env:CODE_ANALYSIS_MCP_URL}\"
         authentication:
           type: \"bearer\"
           token: \"\${env:API_TOKEN}\"
@@ -677,8 +680,8 @@ function convertMarkdownToHtml(text) {
 
 function renderHubSpoke(metadata, markdownBody) {
     const container = document.getElementById('hub-spoke-container');
-    
-    const mcpServers = metadata.tools?.mcp?.servers || [];
+
+    const mcpServers = Array.isArray(metadata.tools?.mcp) ? metadata.tools.mcp : [];
     const hasInterface = metadata.interface;
     const interfaceType = metadata.interface?.type || 'function';
     const hasExecutionConfig = metadata.max_iterations !== undefined;
@@ -762,7 +765,7 @@ function renderHubSpoke(metadata, markdownBody) {
                 <div class="spoke-group-label" style="position: absolute; top: ${UI_CONSTANTS.SPOKE_GROUP_LABEL_TOP}px; left: 30px;">MCP Tools</div>
                 ${mcpServers.map((server, idx) => {
                     const escapedServerName = escapeHtml(server.name);
-                    const escapedTransportType = escapeHtml(server.transport?.type || 'stdio');
+                    const escapedTransportType = escapeHtml(server.transport?.type || 'http');
                     return `
                     <div class="spoke spoke-mcp" data-spoke-type="mcp" data-spoke-index="${idx}" style="position: absolute; top: ${UI_CONSTANTS.SPOKE_START_TOP + (idx * UI_CONSTANTS.SPOKE_SPACING)}px; left: 30px;">
                         <div class="spoke-icon">🔧</div>
@@ -1154,7 +1157,7 @@ function showSpokeDetails(spokeType, spokeIndex) {
             break;
         }
         case 'mcp': {
-            const mcpServer = metadata.tools?.mcp?.servers?.[spokeIndex];
+            const mcpServer = Array.isArray(metadata.tools?.mcp) ? metadata.tools.mcp[spokeIndex] : undefined;
             result = renderMcpDetails(mcpServer);
             break;
         }
@@ -1192,8 +1195,11 @@ function renderMetadata(metadata) {
     ];
 
     const tools = [];
-    if (metadata.tools?.mcp?.servers) {
-        tools.push(`MCP Servers: ${metadata.tools.mcp.servers.length}`);
+    if (metadata.tools?.mcp) {
+        const mcpCount = Array.isArray(metadata.tools.mcp) ? metadata.tools.mcp.length : 0;
+        if (mcpCount > 0) {
+            tools.push(`MCP Servers: ${mcpCount}`);
+        }
     }
 
     const html = `

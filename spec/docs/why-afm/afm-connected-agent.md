@@ -26,14 +26,17 @@ Within the `tools.mcp` section, an AFM file lists the specific MCP tool servers 
 # In an AFM file...
 tools:
   mcp:
-    servers:
-      - name: github_api_server
-        transport:
-          type: http_sse
-          url: "https://mcp.github.com/api"
-      - name: local_file_system
-        transport:
-          type: stdio
+    - name: github_api_server
+      transport:
+        type: http
+        url: "https://mcp.github.com/api"
+        authentication:
+          type: bearer
+          token: "${env:GITHUB_TOKEN}"
+    - name: database_server
+      transport:
+        type: http
+        url: "${env:DATABASE_MCP_URL}"
 ```
 
 <div class="grid" markdown>
