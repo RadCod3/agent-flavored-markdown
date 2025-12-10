@@ -15,7 +15,7 @@ AFM is designed to be composable. It supports not only the definition of individ
 
 This document details the AFM file format, its syntax, and the schema for defining an agent.
 
-<!-- The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [BCP 14](https://www.rfc-editor.org/info/bcp14) [[RFC2119](https://datatracker.ietf.org/doc/html/rfc2119)] [[RFC8174](https://datatracker.ietf.org/doc/html/rfc8174)] when, and only when, they appear in all capitals, as shown here. -->
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [BCP 14](https://www.rfc-editor.org/info/bcp14) [[RFC2119](https://datatracker.ietf.org/doc/html/rfc2119)] [[RFC8174](https://datatracker.ietf.org/doc/html/rfc8174)] when, and only when, they appear in all capitals, as shown here.
 
 
 ### 1.1. Key Goals of AFM
@@ -78,9 +78,10 @@ This section contains metadata about the agent. These metadata fields are **OPTI
 | Section           | Description                                                                      |
 | ----------------- | -------------------------------------------------------------------------------- |
 | [Agent Details](#51-about-the-agent)     | Information about the agent, such as its name, description, version, and author. |
-| [Agent Interface](#52-agent-interface)   | Defines how the agent is invoked and its input/output signature.                 |
-| [Agent Tools](#53-tools) | Defines external tools available to the agent (e.g., via MCP).                  |
-| [Execution Configuration](#54-execution-configuration) | Runtime execution control settings like iteration limits. |
+| [Agent Model](#52-agent-model)   | Defines the AI model that powers the agent, including endpoint and authentication. |
+| [Agent Interface](#53-agent-interface)   | Defines how the agent is invoked and its input/output signature.                 |
+| [Agent Tools](#54-tools) | Defines external tools available to the agent (e.g., via MCP).                  |
+| [Agent Execution](#55-agent-execution) | Runtime execution control settings like iteration limits. |
 
 Refer to the [AFM Schema](#5-schema-definitions) for a complete list of fields and their meanings.
 
@@ -130,7 +131,7 @@ The Markdown body **SHOULD** contain the following headings, with corresponding 
 
 This section defines the schema for the Front Matter. For clarity, the schema is divided into several subsections, each detailing a specific aspect of the Agent.
 
-### 5.1. About the Agent 
+### 5.1. About the Agent {#51-about-the-agent} 
 
 This section defines the schema for agent-specific metadata. It is **OPTIONAL** but recommended for clarity and organization.
 
@@ -204,7 +205,59 @@ license: "MIT"
 ```
 
 
-### 5.2. Agent Interface
+### 5.2. Agent Model {#52-agent-model}
+
+This section specifies the AI model or language model that powers the agent. It is **OPTIONAL** and defines how to access and authenticate with the model service.
+
+#### 5.2.1. Field Definitions
+
+| Field            | Type     | Required | Description                                                                 |
+|------------------|----------|----------|-----------------------------------------------------------------------------|
+| `name`           | `string` | No       | Model identifier or name (e.g., "claude-3-sonnet-20240229", "gpt-4"). |
+| `url`            | `string` | No       | The URL endpoint for the model service. |
+| `authentication` | `object` | No       | Authentication configuration for accessing the model. See [Section 5.6](#56-authentication) for the schema. |
+
+#### 5.2.2. Schema Overview
+
+```yaml
+model:
+  name: string             # Optional model name or identifier
+  url: string              # Optional model service endpoint URL
+  authentication: object   # Optional authentication configuration
+```
+
+#### 5.2.3. Example Usage
+
+**API-based model:**
+```yaml
+model:
+  url: "https://api.anthropic.com/v1/messages"
+  authentication:
+    type: "api_key"
+    key: "${ANTHROPIC_API_KEY}"
+```
+
+**Named model:**
+```yaml
+model:
+  name: "claude-3-sonnet-20240229"
+  authentication:
+    type: "api_key"
+    key: "${ANTHROPIC_API_KEY}"
+```
+
+**Model with both name and URL:**
+```yaml
+model:
+  name: "gpt-4-turbo"
+  url: "https://api.openai.com/v1/chat/completions"
+  authentication:
+    type: "bearer"
+    token: "${OPENAI_API_KEY}"
+```
+
+
+### 5.3. Agent Interface {#53-agent-interface}
 
 This section defines how an agent can be interacted with or triggered. It includes the agent's public API, function signature, or service endpoint. It is **OPTIONAL** and specifies how the agent receives inputs and produces outputs.
 
@@ -212,7 +265,7 @@ If the `interface` field is not explicitly defined in the front matter, AFM impl
 
 Users can override these defaults by specifying the `interface` field in the front matter. AFM implementations **SHALL** use this definition to generate the agent's callable interface and to ensure consistent behavior across different platforms.
 
-#### 5.2.1. Interface Types
+#### 5.3.1. Interface Types
 
 The `interface.type` field **MUST** be one of the following values:
 
@@ -225,7 +278,7 @@ The `interface.type` field **MUST** be one of the following values:
 
 Each interface type defines how the agent is triggered and interacted with. Implementations **MAY** support all four types as described above.
 
-#### 5.2.1. Schema Overview
+#### 5.3.2. Schema Overview
 
 ```yaml
 interface:
@@ -244,7 +297,7 @@ interface:
     secret: string       # Secret for verifying webhook payloads (optional)
 ```
 
-#### 5.2.2. Field Definitions
+#### 5.3.3. Field Definitions
 
 | Field         | Type     | Required | Description                                                                                             |
 |---------------|----------|----------|---------------------------------------------------------------------------------------------------------|
@@ -335,7 +388,7 @@ AFM implementations **SHALL** use this definition to generate the agent's callab
 | `hub`            | `string` | Yes      | The subscription hub URL. |
 | `topic`          | `string` | Yes      | The topic to subscribe to. |
 | `callback`       | `string` | No       | The callback URL where events should be delivered (optional, for dynamic or self-registration). |
-| `authentication` | `object` | No       | Optional authentication configuration for the webhook subscription. See [Section 5.5](#55-authentication) for the schema. |
+| `authentication` | `object` | No       | Optional authentication configuration for the webhook subscription. See [Section 5.6](#56-authentication) for the schema. |
 | `secret`         | `string` | No       | A secret used to sign or verify webhook payloads (optional, for security). |
 
 ##### Exposure Object {#exposure-object}
@@ -354,17 +407,17 @@ Applies to agents of type `service`, `chat`, and `webhook`, and defines how the 
 | Field            | Type     | Required | Description                                                                 |
 |------------------|----------|----------|-----------------------------------------------------------------------------|
 | `path`           | `string` | Yes      | The URL path segment for the agent's HTTP endpoint (e.g., `/math-tutor`). |
-| `authentication` | `object` | No       | Optional authentication configuration for the HTTP endpoint. See [Section 5.5](#55-authentication) for the schema. |
+| `authentication` | `object` | No       | Optional authentication configuration for the HTTP endpoint. See [Section 5.6](#56-authentication) for the schema. |
 
 !!! note "HTTP Object Usage"
     The `http` object is applicable for agents of type `service`, `chat`, or `webhook`. It defines how the agent is exposed via a standard HTTP endpoint, allowing other systems to interact with it over the web.
 
     AFM does not define the HTTP methods (GET, POST, etc.) for the agent's endpoint. This is left to the implementation to decide based on the agent's functionality and requirements.
     
-    HTTP authentication uses the generic authentication schema defined in [Section 5.5](#55-authentication), where the `type` field specifies the authentication scheme (e.g., `oauth2`, `api_key`), and the rest of the fields provide the configuration.
+    HTTP authentication uses the generic authentication schema defined in [Section 5.6](#56-authentication), where the `type` field specifies the authentication scheme (e.g., `oauth2`, `api_key`), and the rest of the fields provide the configuration.
 
 
-#### 5.2.3. Example Usages
+#### 5.3.4. Example Usages
 
 **Function agent (default simple string):**
 ```yaml
@@ -491,11 +544,11 @@ interface:
       path: "/webhook-handler"
 ```
 
-### 5.3. Tools
+### 5.4. Tools {#54-tools}
 
 This section defines which external tools and resources the agent can access.
 
-#### 5.3.1. Schema Overview
+#### 5.4.1. Schema Overview
 
 The tools fields are specified in the YAML frontmatter of an AFM file:
 
@@ -504,7 +557,7 @@ tools:
   mcp: object         # Configuration for connecting to MCP tools.
 ```
 
-#### 5.3.2. Field Definitions
+#### 5.4.2. Field Definitions
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -517,7 +570,7 @@ tools:
 |-------|------|----------|-------------|
 | `servers` | `array` | Yes | List of MCP servers to connect to. See [Section 6.1](#61-model-context-protocol-mcp) for detailed schema. |
 
-#### 5.3.3. Example Usage
+#### 5.4.3. Example Usage
 
 Here's a simple example of tools in an AFM file:
 
@@ -540,35 +593,35 @@ This section is **OPTIONAL**.
 !!! warning "WIP"
     Work in progress: The schema for agent resources is still under development. This section will be updated in future versions of the AFM specification. -->
 
-### 5.4. Execution Configuration
+### 5.5. Agent Execution {#55-agent-execution}
 
 This section defines execution control and runtime behavior settings for the agent. These settings are **OPTIONAL** and help AFM implementations manage agent execution safely and efficiently.
 
-#### 5.4.1. Schema Overview
+#### 5.5.1. Schema Overview
 
 ```yaml
 max_iterations: int    # Maximum number of iterations to prevent infinite loops
 ```
 
-#### 5.4.2. Field Definitions
+#### 5.5.2. Field Definitions
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | <a id="field-max-iterations"></a>[`max_iterations`](#field-max-iterations) | `integer` | No | Maximum number of iterations the agent can perform in a single invocation.<br>This helps prevent infinite loops or runaway execution.<br>Default: Implementation-specific (typically unlimited or a high value like 100).<br>AFM implementations **SHOULD** respect this limit and gracefully terminate agent execution when the limit is reached. |
 
-#### 5.4.3. Example Usage
+#### 5.5.3. Example Usage
 
 ```yaml
 max_iterations: 50
 ```
 
-### 5.5. Authentication {#55-authentication}
+### 5.6. Authentication {#56-authentication}
 
 This section defines the generic client authentication schema that can be reused across different parts of the AFM specification, including MCP server connections and webhook subscriptions.
 
 The authentication object is **OPTIONAL** and specifies authentication configuration for connections.
 
-#### 5.4.1. Schema Overview
+#### 5.6.1. Schema Overview
 
 ```yaml
 authentication:
@@ -580,7 +633,7 @@ authentication:
   # - For oauth2: a grant_type field and client_id, client_secret, token_url, etc.
 ```
 
-#### 5.4.2. Field Definitions
+#### 5.6.2. Field Definitions
 
 <a id="authentication-object"></a>**Authentication Object:**
 
@@ -605,7 +658,7 @@ authentication:
     - Let the agent's host environment manage actual credential storage and retrieval
     - Keep credentials out of version control systems
 
-#### 5.4.3. Example Usage
+#### 5.6.3. Example Usage
 
 ```yaml
 # Bearer token authentication
@@ -665,7 +718,7 @@ mcp:
 | ---------------- | ------ | -------- | ------------------------------------------------------------------------------------------------------------------ |
 | `name`           | String | Yes      | A unique, human-readable identifier for the connection.                                                            |
 | `transport`      | Object | Yes      | An object defining the communication mechanism. See [Transport Object](#transport-object) below.                   |
-| `authentication` | Object | No       | An object declaring the required authentication scheme. See [Section 5.5](#55-authentication) for the schema. |
+| `authentication` | Object | No       | An object declaring the required authentication scheme. See [Section 5.6](#56-authentication) for the schema. |
 | `tool_filter`    | Object | No       | Filter configuration for tools from this server. See [Tool Filter Object](#tool-filter-object) below.              |
 
 **<a id="transport-object"></a>Transport Object:**
