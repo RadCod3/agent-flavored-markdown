@@ -91,19 +91,12 @@ let currentAfmData = null;
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 const UI_CONSTANTS = {
-    ROLE_HEIGHT: 280,
-    INSTRUCTIONS_HEIGHT: 320,
-    HUB_SPOKE_MIN_HEIGHT: 850,
-    // Spoke positioning
-    SPOKE_START_TOP: 190,
-    SPOKE_SPACING: 160,
-    SPOKE_GROUP_LABEL_TOP: 140,
-    INTERFACE_SPOKE_TOP: 80,
-    INTERFACE_LABEL_TOP: 30,
-    EXECUTION_SPOKE_TOP: 280,
-    EXECUTION_LABEL_TOP: 230,
-    // Text truncation
-    DESCRIPTION_MAX_LENGTH: 85,
+    GROUP_LABEL_OFFSET: 40, // px above first box
+    BOX_START_OFFSET: 100,  // px from top for first box
+    BOX_HEIGHT: 120,        // px, should match CSS
+    SPOKE_SPACING: 160,     // px between items in a group
+    GROUP_SPACING: 80,      // px between groups (interfaces <-> execution, etc)
+    DESCRIPTION_MAX_LENGTH: 160,
     HUB_CONTENT_MAX_LENGTH: 110
 };
 
@@ -126,11 +119,11 @@ version: \"1.0.0\"
 namespace: \"development-tools\"
 author: \"Sample Author <author@example.com>\"
 max_iterations: 25
-interface:
-  type: service
-  exposure:
-    http:
-      path: \"/code-review\"
+interfaces:
+  - type: webchat
+    exposure:
+      http:
+        path: \"/code-review\"
 tools:
   mcp:
     - name: \"github\"
@@ -475,47 +468,52 @@ function parseAfmFile(content) {
         throw new Error('Failed to parse YAML frontmatter: ' + error.message);
     }
 
-    const allowedTypes = ['function', 'service', 'chat', 'webhook'];
-    if (Object.prototype.hasOwnProperty.call(metadata, 'interface')) {
-        const iface = metadata.interface;
-        if (!iface || typeof iface !== 'object' || Array.isArray(iface)) {
-            throw new Error('interface must be an object if present');
+    const allowedTypes = ['webchat', 'consolechat', 'webhook'];
+    if (Object.prototype.hasOwnProperty.call(metadata, 'interfaces')) {
+        const interfaces = metadata.interfaces;
+        if (!Array.isArray(interfaces)) {
+            throw new Error('interfaces must be an array if present');
         }
-        if (!iface.type || !allowedTypes.includes(iface.type)) {
-            throw new Error(`interface.type must be one of: ${allowedTypes.join(', ')}`);
-        }
-        if (iface.signature !== undefined) {
-            if (typeof iface.signature !== 'object' || Array.isArray(iface.signature)) {
-                throw new Error('interface.signature must be an object if present');
+        interfaces.forEach((iface, index) => {
+            if (!iface || typeof iface !== 'object' || Array.isArray(iface)) {
+                throw new Error(`interfaces[${index}] must be an object`);
             }
-            // For webhook, input MAY be omitted
-            if (iface.type !== 'webhook') {
-                if (!iface.signature.input || typeof iface.signature.input !== 'object') {
-                    throw new Error('interface.signature.input must be an object for function, chat, and service types');
+            if (!iface.type || !allowedTypes.includes(iface.type)) {
+                throw new Error(`interfaces[${index}].type must be one of: ${allowedTypes.join(', ')}`);
+            }
+            if (iface.signature !== undefined) {
+                if (typeof iface.signature !== 'object' || Array.isArray(iface.signature)) {
+                    throw new Error(`interfaces[${index}].signature must be an object if present`);
                 }
-                if (!iface.signature.output || typeof iface.signature.output !== 'object') {
-                    throw new Error('interface.signature.output must be an object for function, chat, and service types');
+                // For webhook, input MAY be omitted
+                if (iface.type !== 'webhook') {
+                    if (!iface.signature.input || typeof iface.signature.input !== 'object') {
+                        throw new Error(`interfaces[${index}].signature.input must be an object for function, chat, and service types`);
+                    }
+                    if (!iface.signature.output || typeof iface.signature.output !== 'object') {
+                        throw new Error(`interfaces[${index}].signature.output must be an object for function, chat, and service types`);
+                    }
+                } else {
+                    if (iface.signature.input !== undefined && typeof iface.signature.input !== 'object') {
+                        throw new Error(`interfaces[${index}].signature.input must be an object if present for webhook type`);
+                    }
+                    if (!iface.signature.output || typeof iface.signature.output !== 'object') {
+                        throw new Error(`interfaces[${index}].signature.output must be an object for webhook type`);
+                    }
                 }
-            } else {
-                if (iface.signature.input !== undefined && typeof iface.signature.input !== 'object') {
-                    throw new Error('interface.signature.input must be an object if present for webhook type');
+            }
+            if (iface.type === 'webhook') {
+                if (!iface.subscription || typeof iface.subscription !== 'object' || Array.isArray(iface.subscription)) {
+                    throw new Error(`interfaces[${index}].subscription is required and must be an object for webhook type`);
                 }
-                if (!iface.signature.output || typeof iface.signature.output !== 'object') {
-                    throw new Error('interface.signature.output must be an object for webhook type');
+                if (!iface.subscription.protocol) {
+                    throw new Error(`interfaces[${index}].subscription.protocol is required for webhook type`);
+                }
+                if (!iface.subscription.hub) {
+                    throw new Error(`interfaces[${index}].subscription.hub is required for webhook type`);
                 }
             }
-        }
-        if (iface.type === 'webhook') {
-            if (!iface.subscription || typeof iface.subscription !== 'object' || Array.isArray(iface.subscription)) {
-                throw new Error('interface.subscription is required and must be an object for webhook type');
-            }
-            if (!iface.subscription.protocol) {
-                throw new Error('interface.subscription.protocol is required for webhook type');
-            }
-            if (!iface.subscription.hub) {
-                throw new Error('interface.subscription.hub is required for webhook type');
-            }
-        }
+        });
     }
 
     const markdownBody = parts.slice(2).join('---').trim();
@@ -576,10 +574,10 @@ function applySpecDefaults(metadata, markdownBody) {
         defaults.namespace = 'default';
     }
 
-    // Default: interface type is "function" with string input/output signature
-    if (!defaults.interface) {
-        defaults.interface = {
-            type: 'function',
+    // Default: interfaces array with single "consolechat" type interface
+    if (!defaults.interfaces) {
+        defaults.interfaces = [{
+            type: 'consolechat',
             signature: {
                 input: {
                     type: 'string'
@@ -588,22 +586,37 @@ function applySpecDefaults(metadata, markdownBody) {
                     type: 'string'
                 }
             }
-        };
-    } else if (defaults.interface && !defaults.interface.signature) {
-        // If interface exists but no signature, apply default signature based on type
-        const ifaceType = defaults.interface.type || 'function';
+        }];
+    } else {
+        // Apply defaults to interfaces
+        defaults.interfaces = defaults.interfaces.map(iface => {
+            const ifaceType = iface.type || 'consolechat';
+            const updated = { ...iface };
 
-        // For function, chat, and service: default is string input/output
-        if (ifaceType !== 'webhook') {
-            defaults.interface.signature = {
-                input: {
-                    type: 'string'
-                },
-                output: {
-                    type: 'string'
+            // Apply default signature if missing
+            if (!updated.signature && ifaceType !== 'webhook') {
+                // For webchat and consolechat: default is string input/output
+                updated.signature = {
+                    input: { type: 'string' },
+                    output: { type: 'string' }
+                };
+            }
+
+            // Apply default exposure path if missing
+            if (ifaceType === 'webchat' || ifaceType === 'webhook') {
+                if (!updated.exposure) {
+                    updated.exposure = { http: {} };
                 }
-            };
-        }
+                if (!updated.exposure.http) {
+                    updated.exposure.http = {};
+                }
+                if (!updated.exposure.http.path) {
+                    updated.exposure.http.path = ifaceType === 'webchat' ? '/chat' : '/webhook';
+                }
+            }
+
+            return updated;
+        });
     }
 
     return defaults;
@@ -682,26 +695,45 @@ function renderHubSpoke(metadata, markdownBody) {
     const container = document.getElementById('hub-spoke-container');
 
     const mcpServers = Array.isArray(metadata.tools?.mcp) ? metadata.tools.mcp : [];
-    const hasInterface = metadata.interface;
-    const interfaceType = metadata.interface?.type || 'function';
+    const interfaces = Array.isArray(metadata.interfaces) ? metadata.interfaces : [];
     const hasExecutionConfig = metadata.max_iterations !== undefined;
 
     const escapedName = escapeHtml(metadata.name || 'Unnamed Agent');
-    const escapedDescription = escapeHtml(metadata.description || 'No description');
-    const escapedVersion = escapeHtml(metadata.version);
-    const escapedInterfaceType = escapeHtml(interfaceType);
     
     const sections = markdownBody ? parseMarkdownSections(markdownBody) : { role: '', instructions: '' };
     const escapedRole = escapeHtml(sections.role);
     const escapedInstructions = escapeHtml(sections.instructions);
 
+    let executionStart = UI_CONSTANTS.BOX_START_OFFSET;
+    let interfaceStart = executionStart + (hasExecutionConfig ? (UI_CONSTANTS.BOX_HEIGHT + UI_CONSTANTS.GROUP_SPACING) : 0);
+    let mcpStart = UI_CONSTANTS.BOX_START_OFFSET;
+    let interfaceSpacing = 0;
+    if (interfaces.length === 1) {
+        interfaceSpacing = 0;
+    } else if (interfaces.length === 2) {
+        interfaceSpacing = UI_CONSTANTS.BOX_HEIGHT + 40;
+    } else if (interfaces.length === 3) {
+        interfaceSpacing = UI_CONSTANTS.BOX_HEIGHT + 20;
+    }
+
+
+
     const html = `
         <div class="hub-spoke-visual">
             <svg class="connections-svg" viewBox="0 0 1200 900">
-                ${hasInterface ? '<line x1="600" y1="450" x2="1010" y2="180" class="connection-line-interface" stroke-width="2.5" />' : ''}
-                ${hasExecutionConfig ? '<line x1="600" y1="450" x2="1010" y2="380" class="connection-line-interface" stroke-width="2.5" />' : ''}
-                ${mcpServers.map((_, idx) => 
-                    `<line x1="600" y1="450" x2="190" y2="${300 + (idx * 160)}" class="connection-line-mcp" stroke-width="2.5" />`
+                ${interfaces.length === 1
+                    ? `<line x1="600" y1="450" x2="1010" y2="${interfaceStart + (UI_CONSTANTS.BOX_HEIGHT / 2)}" class="connection-line-interface" stroke-width="2.5" />`
+                    : interfaces.map((_, idx) => {
+                        // For multiple interfaces, use spacing
+                        const y = interfaceStart + (2 * idx * interfaceSpacing) + (UI_CONSTANTS.BOX_HEIGHT / 2);
+                        return `<line x1="600" y1="450" x2="1010" y2="${y}" class="connection-line-interface" stroke-width="2.5" />`;
+                    }).join('')}
+                ${hasExecutionConfig ? (() => {
+                    // Draw the execution line from hub to center of execution box on the right (now above interfaces)
+                    return `<line x1=\"600\" y1=\"450\" x2=\"1010\" y2=\"${executionStart + (UI_CONSTANTS.BOX_HEIGHT / 2)}\" class=\"connection-line-interface\" stroke-width=\"2.5\" />`;
+                })() : ''}
+                ${mcpServers.map((_, idx) =>
+                    `<line x1="600" y1="450" x2="190" y2="${mcpStart + (idx * UI_CONSTANTS.SPOKE_SPACING) + (UI_CONSTANTS.BOX_HEIGHT / 2)}" class="connection-line-mcp" stroke-width="2.5" />`
                 ).join('')}
             </svg>
 
@@ -710,11 +742,6 @@ function renderHubSpoke(metadata, markdownBody) {
                     <i class="bi bi-robot"></i>
                 </div>
                 <div class="hub-title">${escapedName}</div>
-                <div class="hub-subtitle">${escapedDescription.substring(0, UI_CONSTANTS.DESCRIPTION_MAX_LENGTH)}${escapedDescription.length > UI_CONSTANTS.DESCRIPTION_MAX_LENGTH ? '...' : ''}</div>
-                <div class="hub-badges">
-                    ${metadata.version ? `<span class="hub-version">v${escapedVersion}</span>` : ''}
-                    <span class="hub-type hub-type-${escapedInterfaceType}">${escapedInterfaceType}</span>
-                </div>
                 ${markdownBody ? `
                     <div class="hub-instructions">
                         ${sections.role ? `
@@ -740,34 +767,39 @@ function renderHubSpoke(metadata, markdownBody) {
             </div>
 
             <div class="spokes-container">
-                ${hasInterface ? `
-                <div class="spoke-group-label" style="position: absolute; top: ${UI_CONSTANTS.INTERFACE_LABEL_TOP}px; right: 30px;">Interface</div>
-                <div class="spoke spoke-interface" data-spoke-type="interface" style="position: absolute; top: ${UI_CONSTANTS.INTERFACE_SPOKE_TOP}px; right: 30px;">
-                    <div class="spoke-icon">
-                        ${interfaceType === 'function' ? '<i class="bi bi-code-square"></i>' : ''}
-                        ${interfaceType === 'service' ? '<i class="bi bi-cloud"></i>' : ''}
-                        ${interfaceType === 'chat' ? '<i class="bi bi-chat-dots"></i>' : ''}
-                        ${interfaceType === 'webhook' ? '<i class="bi bi-broadcast"></i>' : ''}
-                    </div>
-                    <div class="spoke-subtitle">${escapedInterfaceType}</div>
-                </div>
-                ` : ''}
                 ${hasExecutionConfig ? `
-                <div class="spoke-group-label" style="position: absolute; top: ${UI_CONSTANTS.EXECUTION_LABEL_TOP}px; right: 30px;">Execution</div>
-                <div class="spoke spoke-execution" data-spoke-type="execution" style="position: absolute; top: ${UI_CONSTANTS.EXECUTION_SPOKE_TOP}px; right: 30px;">
+                <div class="spoke-group-label" style="position: absolute; top: ${executionStart - UI_CONSTANTS.GROUP_LABEL_OFFSET}px; right: 30px;">Execution</div>
+                <div class="spoke spoke-execution" data-spoke-type="execution" style="position: absolute; top: ${executionStart}px; right: 30px; height: ${UI_CONSTANTS.BOX_HEIGHT}px;">
                     <div class="spoke-icon">
                         <i class="bi bi-gear-fill"></i>
                     </div>
                     <div class="spoke-subtitle">max_iterations: ${metadata.max_iterations}</div>
                 </div>
                 ` : ''}
+                ${interfaces.length > 0 ? `
+                <div class="spoke-group-label" style="position: absolute; top: ${interfaceStart - UI_CONSTANTS.GROUP_LABEL_OFFSET}px; right: 30px;">Interface${interfaces.length > 1 ? 's' : ''}</div>
+                ` : ''}
+                ${interfaces.map((iface, idx) => {
+                    const ifaceType = iface.type || 'consolechat';
+                    const escapedType = escapeHtml(ifaceType);
+                    return `
+                    <div class="spoke spoke-interface" data-spoke-type="interface" data-spoke-index="${idx}" style="position: absolute; top: ${interfaceStart + (idx * interfaceSpacing)}px; right: 30px; height: ${UI_CONSTANTS.BOX_HEIGHT}px;">
+                        <div class="spoke-icon">
+                            ${ifaceType === 'webchat' ? '<i class="bi bi-chat-dots"></i>' : ''}
+                            ${ifaceType === 'consolechat' ? '<i class="bi bi-terminal"></i>' : ''}
+                            ${ifaceType === 'webhook' ? '<i class="bi bi-broadcast"></i>' : ''}
+                        </div>
+                        <div class="spoke-subtitle">${escapedType}</div>
+                    </div>
+                    `;
+                }).join('')}
                 ${mcpServers.length > 0 ? `
-                <div class="spoke-group-label" style="position: absolute; top: ${UI_CONSTANTS.SPOKE_GROUP_LABEL_TOP}px; left: 30px;">MCP Tools</div>
+                <div class="spoke-group-label" style="position: absolute; top: ${mcpStart - UI_CONSTANTS.GROUP_LABEL_OFFSET}px; left: 30px;">MCP Tools</div>
                 ${mcpServers.map((server, idx) => {
                     const escapedServerName = escapeHtml(server.name);
                     const escapedTransportType = escapeHtml(server.transport?.type || 'http');
                     return `
-                    <div class="spoke spoke-mcp" data-spoke-type="mcp" data-spoke-index="${idx}" style="position: absolute; top: ${UI_CONSTANTS.SPOKE_START_TOP + (idx * UI_CONSTANTS.SPOKE_SPACING)}px; left: 30px;">
+                    <div class="spoke spoke-mcp" data-spoke-type="mcp" data-spoke-index="${idx}" style="position: absolute; top: ${mcpStart + (idx * UI_CONSTANTS.SPOKE_SPACING)}px; left: 30px; height: ${UI_CONSTANTS.BOX_HEIGHT}px;">
                         <div class="spoke-icon">🔧</div>
                         <div class="spoke-title">${escapedServerName}</div>
                         <div class="spoke-subtitle">${escapedTransportType}</div>
@@ -912,10 +944,8 @@ function renderSchemaDetails(schema, isNested = false) {
             </div>
         `;
     }
-    
     if (schema.type === 'array') {
         const itemsSchema = schema.items;
-
         if (!itemsSchema) {
             return `
                 <div class="row mb-3">
@@ -926,10 +956,8 @@ function renderSchemaDetails(schema, isNested = false) {
                 </div>
             `;
         }
-
         const itemType = itemsSchema.type || 'unknown';
         const itemConstraints = renderPropertyConstraints(itemsSchema);
-
         // If items is an object with properties, show them in a nested table
         if ((itemType === 'object' && itemsSchema.properties) || itemsSchema.properties) {
             return `
@@ -947,7 +975,6 @@ function renderSchemaDetails(schema, isNested = false) {
                 </div>
             `;
         }
-
         // Simple item type (string, number, etc.)
         return `
             <div class="row mb-3">
@@ -994,10 +1021,11 @@ function renderPropertyConstraints(schema) {
     return constraints.length ? constraints.join(' | ') : '';
 }
 
-function renderInterfaceDetails(interfaceConfig) {
+function renderInterfaceDetails(interfaceConfig, index) {
     const interfaceExposure = interfaceConfig?.exposure || {};
     const interfaceSignature = interfaceConfig?.signature;
     const interfaceTypeValue = interfaceConfig?.type || 'function';
+    const indexLabel = index !== undefined ? ` #${index + 1}` : '';
 
     let subscriptionHtml = '';
     if (interfaceTypeValue === 'webhook' && interfaceConfig.subscription) {
@@ -1019,7 +1047,7 @@ function renderInterfaceDetails(interfaceConfig) {
         `;
     }
     return {
-        title: '<i class="bi bi-broadcast me-2"></i>Agent Interface',
+        title: `<i class="bi bi-broadcast me-2"></i>Agent Interface${indexLabel}`,
         html: `
             <div class="detail-form">
                 <h6 class="text-muted mb-3">Interface Configuration</h6>
@@ -1162,7 +1190,8 @@ function showSpokeDetails(spokeType, spokeIndex) {
             break;
         }
         case 'interface': {
-            result = renderInterfaceDetails(metadata.interface);
+            const interface = Array.isArray(metadata.interfaces) ? metadata.interfaces[spokeIndex] : undefined;
+            result = renderInterfaceDetails(interface, spokeIndex);
             break;
         }
         case 'execution': {

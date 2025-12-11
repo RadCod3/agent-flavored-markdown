@@ -50,11 +50,11 @@ hide:
 spec_version: "0.3.0"
 name: "Code Review Assistant"
 description: "AI assistant for code review and improvements"
-interface:
-  type: service
-  exposure:
-    http:
-      path: "/code-review"
+interfaces:
+  - type: webchat
+    exposure:
+      http:
+        path: "/code-review"
 tools:
   mcp:
     - name: "github"

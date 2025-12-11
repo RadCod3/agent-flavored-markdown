@@ -60,7 +60,7 @@ This section contains metadata about the agent. These metadata fields are **OPTI
 | ----------------- | -------------------------------------------------------------------------------- |
 | [Agent Details](#51-about-the-agent)     | Information about the agent, such as its name, description, version, and author. |
 | [Agent Model](#52-agent-model)   | Defines the AI model that powers the agent. |
-| [Agent Interface](#53-agent-interface)   | Defines how the agent is invoked and its input/output signature.                 |
+| [Agent Interfaces](#53-agent-interfaces)   | Defines how the agent is invoked and its input/output signature.                 |
 | [Agent Tools](#54-tools) | Defines external tools available to the agent (e.g., via MCP).                  |
 | [Agent Execution](#55-agent-execution) | Runtime execution configuration like iteration limits. |
 
@@ -212,53 +212,56 @@ model:
     token: "${env:OPENAI_API_KEY}"
 ```
 
-### 5.3. Agent Interface {#53-agent-interface}
+### 5.3. Agent Interfaces {#53-agent-interfaces}
 
-This section defines how an agent can be interacted with or triggered. It includes the agent's public API, function signature, or service endpoint. It is **OPTIONAL** and specifies how the agent receives inputs and produces outputs.
+This section defines how an agent can be interacted with or triggered. An agent can have multiple interfaces, allowing it to be accessed in different ways. It is **OPTIONAL** and specifies how the agent receives inputs and produces outputs.
 
-If the `interface` field is not explicitly defined in the front matter, AFM implementations **MUST** assume a default interface of type `function`. In this default mode, the agent **SHALL** be invoked as a stateless, single-invocation callable: it **MUST** accept a single string input and **MUST** produce a single string output. After processing the input, the agent **SHALL** complete execution and return the output.
+If the `interfaces` field is not explicitly defined in the front matter, AFM implementations **MUST** assume a default interface of type `consolechat`. In this default mode, the agent **SHALL** be invoked as a command-line chat interface: it **MUST** accept a single string input (user message) and **MUST** produce a single string output (agent reply).
 
-Users can override these defaults by specifying the `interface` field in the front matter. AFM implementations **SHALL** use this definition to generate the agent's callable interface and to ensure consistent behavior across different platforms.
+Users can override these defaults by specifying the `interfaces` field in the front matter as an array of interface definitions. AFM implementations **SHALL** use these definitions to generate the agent's callable interfaces and to ensure consistent behavior across different platforms.
 
 #### 5.3.1. Interface Types
 
 The `interface.type` field **MUST** be one of the following values:
 
-| Value      | Description                                                                                                         |
-|------------|---------------------------------------------------------------------------------------------------------------------|
-| `function` | The agent is invoked as a callable function, which could be called within an application, as a scheduled task, etc. |
-| `service`  | The agent is exposed as a network-accessible service (e.g., REST API).                                              |
-| `chat`     | The agent is optimized for conversational use, with string input/output (e.g., chatbots).                           |
-| `webhook`  | The agent is exposed as a webhook endpoint and supports subscription details (e.g., WebSub hub integration).        |
+| Value         | Description                                                                                                         |
+|---------------|---------------------------------------------------------------------------------------------------------------------|
+| `consolechat` | The agent is exposed as a command-line/terminal chat interface for interactive console-based conversations.         |
+| `webchat`     | The agent is exposed as a web-based chat interface, accessible through browsers with a conversational UI.          |
+| `webhook`     | The agent is exposed as a webhook endpoint and supports subscription details (e.g., WebSub hub integration).        |
 
-Each interface type defines how the agent is triggered and interacted with. Implementations **MAY** support all four types as described above.
+Each interface type defines how the agent is triggered and interacted with. Implementations **MAY** support all three types as described above.
 
 #### 5.3.2. Schema Overview
 
 ```yaml
-interface:
-  type: function | service | chat | webhook
-  signature:
-    input: object      # JSON Schema object defining input parameters
-    output: object     # JSON Schema object defining output parameters
-  # Optional, depending on type:
-  exposure:              # For service/chat/webhook types
-    http: object         # Configuration for exposing as an HTTP endpoint.
-  subscription:          # For webhook type
-    protocol: string     # e.g., "websub"
-    hub: string          # Subscription hub URL
-    topic: string        # Topic to subscribe to
-    callback: string     # Callback URL for receiving events (optional, for dynamic registration)
-    secret: string       # Secret for verifying webhook payloads (optional)
+interfaces:
+  - type: webchat | consolechat | webhook
+    signature:
+      input: object      # JSON Schema object defining input parameters
+      output: object     # JSON Schema object defining output parameters
+    # Optional, depending on type:
+    exposure:            # For webchat/webhook types only
+      http: object       # Configuration for exposing as an HTTP endpoint.
+    subscription:        # For webhook type
+      protocol: string   # e.g., "websub"
+      hub: string        # Subscription hub URL
+      topic: string      # Topic to subscribe to
+      callback: string   # Callback URL for receiving events (optional, for dynamic registration)
+      secret: string     # Secret for verifying webhook payloads (optional)
 ```
 
 #### 5.3.3. Field Definitions
 
+The `interfaces` field is an array where each element represents an interface definition. Each interface object has the following fields:
+
+**Interface Object:**
+
 | Field         | Type     | Required | Description                                                                                             |
 |---------------|----------|----------|---------------------------------------------------------------------------------------------------------|
-| `type`        | `string` | Yes      | The agent's interface type. Must be one of:<br>- `function`: Invoked as a callable function (e.g., within an application or as a scheduled task).<br>- `service`: Network-accessible agent.<br>- `chat`: Conversational agent (string input/output).<br>- `webhook`: Service with subscription support. |
+| `type`        | `string` | Yes      | The agent's interface type. Must be one of:<br>- `webchat`: Web-based chat interface.<br>- `consolechat`: Command-line/terminal chat interface.<br>- `webhook`: Webhook endpoint with subscription support. |
 | `signature`   | `object` | Yes      | Defines the agent's input and output parameters. See [Signature Object](#signature-object).                  |
-| `exposure`    | `object` | No       | Configuration for how a `service`, `chat`, or `webhook` agent is exposed. See [Exposure Object](#exposure-object).                |
+| `exposure`    | `object` | No       | Configuration for how a `webchat` or `webhook` agent is exposed via HTTP. Not applicable to `consolechat`. See [Exposure Object](#exposure-object).                |
 | `subscription`| `object` | No       | (webhook only) Subscription configuration. See below. |
 
 ##### Signature Object {#signature-object}
@@ -330,7 +333,7 @@ signature:
 **Default Behavior:**
 
 Default signature behavior:
-- For `function`, `chat`, and `service` types: the default `signature` is string input and string output.
+- For `consolechat` and `webchat` types: the default `signature` is string input and string output.
 - For `webhook` type: the `input` field MAY be omitted, as the webhook provider determines the input payload structure.
 
 AFM implementations **SHALL** use this definition to generate the agent's callable interface and to ensure consistent behavior across different platforms.
@@ -361,142 +364,107 @@ Applies to agents of type `service`, `chat`, and `webhook`, and defines how the 
 
 | Field            | Type     | Required | Description                                                                 |
 |------------------|----------|----------|-----------------------------------------------------------------------------|
-| `path`           | `string` | Yes      | The URL path segment for the agent's HTTP endpoint (e.g., `/math-tutor`). |
+| `path`           | `string` | No       | The URL path segment for the agent's HTTP endpoint (e.g., `/math-tutor`). If not specified, implementations **SHOULD** use `/chat` for `webchat` interfaces and `/webhook` for `webhook` interfaces. |
 | `authentication` | `object` | No       | Optional authentication configuration for the HTTP endpoint. See [Section 5.6](#56-authentication) for the schema. |
 
-!!! note "HTTP Object Usage"
-    The `http` object is applicable for agents of type `service`, `chat`, or `webhook`. It defines how the agent is exposed via a standard HTTP endpoint, allowing other systems to interact with it over the web.
+!!! note "HTTP Exposure Configuration"
+    The `http` object is applicable for agents of type `webchat` or `webhook`. It defines how the agent is exposed via a standard HTTP endpoint, allowing other systems to interact with it over the web.
+
+    **Default Paths:**
+
+    - `webchat`: If no `exposure.http.path` is specified, implementations **SHOULD** default to `/chat`
+    - `webhook`: If no `exposure.http.path` is specified, implementations **SHOULD** default to `/webhook`
 
     AFM does not define the HTTP methods (GET, POST, etc.) for the agent's endpoint. This is left to the implementation to decide based on the agent's functionality and requirements.
-    
+
     HTTP authentication uses the generic authentication schema defined in [Section 5.6](#56-authentication), where the `type` field specifies the authentication scheme (e.g., `oauth2`, `api_key`), and the rest of the fields provide the configuration.
 
 
 #### 5.3.4. Example Usages
 
-**Function agent (default simple string):**
+**Web chat agent (default simple string):**
 ```yaml
-interface:
-  type: function
-  signature:
-    input:
-      type: string
-    output:
-      type: string
+interfaces:
+  - type: webchat
+    signature:
+      input:
+        type: string
+      output:
+        type: string
 ```
 
-**Function agent (custom with structured input/output):**
+**Web chat agent (custom with structured input/output):**
 ```yaml
-interface:
-  type: function
-  signature:
-    input:
-      type: object
-      properties:
-        user_prompt:
-          type: string
-          description: "The user's query or request"
-        context:
-          type: object
-          description: "Additional context for the request"
-      required: [user_prompt]
-    output:
-      type: object
-      properties:
-        response:
-          type: string
-          description: "The agent's response to the user prompt"
-        confidence:
-          type: number
-          description: "Confidence score for the response"
-      required: [response]
+interfaces:
+  - type: webchat
+    signature:
+      input:
+        type: object
+        properties:
+          message:
+            type: string
+            description: "The user's chat message"
+          context:
+            type: object
+            description: "Additional context for the conversation"
+        required: [message]
+      output:
+        type: object
+        properties:
+          reply:
+            type: string
+            description: "The agent's chat reply"
+          confidence:
+            type: number
+            description: "Confidence score for the response"
+        required: [reply]
+    exposure:
+      http:
+        path: "/webchat"
 ```
 
-**Service agent:**
+**Console chat agent:**
 ```yaml
-interface:
-  type: service
-  signature:
-    input:
-      type: object
-      properties:
-        user_prompt:
-          type: string
-          description: "The user's query or request"
-        context:
-          type: object
-          description: "Additional context for the request"
-      required: [user_prompt]
-    output:
-      type: object
-      properties:
-        response:
-          type: string
-          description: "The agent's response to the user prompt"
-        confidence:
-          type: number
-          description: "Confidence score for the response"
-      required: [response]
-  exposure:
-    http:
-      path: "/research-assistant"
-```
-
-**Chat agent:**
-```yaml
-interface:
-  type: chat
-  signature:
-    input:
-      type: object
-      properties:
-        message:
-          type: string
-          description: "The user's chat message"
-      required: [message]
-    output:
-      type: object
-      properties:
-        reply:
-          type: string
-          description: "The agent's chat reply"
-      required: [reply]
-  exposure:
-    http:
-      path: "/chatbot"
+interfaces:
+  - type: consolechat
+    signature:
+      input:
+        type: string
+      output:
+        type: string
 ```
 
 **Webhook agent:**
 ```yaml
-interface:
-  type: webhook
-  signature:
-    input:
-      type: object
-      properties:
-        event:
-          type: string
-          description: "The event type received by the webhook"
-        payload:
-          type: object
-          description: "The event payload"
-      required: [event, payload]
-    output:
-      type: object
-      properties:
-        result:
-          type: string
-          description: "The agent's response to the webhook event"
-      required: [result]
-  subscription:
-    protocol: "websub"
-    hub: "https://example.com/websub-hub"
-    topic: "https://example.com/events/agent"
-    callback: "https://myagent.example.com/webhook-callback"
-    secret: "${env:WEBHOOK_SECRET}"
-  exposure:
-    http:
-      path: "/webhook-handler"
+interfaces:
+  - type: webhook
+    signature:
+      input:
+        type: object
+        properties:
+          event:
+            type: string
+            description: "The event type received by the webhook"
+          payload:
+            type: object
+            description: "The event payload"
+        required: [event, payload]
+      output:
+        type: object
+        properties:
+          result:
+            type: string
+            description: "The agent's response to the webhook event"
+        required: [result]
+    subscription:
+      protocol: "websub"
+      hub: "https://example.com/websub-hub"
+      topic: "https://example.com/events/agent"
+      callback: "https://myagent.example.com/webhook-callback"
+      secret: "${env:WEBHOOK_SECRET}"
+    exposure:
+      http:
+        path: "/webhook-handler"
 ```
 
 ### 5.4. Tools {#54-tools}
