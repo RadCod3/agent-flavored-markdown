@@ -119,6 +119,12 @@ version: \"1.0.0\"
 namespace: \"development-tools\"
 author: \"Sample Author <author@example.com>\"
 max_iterations: 25
+model:
+  name: \"gpt-4o\"
+  provider: \"openai\"
+  authentication:
+    type: \"bearer\"
+    token: \"\${env:OPENAI_API_KEY}\"
 interfaces:
   - type: webchat
     exposure:
@@ -697,14 +703,17 @@ function renderHubSpoke(metadata, markdownBody) {
     const mcpServers = Array.isArray(metadata.tools?.mcp) ? metadata.tools.mcp : [];
     const interfaces = Array.isArray(metadata.interfaces) ? metadata.interfaces : [];
     const hasExecutionConfig = metadata.max_iterations !== undefined;
+    const hasModel = metadata.model && (metadata.model.name || metadata.model.provider || metadata.model.url);
 
     const escapedName = escapeHtml(metadata.name || 'Unnamed Agent');
-    
+
     const sections = markdownBody ? parseMarkdownSections(markdownBody) : { role: '', instructions: '' };
     const escapedRole = escapeHtml(sections.role);
     const escapedInstructions = escapeHtml(sections.instructions);
 
-    let executionStart = UI_CONSTANTS.BOX_START_OFFSET;
+    // Calculate positions from top to bottom on the right side
+    let modelStart = UI_CONSTANTS.BOX_START_OFFSET;
+    let executionStart = modelStart + (hasModel ? (UI_CONSTANTS.BOX_HEIGHT + UI_CONSTANTS.GROUP_SPACING) : 0);
     let interfaceStart = executionStart + (hasExecutionConfig ? (UI_CONSTANTS.BOX_HEIGHT + UI_CONSTANTS.GROUP_SPACING) : 0);
     let mcpStart = UI_CONSTANTS.BOX_START_OFFSET;
     let interfaceSpacing = 0;
@@ -721,6 +730,7 @@ function renderHubSpoke(metadata, markdownBody) {
     const html = `
         <div class="hub-spoke-visual">
             <svg class="connections-svg" viewBox="0 0 1200 900">
+                ${hasModel ? `<line x1="600" y1="450" x2="1010" y2="${modelStart + (UI_CONSTANTS.BOX_HEIGHT / 2)}" class="connection-line-interface" stroke-width="2.5" />` : ''}
                 ${interfaces.length === 1
                     ? `<line x1="600" y1="450" x2="1010" y2="${interfaceStart + (UI_CONSTANTS.BOX_HEIGHT / 2)}" class="connection-line-interface" stroke-width="2.5" />`
                     : interfaces.map((_, idx) => {
@@ -729,7 +739,7 @@ function renderHubSpoke(metadata, markdownBody) {
                         return `<line x1="600" y1="450" x2="1010" y2="${y}" class="connection-line-interface" stroke-width="2.5" />`;
                     }).join('')}
                 ${hasExecutionConfig ? (() => {
-                    // Draw the execution line from hub to center of execution box on the right (now above interfaces)
+                    // Draw the execution line from hub to center of execution box on the right
                     return `<line x1=\"600\" y1=\"450\" x2=\"1010\" y2=\"${executionStart + (UI_CONSTANTS.BOX_HEIGHT / 2)}\" class=\"connection-line-interface\" stroke-width=\"2.5\" />`;
                 })() : ''}
                 ${mcpServers.map((_, idx) =>
@@ -767,6 +777,16 @@ function renderHubSpoke(metadata, markdownBody) {
             </div>
 
             <div class="spokes-container">
+                ${hasModel ? `
+                <div class="spoke-group-label" style="position: absolute; top: ${modelStart - UI_CONSTANTS.GROUP_LABEL_OFFSET}px; right: 30px;">Model</div>
+                <div class="spoke spoke-interface spoke-model" data-spoke-type="model" style="position: absolute; top: ${modelStart}px; right: 30px; height: ${UI_CONSTANTS.BOX_HEIGHT}px;">
+                    <div class="spoke-icon">
+                        <i class="bi bi-cpu"></i>
+                    </div>
+                    ${metadata.model.name ? `<div class="spoke-title">${escapeHtml(metadata.model.name)}</div>` : ''}
+                    <div class="spoke-subtitle">${metadata.model.provider ? escapeHtml(metadata.model.provider) : 'configured'}</div>
+                </div>
+                ` : ''}
                 ${hasExecutionConfig ? `
                 <div class="spoke-group-label" style="position: absolute; top: ${executionStart - UI_CONSTANTS.GROUP_LABEL_OFFSET}px; right: 30px;">Execution</div>
                 <div class="spoke spoke-execution" data-spoke-type="execution" style="position: absolute; top: ${executionStart}px; right: 30px; height: ${UI_CONSTANTS.BOX_HEIGHT}px;">
@@ -881,7 +901,7 @@ function renderMcpDetails(mcpServer) {
 
 function renderExecutionConfigDetails(metadata) {
     const maxIterations = metadata.max_iterations;
-    
+
     return {
         title: '<i class="bi bi-gear-fill me-2"></i>Execution Configuration',
         html: `
@@ -893,10 +913,78 @@ function renderExecutionConfigDetails(metadata) {
                         <div class="form-control form-control-auto-height">${maxIterations !== undefined ? escapeHtml(String(maxIterations)) : '<span class="text-muted">Not set (unlimited)</span>'}</div>
                     </div>
                 </div>
-                
+
                 <div class="alert alert-info">
                     <i class="bi bi-info-circle me-2"></i>
                     The max_iterations setting prevents infinite loops by limiting how many iteration cycles the agent can perform in a single invocation. If not set, implementations may allow unlimited iterations or apply their own default limits.
+                </div>
+            </div>
+        `
+    };
+}
+
+function renderModelDetails(model) {
+    if (!model) {
+        return {
+            title: '<i class="bi bi-cpu me-2"></i>Model',
+            html: '<p class="text-muted">No model configured</p>'
+        };
+    }
+
+    return {
+        title: '<i class="bi bi-cpu me-2"></i>Model Configuration',
+        html: `
+            <div class="detail-form">
+                <h6 class="text-muted mb-3">AI Model Settings</h6>
+                ${model.name ? `
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label fw-bold">Model Name</label>
+                    <div class="col-sm-8">
+                        <div class="form-control form-control-auto-height">${highlightVars(model.name)}</div>
+                    </div>
+                </div>
+                ` : ''}
+                ${model.provider ? `
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label fw-bold">Provider</label>
+                    <div class="col-sm-8">
+                        <div class="form-control form-control-auto-height">${highlightVars(model.provider)}</div>
+                    </div>
+                </div>
+                ` : ''}
+                ${model.url ? `
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label fw-bold">URL</label>
+                    <div class="col-sm-8">
+                        <div class="form-control form-control-auto-height">${highlightVars(model.url)}</div>
+                    </div>
+                </div>
+                ` : ''}
+                ${model.authentication ? `
+                <div class="row mb-3">
+                    <label class="col-sm-4 col-form-label fw-bold">Authentication</label>
+                    <div class="col-sm-8">
+                        <div class="border rounded p-3 bg-white">
+                            <div class="mb-2">
+                                <div class="fw-semibold">Type:</div>
+                                <div class="form-control form-control-auto-height mt-1">${highlightVars(model.authentication.type || 'configured')}</div>
+                            </div>
+                            ${Object.entries(model.authentication)
+                                .filter(([key]) => key !== 'type')
+                                .map(([key, value]) => `
+                                    <div class="mb-2">
+                                        <div class="fw-semibold">${escapeHtml(key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' '))}:</div>
+                                        <div class="form-control form-control-auto-height mt-1">${highlightVars(String(value))}</div>
+                                    </div>
+                                `).join('')}
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    The model configuration specifies which AI model powers this agent and how to access it.
                 </div>
             </div>
         `
@@ -1174,9 +1262,9 @@ function renderInterfaceDetails(interfaceConfig, index) {
 function showSpokeDetails(spokeType, spokeIndex) {
     const detailsTitle = document.getElementById('spoke-details-title');
     const detailsContent = document.getElementById('spoke-details-content');
-    
+
     const { metadata, markdownBody } = currentAfmData;
-    
+
     // Render details based on spoke type
     let result;
     switch(spokeType) {
@@ -1198,6 +1286,10 @@ function showSpokeDetails(spokeType, spokeIndex) {
             result = renderExecutionConfigDetails(metadata);
             break;
         }
+        case 'model': {
+            result = renderModelDetails(metadata.model);
+            break;
+        }
         default: {
             result = {
                 title: '<i class="bi bi-info-circle me-2"></i>Details',
@@ -1205,7 +1297,7 @@ function showSpokeDetails(spokeType, spokeIndex) {
             };
         }
     }
-    
+
     detailsTitle.innerHTML = result.title;
     detailsContent.innerHTML = result.html;
 }
@@ -1222,6 +1314,18 @@ function renderMetadata(metadata) {
         { label: 'Author', value: metadata.author },
         { label: 'License', value: metadata.license },
     ];
+
+    if (metadata.model) {
+        if (metadata.model.name) {
+            fields.push({ label: 'Model Name', value: metadata.model.name });
+        }
+        if (metadata.model.provider) {
+            fields.push({ label: 'Model Provider', value: metadata.model.provider });
+        }
+        if (metadata.model.url) {
+            fields.push({ label: 'Model URL', value: metadata.model.url });
+        }
+    }
 
     const tools = [];
     if (metadata.tools?.mcp) {

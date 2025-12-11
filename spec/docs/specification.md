@@ -189,6 +189,7 @@ This section specifies the AI model or language model that powers the agent. It 
 | Field            | Type     | Required | Description                                                                 |
 |------------------|----------|----------|-----------------------------------------------------------------------------|
 | `name`           | `string` | No       | Model identifier or name. |
+| `provider`       | `string` | No       | The organization or service providing the model (e.g., "openai", "anthropic"). |
 | `url`            | `string` | No       | The URL endpoint for the model service. |
 | `authentication` | `object` | No       | Authentication configuration for accessing the model. See [Section 5.6](#56-authentication) for the schema. |
 
@@ -197,6 +198,7 @@ This section specifies the AI model or language model that powers the agent. It 
 ```yaml
 model:
   name: string             # Optional model name or identifier
+  provider: string         # Optional model provider (e.g., "openai", "anthropic")
   url: string              # Optional model service endpoint URL
   authentication: object   # Optional authentication configuration
 ```
@@ -206,6 +208,7 @@ model:
 ```yaml
 model:
   name: "gpt-4-turbo"
+  provider: "openai"
   url: "https://api.openai.com/v1/chat/completions"
   authentication:
     type: "bearer"
