@@ -494,10 +494,10 @@ function parseAfmFile(content) {
                 // For webhook, input MAY be omitted
                 if (iface.type !== 'webhook') {
                     if (!iface.signature.input || typeof iface.signature.input !== 'object') {
-                        throw new Error(`interfaces[${index}].signature.input must be an object for function, chat, and service types`);
+                        throw new Error(`interfaces[${index}].signature.input must be an object for consolechat and webchat types`);
                     }
                     if (!iface.signature.output || typeof iface.signature.output !== 'object') {
-                        throw new Error(`interfaces[${index}].signature.output must be an object for function, chat, and service types`);
+                        throw new Error(`interfaces[${index}].signature.output must be an object for consolechat and webchat types`);
                     }
                 } else {
                     if (iface.signature.input !== undefined && typeof iface.signature.input !== 'object') {
@@ -1112,7 +1112,7 @@ function renderPropertyConstraints(schema) {
 function renderInterfaceDetails(interfaceConfig, index) {
     const interfaceExposure = interfaceConfig?.exposure || {};
     const interfaceSignature = interfaceConfig?.signature;
-    const interfaceTypeValue = interfaceConfig?.type || 'function';
+    const interfaceTypeValue = interfaceConfig?.type || 'consolechat';
     const indexLabel = index !== undefined ? ` #${index + 1}` : '';
 
     let subscriptionHtml = '';
