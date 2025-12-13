@@ -758,8 +758,22 @@ function renderHubSpoke(metadata, markdownBody) {
                 ${interfaces.length === 1
                     ? `<line x1="600" y1="450" x2="1010" y2="${interfaceStart + (UI_CONSTANTS.BOX_HEIGHT / 2)}" class="connection-line-interface" stroke-width="2.5" />`
                     : interfaces.map((_, idx) => {
-                        // For multiple interfaces, use spacing
-                        const y = interfaceStart + (2 * idx * interfaceSpacing) + (UI_CONSTANTS.BOX_HEIGHT / 2);
+                        // For multiple interfaces, use spacing with visual fanning effect
+                        // Calculate position based on actual box position
+                        let y = interfaceStart + (idx * interfaceSpacing) + (UI_CONSTANTS.BOX_HEIGHT / 2);
+
+                        // Add visual fanning effect: spread lines out more than boxes
+                        // Use a scaling factor that reduces for later interfaces to avoid excessive spread
+                        if (interfaces.length > 1 && idx > 0) {
+                            const fanFactor = interfaces.length === 2 ? 1.0 : 0.6; // Less aggressive for 3+ interfaces
+                            y += idx * interfaceSpacing * fanFactor;
+                        }
+
+                        // Move first interface line down past the label
+                        if (idx === 0) {
+                            y += UI_CONSTANTS.GROUP_LABEL_OFFSET + 40;
+                        }
+
                         return `<line x1="600" y1="450" x2="1010" y2="${y}" class="connection-line-interface" stroke-width="2.5" />`;
                     }).join('')}
                 ${hasExecutionConfig ? (() => {
