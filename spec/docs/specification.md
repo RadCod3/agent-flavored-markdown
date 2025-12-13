@@ -240,6 +240,7 @@ Each interface type defines how the agent is triggered and interacted with. Impl
 ```yaml
 interfaces:
   - type: webchat | consolechat | webhook
+    prompt: string       # For webhook type: template string for constructing the user prompt for the agent run
     signature:
       input: object      # JSON Schema object defining input parameters
       output: object     # JSON Schema object defining output parameters
@@ -263,6 +264,7 @@ The `interfaces` field is an array where each element represents an interface de
 | Field         | Type     | Required | Description                                                                                             |
 |---------------|----------|----------|---------------------------------------------------------------------------------------------------------|
 | `type`        | `string` | Yes      | The agent's interface type. Must be one of:<br>- `webchat`: Web-based chat interface.<br>- `consolechat`: Command-line/terminal chat interface.<br>- `webhook`: Webhook endpoint with subscription support. |
+| `prompt`      | `string` | No       | (webhook only) A template string for constructing the user prompt for an agent run from webhook data.<br>Supports [variable substitution](#7-variable-substitution) with HTTP context prefixes:<br>- `${http:payload.fieldname}` to access webhook payload fields<br>- `${http:header.headername}` to access HTTP headers<br>When provided, this templated prompt is used as the user prompt to the agent instead of passing the raw payload.<br>When omitted, the implementation determines how to construct the agent prompt from the webhook payload. |
 | `signature`   | `object` | Yes      | Defines the agent's input and output parameters. See [Signature Object](#signature-object).                  |
 | `exposure`    | `object` | No       | Configuration for how a `webchat` or `webhook` agent is exposed via HTTP. Not applicable to `consolechat`. See [Exposure Object](#exposure-object).                |
 | `subscription`| `object` | No       | (webhook only) Subscription configuration. See below. |
@@ -437,10 +439,22 @@ interfaces:
         type: string
 ```
 
-**Webhook agent:**
+**Webhook agent (with prompt templating):**
 ```yaml
 interfaces:
   - type: webhook
+    prompt: |
+      A new ${http:payload.event} event was received from ${http:header.User-Agent}.
+
+      Event Details:
+      - Type: ${http:payload.event}
+      - Timestamp: ${http:payload.timestamp}
+      - Source: ${http:payload.source}
+
+      Payload:
+      ${http:payload.data}
+
+      Please analyze this webhook event and provide a summary of the action taken.
     signature:
       input:
         type: object
@@ -686,13 +700,30 @@ tools:
 
 AFM files MAY use `${...}` syntax for variable substitution. The timing of variable resolution is implementation-defined.
 
-The content within `${...}` is also implementation-defined and implementations are responsible for determining how and when variables are resolved, including handling prefix conventions (e.g., `${env:VAR}`, `${file:KEY}`).
+The content within `${...}` is also implementation-defined and implementations are responsible for determining how and when variables are resolved, including handling prefix conventions (e.g., `${env:VAR}`, `${file:KEY}`, `${http:payload.field}`).
 
 Variable resolution commonly occurs before the agent is made available for use, but MAY also happen at other stages depending on the implementation.
 
-### 7.1. Example Usage
+### 7.1. Variable Prefixes
 
 Implementations MAY adopt and support prefixes to specify the source of variable values:
+
+| Prefix | Context | Description | Example |
+|--------|---------|-------------|---------|
+| `env:` | Static | Environment variable | `${env:API_TOKEN}` |
+| `file:` | Static | Value from external config file | `${file:api.baseUrl}` |
+| `secret:` | Static | Value from secrets manager | `${secret:MODEL_API_KEY}` |
+| `http:payload` | Runtime (webhook) | Access webhook payload fields | `${http:payload.event}` or `${http:payload['nested.field']}` |
+| `http:header` | Runtime (webhook) | Access HTTP request headers | `${http:header.User-Agent}` or `${http:header.X-GitHub-Event}` |
+
+**Static vs Runtime Resolution:**
+
+- **Static variables** (`env:`, `file:`, `secret:`): Resolved once when the agent is loaded or initialized
+- **Runtime variables** (`http:payload`, `http:header`): Resolved dynamically for each webhook invocation using request-specific data
+
+### 7.2. Example Usage
+
+**Static variable substitution:**
 
 ```yaml
 authentication:
@@ -706,6 +737,39 @@ model:
     type: "bearer"
     token: "${secret:MODEL_API_KEY}" # From secrets manager
 ```
+
+**Runtime variable substitution (webhook prompts):**
+
+```yaml
+interfaces:
+  - type: webhook
+    prompt: |
+      New GitHub ${http:payload.action} event on repository ${http:payload.repository.full_name}
+
+      Event: ${http:header.X-GitHub-Event}
+      Sender: ${http:payload.sender.login}
+
+      Details:
+      ${http:payload}
+```
+
+### 7.3. Webhook Variable Access Patterns
+
+When using `http:payload` and `http:header` in webhook prompts:
+
+**Payload Field Access:**
+- Dot notation: `${http:payload.field.nested}` for nested object access
+- Bracket notation: `${http:payload['field.with.dots']}` for fields containing special characters
+- Array access: `${http:payload.items[0]}` for array element access by index
+- Combined access: `${http:payload.users[0].name}` or `${http:payload['special-field'][0]}` for complex paths
+- Root access: `${http:payload}` returns the entire payload as a JSON string
+
+**Header Access:**
+- Header names are case-insensitive: `${http:header.Content-Type}` or `${http:header.content-type}`
+- Headers with special characters: `${http:header.X-GitHub-Event}`
+
+**Error Handling:**
+Implementations **SHOULD** handle missing or invalid variable references gracefully by using meaningful defaults or failing with clear error messages.
 
 ## 8. Future Work
 
