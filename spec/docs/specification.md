@@ -18,7 +18,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ### 1.1. Key Goals of AFM
 
-AFM addresses the current fragmentation in the AI agent ecosystem by providing a unified standard for agent definition and interoperability:
+AFM addresses the current fragmentation in the AI agent ecosystem by providing a unified, text-based standard for agent definition:
 
 - **Simple Syntax**: AFM allows developers to *declare* an agent's instructions, tools, and configuration in a simple, text-based format, moving away from complex, imperative code.
 - **Human-Readability**: AFM uses a simple markdown-based syntax that is intuitive for both developers and non-technical stakeholders to read, write, and understand.
@@ -28,12 +28,12 @@ AFM addresses the current fragmentation in the AI agent ecosystem by providing a
 
 ## 2. Core Concepts
 
-AFM is built around several core concepts that define how agents are structured and interact:
+AFM is built around several core concepts that define how agents are structured and can be interacted with:
 
 - **Agent**: The primary entity defined in AFM, representing an AI agent with specific capabilities and behaviors.
 - **Role**: The responsibilities or tasks an agent is designed to perform, defining its purpose within a given context.
-- **Instructions**: Explicit directives in natural language that shape the agent's behavior and guide its actions, typically forming the core of the system prompt.
-- **Agent Details**: Programmatic metadata describing the agent, including name, version, author, and other identifying information.
+- **Instructions**: Explicit directives that shape the agent's behavior and guide its actions, typically forming the core of the system prompt.
+- **Details**: Programmatic metadata describing the agent, including name, version, author, and other identifying information.
 - **Tools**: External tools and services available to the agent (e.g., via MCP).
 - **Interface**: The specification for how an agent exposes itself to the outside world, defining its callable signature and endpoints.
 
@@ -58,7 +58,7 @@ This section contains metadata about the agent. These metadata fields are **OPTI
 
 | Section           | Description                                                                      |
 | ----------------- | -------------------------------------------------------------------------------- |
-| [Agent Details](#51-about-the-agent)     | Information about the agent, such as its name, description, version, and author. |
+| [Agent Details](#51-agent-details)     | Information about the agent, such as its name, description, version, and author. |
 | [Agent Model](#52-agent-model)   | Defines the AI model that powers the agent. |
 | [Agent Interfaces](#53-agent-interfaces)   | Defines how the agent is invoked and its input/output signature.                 |
 | [Agent Tools](#54-tools) | Defines external tools available to the agent (e.g., via MCP).                  |
@@ -69,7 +69,7 @@ Refer to the [AFM Schema](#5-schema-definitions) for a complete list of fields a
 
 ### 4.3. Markdown Body
 
-This section contains the detailed, natural language instructions that guide the agent's behavior.
+This section contains the detailed instructions that guide the agent's behavior.
 
 Users can use markdown syntax to format the text, including headings, lists, links, and code blocks.
 
@@ -87,31 +87,34 @@ The Markdown body **MUST** contain the following headings, with corresponding co
     ---
     spec_version: "0.3.0"
     name: "Math Tutor"
-    description: "An AI assistant that helps with mathematics problems"
+    description: "An AI assistant that helps with math problems"
     version: "1.0.0"
-    authors:
-      - "Jane Smith <jane@example.com>"
-    license: "MIT"
+    max_iterations: 20
+    interfaces:
+      - type: consolechat
+
+    tools:
+      mcp:
+        - name: "math_operations"
+          transport:
+            type: "http"
+            url: "${MATH_MCP_SERVER}"
     ---
 
     # Role
-    The Math Tutor is an AI agent designed to assist students with mathematics problems, providing explanations, step-by-step solutions, and practice exercises.
+
+    You are an experienced math tutor capable of assisting students with mathematics problems, providing explanations, step-by-step solutions, and practice exercises.
 
     # Instructions
-    - Use clear and concise language when explaining concepts.
-    - Provide examples to illustrate complex ideas.
-    - Encourage students to think critically and solve problems independently.
-    - Answer questions about mathematical concepts
-    - Solve equations and provide step-by-step solutions
-    - Generate practice problems and quizzes when requested
-    - Provide explanations and tips for solving math problems
+
+    You are a knowledgeable and patient math tutor who helps students understand mathematical concepts. Provide clear, step-by-step explanations for math problems, using simple language and avoiding jargon unless explaining it. When solving problems, show all work and explain each step. Use the available math operations tools when performing calculations. Explain mathematical concepts with real-world examples when possible. Be encouraging and supportive of students' efforts, ask clarifying questions if a problem is not clearly stated, provide multiple approaches to solving problems when applicable, help students identify and correct their mistakes.
     ```
 
 ## 5. Schema Definitions
 
 This section defines the schema for the Front Matter. For clarity, the schema is divided into several subsections, each detailing a specific aspect of the Agent.
 
-### 5.1. About the Agent {#51-about-the-agent} 
+### 5.1. Agent Details {#51-agent-details} 
 
 This section defines the schema for agent-specific metadata. It is **OPTIONAL** but recommended for clarity and organization.
 
@@ -142,13 +145,13 @@ Each field serves a specific purpose in defining and organizing the agent:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| <a id="field-spec-version"></a>[`spec_version`](#field-spec-version) | `string` | No | Version of the AFM specification this file conforms to (e.g., "0.3.0").<br>This is **OPTIONAL** but recommended for forward compatibility.<br>AFM implementations **MAY** use this field to validate compatibility and provide warnings for mismatched spec versions. |
+| <a id="field-spec-version"></a>[`spec_version`](#field-spec-version) | `string` | No | Version of the AFM specification this file conforms to (e.g., "0.3.0").<br>This is **OPTIONAL** but recommended for compatibility.<br>AFM implementations **MAY** use this field to validate compatibility and provide warnings for mismatched spec versions. |
 | <a id="field-name"></a>[`name`](#field-name) | `string` | No | Identifies the agent in human-readable form.<br>Default: inferred from the filename of the AFM file.<br>AFM implementations **SHALL** use this field to display the agent's name in user interfaces. |
 | <a id="field-description"></a>[`description`](#field-description) | `string` | No | Provides a concise summary of what the agent does.<br>Default: inferred from the markdown body `# Role` section.<br>AFM implementations **SHALL** use this field to display the agent's description in user interfaces. |
 | <a id="field-version"></a>[`version`](#field-version) | `string` | No | [Semantic version](https://semver.org/) of the agent definition (MAJOR.MINOR.PATCH).<br>Default: "0.0.0".<br>AFM implementations **SHALL** use this field to display the agent's version in user interfaces. |
 | <a id="field-author"></a>[`author`](#field-author) | `string` | No | Single author in format `Name <Email>`.<br>Credits the creator of the agent definition. If both `author` and `authors` fields are provided, `authors` takes precedence. |
 | <a id="field-authors"></a>[`authors`](#field-authors) | `string[]` | No | Multiple authors, each in format `Name <Email>`.<br>Credits the creators of the agent definition. Takes precedence over `author` if both exist. |
-| <a id="field-icon-url"></a>[`icon-url`](#field-icon-url) | `string` | No | URL to an icon representing the agent.<br>This is **OPTIONAL** but recommended for visual representation in user interfaces.<br>AFM implementations **SHALL** use this field to display the agent's icon in user interfaces. |
+| <a id="field-icon-url"></a>[`icon_url`](#field-icon-url) | `string` | No | URL to an icon representing the agent.<br>This is **OPTIONAL** but recommended for visual representation in user interfaces.<br>AFM implementations **SHALL** use this field to display the agent's icon in user interfaces. |
 | <a id="field-provider"></a>[`provider`](#field-provider) | `object` | No | Information about the organization providing the agent.<br>This is **OPTIONAL** but recommended for attribution.<br>See the [Provider Object](#provider-object) below for details. |
 | <a id="field-license"></a>[`license`](#field-license) | `string` | No | License under which the agent definition is released.<br>This is **OPTIONAL** but recommended for clarity. |
 
@@ -156,18 +159,18 @@ Each field serves a specific purpose in defining and organizing the agent:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| <a id="field-provider-name"></a>[`provider.name`](#field-provider-name) | `string` | No | Name of the organization providing the agent. |
-| <a id="field-provider-url"></a>[`provider.url`](#field-provider-url) | `string` | No | URL to the organization's website. |
+| <a id="field-provider-name"></a>[`name`](#field-provider-name) | `string` | No | Name of the organization providing the agent. |
+| <a id="field-provider-url"></a>[`url`](#field-provider-url) | `string` | No | URL to the organization's website. |
 
 #### 5.1.3. Example Usage
 
-The following example demonstrates a valid agent metadata section as specified in [Section 5.1.1](#51-about-the-agent). This YAML front matter illustrates the use of recommended and optional fields for agent definition:
+The following example demonstrates a valid agent metadata section as specified in [Section 5.1.1](#51-agent-details). This YAML front matter illustrates the use of recommended and optional fields for agent definition:
 
 ```yaml
 ---
 spec_version: "0.3.0"
 name: "Math Tutor"
-description: "An AI assistant that helps with mathematics problems"
+description: "An AI assistant that helps with math problems"
 version: "1.2.0"
 authors:
   - "Jane Smith <jane@example.com>"
@@ -175,7 +178,7 @@ authors:
 provider:
   name: "Example AI Solutions"
   url: "https://example.com"
-icon-url: "https://example.com/icons/math-tutor.png"
+icon_url: "https://example.com/icons/math-tutor.png"
 license: "MIT"
 ---
 ```
@@ -253,6 +256,8 @@ interfaces:
       topic: string      # Topic to subscribe to
       callback: string   # Callback URL for receiving events (optional, for dynamic registration)
       secret: string     # Secret for verifying webhook payloads (optional)
+      authentication: object   # Authentication configuration for the subscription  (optional)
+
 ```
 
 #### 5.3.3. Field Definitions
@@ -263,15 +268,15 @@ The `interfaces` field is an array where each element represents an interface de
 
 | Field         | Type     | Required | Description                                                                                             |
 |---------------|----------|----------|---------------------------------------------------------------------------------------------------------|
-| `type`        | `string` | Yes      | The agent's interface type. Must be one of:<br>- `webchat`: Web-based chat interface.<br>- `consolechat`: Command-line/terminal chat interface.<br>- `webhook`: Webhook endpoint with subscription support. |
+| `type`        | `string` | Yes      | The agent's interface type. Must be one of:<br>- `webchat`: Web-based chat interface<br>- `consolechat`: Command-line/terminal chat interface<br>- `webhook`: Webhook endpoint with subscription support |
 | `prompt`      | `string` | No       | (webhook only) A template string for constructing the user prompt for an agent run from webhook data.<br>Supports [variable substitution](#7-variable-substitution) with HTTP context prefixes:<br>- `${http:payload.fieldname}` to access webhook payload fields<br>- `${http:header.headername}` to access HTTP headers<br>When provided, this templated prompt is used as the user prompt to the agent instead of passing the raw payload.<br>When omitted, the implementation determines how to construct the agent prompt from the webhook payload. |
 | `signature`   | `object` | Yes      | Defines the agent's input and output parameters. See [Signature Object](#signature-object).                  |
 | `exposure`    | `object` | No       | Configuration for how a `webchat` or `webhook` agent is exposed via HTTP. Not applicable to `consolechat`. See [Exposure Object](#exposure-object).                |
-| `subscription`| `object` | No       | (webhook only) Subscription configuration. See below. |
+| `subscription`| `object` | No       | (webhook only) Subscription configuration. See [Subscription Object](#subscription-object). |
 
 ##### Signature Object {#signature-object}
 
-Defines the data contract for the agent. The `input` and `output` fields MUST conform to the [JSON Schema](https://json-schema.org/) specification, but MAY be expressed in YAML syntax (as is common in OpenAPI and similar specifications). This allows for:
+Defines the data contract for the agent. The `input` and `output` fields MUST conform to the [JSON Schema](https://json-schema.org/) specification, but are expressed in YAML syntax. This allows for:
 
 - Simple signatures (e.g., a single string, number, boolean, or array)
 - Complex, structured objects with named properties
@@ -280,6 +285,7 @@ Defines the data contract for the agent. The `input` and `output` fields MUST co
 **Examples:**
 
 *Single string input/output (default):*
+
 ```yaml
 signature:
   input:
@@ -289,14 +295,6 @@ signature:
 ```
 
 *Complex object with properties:*
-
-When `input` or `output` is an object type, it is RECOMMENDED to document the properties using a table with the following columns:
-
-| Name | Type | Description | Required |
-|------|------|-------------|----------|
-| property name | JSON Schema type | Description of the property | true/false |
-
-This table maps directly to the `properties`, `type`, `description`, and `required` fields in JSON Schema. For example:
 
 ```yaml
 signature:
@@ -338,17 +336,20 @@ signature:
 **Default Behavior:**
 
 Default signature behavior:
+
 - For `consolechat` and `webchat` types: the default `signature` is string input and string output.
+
 - For `webhook` type: the `input` field MAY be omitted, as the webhook provider determines the input payload structure.
 
 AFM implementations **SHALL** use this definition to generate the agent's callable interface and to ensure consistent behavior across different platforms.
 
+<a id="subscription-object"></a>
 **Subscription Object (webhook only):**
 
 | Field            | Type     | Required | Description |
 |------------------|----------|----------|-------------|
 | `protocol`       | `string` | Yes      | The subscription protocol (e.g., `websub`). |
-| `hub`            | `string` | Yes      | The subscription hub URL. |
+| `hub`            | `string` | Yes      | The hub to subscribe at. |
 | `topic`          | `string` | Yes      | The topic to subscribe to. |
 | `callback`       | `string` | No       | The callback URL where events should be delivered (optional, for dynamic or self-registration). |
 | `authentication` | `object` | No       | Optional authentication configuration for the webhook subscription. See [Section 5.6](#56-authentication) for the schema. |
@@ -362,15 +363,11 @@ Applies to agents of type `webchat` and `webhook`, and defines how the correspon
 |--------|----------|----------|----------------------------------------------------------------------|
 | `http` | `object` | No | Defines how to expose the agent via a standard HTTP endpoint.        |
 
-!!! warning "WIP"
-    Work in progress
-
 **HTTP Object:**
 
 | Field            | Type     | Required | Description                                                                 |
 |------------------|----------|----------|-----------------------------------------------------------------------------|
 | `path`           | `string` | No       | The URL path segment for the agent's HTTP endpoint (e.g., `/math-tutor`). If not specified, implementations **SHOULD** use `/chat` for `webchat` interfaces and `/webhook` for `webhook` interfaces. |
-| `authentication` | `object` | No       | Optional authentication configuration for the HTTP endpoint. See [Section 5.6](#56-authentication) for the schema. |
 
 !!! note "HTTP Exposure Configuration"
     The `http` object is applicable for agents of type `webchat` or `webhook`. It defines how the agent is exposed via a standard HTTP endpoint, allowing other systems to interact with it over the web.
@@ -381,8 +378,6 @@ Applies to agents of type `webchat` and `webhook`, and defines how the correspon
     - `webhook`: If no `exposure.http.path` is specified, implementations **SHOULD** default to `/webhook`
 
     AFM does not define the HTTP methods (GET, POST, etc.) for the agent's endpoint. This is left to the implementation to decide based on the agent's functionality and requirements.
-
-    HTTP authentication uses the generic authentication schema defined in [Section 5.6](#56-authentication), where the `type` field specifies the authentication scheme (e.g., `oauth2`, `api_key`), and the rest of the fields provide the configuration.
 
 
 #### 5.3.4. Example Usages
@@ -486,7 +481,7 @@ interfaces:
 
 ### 5.4. Tools {#54-tools}
 
-This section defines which external tools and resources the agent can access.
+This section defines the tools the agent can access and use.
 
 #### 5.4.1. Schema Overview
 
@@ -527,14 +522,14 @@ This section defines execution control and runtime behavior settings for the age
 #### 5.5.1. Schema Overview
 
 ```yaml
-max_iterations: int    # Maximum number of iterations to prevent infinite loops
+max_iterations: int    # Maximum number of iterations per agent run
 ```
 
 #### 5.5.2. Field Definitions
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| <a id="field-max-iterations"></a>[`max_iterations`](#field-max-iterations) | `integer` | No | Maximum number of iterations the agent can perform in a single invocation.<br>This helps prevent infinite loops or runaway execution.<br>Default: Implementation-specific (typically unlimited or a high value like 100).<br>AFM implementations **SHOULD** respect this limit and gracefully terminate agent execution when the limit is reached. |
+| <a id="field-max-iterations"></a>[`max_iterations`](#field-max-iterations) | `integer` | No | Maximum number of iterations the agent can perform in a single run.<br>This helps prevent infinite loops or runaway execution.<br>Default: Implementation-specific (typically unlimited or a high value like 100).<br>AFM implementations **SHOULD** respect this limit and gracefully terminate agent execution when the limit is reached. |
 
 #### 5.5.3. Example Usage
 
@@ -544,9 +539,9 @@ max_iterations: 50
 
 ### 5.6. Authentication {#56-authentication}
 
-This section defines the generic client authentication schema that can be reused across different parts of the AFM specification, including MCP server connections and webhook subscriptions.
+This section defines the generic client authentication schema that is used across different parts of the AFM specification, including MCP server connections and webhook subscriptions.
 
-The authentication object is **OPTIONAL** and specifies authentication configuration for connections.
+The authentication object is **OPTIONAL**.
 
 #### 5.6.1. Schema Overview
 
@@ -557,7 +552,6 @@ authentication:
   # Examples:
   # - For bearer: token
   # - For basic: username, password
-  # - For oauth2: a grant_type field and client_id, client_secret, token_url, etc.
 ```
 
 #### 5.6.2. Field Definitions
@@ -569,21 +563,20 @@ authentication:
 | `type` | String | Yes      | Authentication scheme (e.g., `bearer`, `basic`, `jwt`, `oauth2`).<br>Determines which additional fields are required or supported. |
 | `*`    | Various | Varies   | Additional fields are authentication-type specific. See examples below for common patterns.<br>Values **SHOULD** use [variable substitution](#7-variable-substitution) to reference credentials securely. |
 
-!!! note "Authentication Field Structure"
+<!-- !!! note "Authentication Field Structure"
     The authentication object uses a type-specific structure where the `type` field determines which additional fields are needed:
     
     - **bearer**: Requires `token` field
     - **basic**: Requires `username` and `password` fields
     - **oauth2**: May require a `grant_type` field and fields like `client_id`, `client_secret`, `token_url`, `scope`, etc.
     
-    The exact set of fields and their semantics are implementation-specific, but implementations **SHOULD** follow common authentication patterns for each type.
+    The exact set of fields and their semantics are implementation-specific, but implementations **SHOULD** follow common authentication patterns for each type. -->
 
 !!! warning "Security Best Practices"
-    Sensitive credentials (tokens, passwords, secrets, keys) **SHOULD NOT** be hardcoded in AFM files. Instead:
+    Sensitive credentials (e.g., tokens, passwords, secrets, keys) **SHOULD NOT** be hardcoded in AFM files. Instead:
     
     - Use [variable substitution](#7-variable-substitution) to reference credentials from secure sources
     - Let the agent's host environment manage actual credential storage and retrieval
-    - Keep credentials out of version control systems
 
 #### 5.6.3. Example Usage
 
@@ -600,9 +593,9 @@ authentication:
   password: "${env:API_PASSWORD}"
 ```
 
-## 6. Protocol Extensions
+## 6. Protocol Specifications
 
-This section provides detailed specifications for the protocols referenced in above schema. These protocols enable agents to communicate with external systems and other agents.
+This section details the protocols that agents use to communicate with external systems and other agents, as referenced in the schema above.
 
 ### 6.1. Model Context Protocol (MCP)
 
@@ -615,12 +608,12 @@ mcp:
   - name: string           # Unique identifier for the server connection
     transport:
       type: string         # Transport mechanism (must be "http")
-      url: string          # URL endpoint for the MCP server
+      url: string          # URL for the MCP server
       authentication:      # Optional authentication configuration
         type: string       # Authentication scheme (bearer, jwt, oauth2, etc.)
     tool_filter:           # Optional
-      allow: [string]      # Whitelist of tools in "tool_name" format
-      deny: [string]       # Blacklist of tools in "tool_name" format
+      allow: [string]      # Whitelist of tools
+      deny: [string]       # Blacklist of tools
 ```
 
 #### 6.1.2. Field Definitions
@@ -632,7 +625,7 @@ The `mcp` field is an array where each element represents an MCP server connecti
 | Key              | Type   | Required | Description                                                                                                        |
 | ---------------- | ------ | -------- | ------------------------------------------------------------------------------------------------------------------ |
 | `name`           | String | Yes      | A unique, human-readable identifier for the connection.                                                            |
-| `transport`      | Object | Yes      | An object defining the communication mechanism. See [Transport Object](#transport-object) below.                   |
+| `transport`      | Object | Yes      | An object defining the transport mechanism. See [Transport Object](#transport-object) below.                   |
 | `tool_filter`    | Object | No       | Filter configuration for tools from this server. See [Tool Filter Object](#tool-filter-object) below.              |
 
 **<a id="transport-object"></a>Transport Object:**
@@ -640,7 +633,7 @@ The `mcp` field is an array where each element represents an MCP server connecti
 | Key              | Type   | Required | Description                                                                                           |
 | ---------------- | ------ | -------- | ----------------------------------------------------------------------------------------------------- |
 | `type`           | String | Yes      | Transport mechanism. Must be `http`.                                                                  |
-| `url`            | String | Yes      | The URL endpoint of the MCP server.                                                                   |
+| `url`            | String | Yes      | The URL of the MCP server.                                                                   |
 | `authentication` | Object | No       | Authentication configuration for the connection. See [Section 5.6](#56-authentication) for the schema.|
 
 **<a id="tool-filter-object"></a>Tool Filter Object:**
@@ -651,10 +644,7 @@ The `mcp` field is an array where each element represents an MCP server connecti
 | `deny`  | String Array | No       | A blacklist of tools to hide from this server, using just the tool name (e.g., `write_file`). Applied after `allow` filtering. |
 
 !!! note "Filter Precedence"
-    When both `allow` and `deny` are specified:
-    1. First, if `allow` is present, only the tools in the allow list are made available
-    2. Then, `deny` is applied to remove specific tools from that filtered set
-    If only `deny` is specified, all tools from the server are available except those in the deny list.
+    When both `allow` and `deny` are specified, the tools in the `allow` list are made available and then the `deny` list is applied to remove specific tools from that filtered set. If only `deny` is specified, all tools from the server are available except those in the deny list.
 
 #### 6.1.3. Example Implementation
 
@@ -663,24 +653,24 @@ This example defines tool connections to remote MCP servers with authentication 
 ```yaml
 tools:
   mcp:
-    - name: github_mcp_server
+    - name: "github_mcp_server"
       transport:
-        type: http
+        type: "http"
         url: "${env:GITHUB_MCP_URL}"
         authentication:
-          type: bearer
+          type: "bearer"
           token: "${env:GITHUB_OAUTH_TOKEN}"
       tool_filter:
         allow:
           - "issues.create"
           - "repos.list"
 
-    - name: database_server
+    - name: "database_server"
       transport:
-        type: http
+        type: "http"
         url: "${env:DATABASE_MCP_URL}"
         authentication:
-          type: bearer
+          type: "bearer"
           token: "${env:DATABASE_API_KEY}"
       tool_filter:
         allow:
@@ -698,23 +688,28 @@ tools:
 
 ## 7. Variable Substitution
 
-AFM files MAY use `${...}` syntax for variable substitution. The timing of variable resolution is implementation-defined.
+AFM files MAY use `${...}` syntax for variable substitution.
 
-The content within `${...}` is also implementation-defined and implementations are responsible for determining how and when variables are resolved, including handling prefix conventions (e.g., `${env:VAR}`, `${file:KEY}`, `${http:payload.field}`).
+This specification defines three standard variable prefixes:
 
-Variable resolution commonly occurs before the agent is made available for use, but MAY also happen at other stages depending on the implementation.
+- The `env:` prefix (e.g., `${env:API_TOKEN}`) is **specification-defined** and MUST resolve to an environment variable, generally at agent load time (i.e., variable resolution for `env:` occurs before the agent is made available for use).
+- The `http:payload` prefix (e.g., `${http:payload.field}`) is **specification-defined** for webhook interfaces and MUST resolve to the corresponding field in the incoming webhook payload at runtime. Variable resolution for `http:payload` occurs at runtime for each webhook invocation.
+- The `http:header` prefix (e.g., `${http:header.User-Agent}`) is **specification-defined** for webhook interfaces and MUST resolve to the corresponding HTTP header value from the incoming webhook request at runtime. Header names are case-insensitive.
+
+Implementations MAY define and support additional variable substitution conventions beyond those specified here. Common examples include `file:` and `secret:`, but these are **implementation-defined** and MAY vary between AFM implementations. The timing and semantics of resolution for these prefixes are determined by the implementation.
+
 
 ### 7.1. Variable Prefixes
 
-Implementations MAY adopt and support prefixes to specify the source of variable values:
+The following table summarizes variable prefixes and their status:
 
-| Prefix | Context | Description | Example |
-|--------|---------|-------------|---------|
-| `env:` | Static | Environment variable | `${env:API_TOKEN}` |
-| `file:` | Static | Value from external config file | `${file:api.baseUrl}` |
-| `secret:` | Static | Value from secrets manager | `${secret:MODEL_API_KEY}` |
-| `http:payload` | Runtime (webhook) | Access webhook payload fields | `${http:payload.event}` or `${http:payload['nested.field']}` |
-| `http:header` | Runtime (webhook) | Access HTTP request headers | `${http:header.User-Agent}` or `${http:header.X-GitHub-Event}` |
+| Prefix | Context | Description | Example | Spec Status |
+|--------|---------|-------------|---------|-------------|
+| `env:` | Static | Environment variable | `${env:API_TOKEN}` | **Spec-defined** |
+| `http:payload` | Runtime (webhook) | Access webhook payload fields | `${http:payload.event}` or `${http:payload['nested.field']}` | **Spec-defined** |
+| `http:header` | Runtime (webhook) | Access HTTP request headers | `${http:header.User-Agent}` or `${http:header.X-GitHub-Event}` | **Spec-defined** |
+| `file:` | Static | Value from external config file | `${file:api.baseUrl}` | Implementation-defined |
+| `secret:` | Static | Value from secrets manager | `${secret:MODEL_API_KEY}` | Implementation-defined |
 
 **Static vs Runtime Resolution:**
 
@@ -757,16 +752,18 @@ interfaces:
 
 When using `http:payload` and `http:header` in webhook prompts:
 
-**Payload Field Access:**
-- Dot notation: `${http:payload.field.nested}` for nested object access
-- Bracket notation: `${http:payload['field.with.dots']}` for fields containing special characters
-- Array access: `${http:payload.items[0]}` for array element access by index
-- Combined access: `${http:payload.users[0].name}` or `${http:payload['special-field'][0]}` for complex paths
-- Root access: `${http:payload}` returns the entire payload as a JSON string
+**Payload Field Access (Specification Requirements):**
 
-**Header Access:**
-- Header names are case-insensitive: `${http:header.Content-Type}` or `${http:header.content-type}`
-- Headers with special characters: `${http:header.X-GitHub-Event}`
+- Implementations **MUST** support dot notation for nested object access (e.g., `${http:payload.field.nested}` resolves to the value of the `nested` property within the `field` object).
+- Implementations **MUST** support bracket notation for field names containing special characters or dots (e.g., `${http:payload['field.with.dots']}` resolves to the value of the `field.with.dots` property).
+- Implementations **MUST** support array access by index (e.g., `${http:payload.items[0]}` resolves to the first element of the `items` array).
+- Implementations **MUST** support combined access for complex paths (e.g., `${http:payload.users[0].name}` or `${http:payload['special-field'][0]}` resolves to the `name` property of the first element in the `users` array, or the first element of the `special-field` array, respectively).
+- Implementations **MUST** support root access, where `${http:payload}` resolves to the entire payload as a JSON string.
+
+**Header Access (Specification Requirements):**
+
+- Implementations **MUST** treat header names as case-insensitive (e.g., `${http:header.Content-Type}` and `${http:header.content-type}` MUST resolve to the same value).
+- Implementations **MUST** support access to headers with special characters (e.g., `${http:header.X-GitHub-Event}` resolves to the value of the `X-GitHub-Event` header).
 
 **Error Handling:**
 Implementations **SHOULD** handle missing or invalid variable references gracefully by using meaningful defaults or failing with clear error messages.
