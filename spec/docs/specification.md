@@ -20,7 +20,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 AFM addresses the current fragmentation in the AI agent ecosystem by providing a unified, text-based standard for agent definition:
 
-- **Simple Syntax**: AFM allows developers to *declare* an agent's instructions, tools, and configuration in a simple, text-based format, moving away from complex, imperative code.
+- **Simple Syntax**: AFM allows developers to *declare* an agent's instructions, tools, and configuration in a simple, no-code, text-based format, moving away from complex, imperative code.
 - **Human-Readability**: AFM uses a simple markdown-based syntax that is intuitive for both developers and non-technical stakeholders to read, write, and understand.
 - **Adaptable**: AFM is designed to be flexible and extensible, allowing the standard to evolve as AI technologies and requirements change.
 - **Unified Experience**: AFM provides a clean, declarative model that works seamlessly for both developers writing code and those using visual, low-code interfaces. The same AFM file can power both experiences.
@@ -92,7 +92,6 @@ The Markdown body **MUST** contain the following headings, with corresponding co
     max_iterations: 20
     interfaces:
       - type: consolechat
-
     tools:
       mcp:
         - name: "math_operations"
@@ -103,11 +102,18 @@ The Markdown body **MUST** contain the following headings, with corresponding co
 
     # Role
 
-    You are an experienced math tutor capable of assisting students with mathematics problems, providing explanations, step-by-step solutions, and practice exercises.
+    You are an experienced math tutor capable of assisting students with mathematics problems, providing explanations, step-by-step 
+    solutions, and practice exercises.
 
     # Instructions
 
-    You are a knowledgeable and patient math tutor who helps students understand mathematical concepts. Provide clear, step-by-step explanations for math problems, using simple language and avoiding jargon unless explaining it. When solving problems, show all work and explain each step. Use the available math operations tools when performing calculations. Explain mathematical concepts with real-world examples when possible. Be encouraging and supportive of students' efforts, ask clarifying questions if a problem is not clearly stated, provide multiple approaches to solving problems when applicable, help students identify and correct their mistakes.
+    You are a knowledgeable and patient math tutor who helps students understand mathematical concepts. Provide clear, step-by-step 
+    explanations for math problems, using simple language and avoiding jargon unless explaining it. 
+    
+    When solving problems, show all work and explain each step. Use the available math operations tools when performing calculations. 
+    Explain mathematical concepts with real-world examples when possible. Be encouraging and supportive of students' efforts, ask clarifying 
+    questions if a problem is not clearly stated, provide multiple approaches to solving problems when applicable, help students identify 
+    and correct their mistakes.
     ```
 
 ## 5. Schema Definitions
@@ -145,22 +151,22 @@ Each field serves a specific purpose in defining and organizing the agent:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| <a id="field-spec-version"></a>[`spec_version`](#field-spec-version) | `string` | No | Version of the AFM specification this file conforms to (e.g., "0.3.0").<br>This is **OPTIONAL** but recommended for compatibility.<br>AFM implementations **MAY** use this field to validate compatibility and provide warnings for mismatched spec versions. |
-| <a id="field-name"></a>[`name`](#field-name) | `string` | No | Identifies the agent in human-readable form.<br>Default: inferred from the filename of the AFM file.<br>AFM implementations **SHALL** use this field to display the agent's name in user interfaces. |
-| <a id="field-description"></a>[`description`](#field-description) | `string` | No | Provides a concise summary of what the agent does.<br>Default: inferred from the markdown body `# Role` section.<br>AFM implementations **SHALL** use this field to display the agent's description in user interfaces. |
-| <a id="field-version"></a>[`version`](#field-version) | `string` | No | [Semantic version](https://semver.org/) of the agent definition (MAJOR.MINOR.PATCH).<br>Default: "0.0.0".<br>AFM implementations **SHALL** use this field to display the agent's version in user interfaces. |
-| <a id="field-author"></a>[`author`](#field-author) | `string` | No | Single author in format `Name <Email>`.<br>Credits the creator of the agent definition. If both `author` and `authors` fields are provided, `authors` takes precedence. |
-| <a id="field-authors"></a>[`authors`](#field-authors) | `string[]` | No | Multiple authors, each in format `Name <Email>`.<br>Credits the creators of the agent definition. Takes precedence over `author` if both exist. |
-| <a id="field-icon-url"></a>[`icon_url`](#field-icon-url) | `string` | No | URL to an icon representing the agent.<br>This is **OPTIONAL** but recommended for visual representation in user interfaces.<br>AFM implementations **SHALL** use this field to display the agent's icon in user interfaces. |
-| <a id="field-provider"></a>[`provider`](#field-provider) | `object` | No | Information about the organization providing the agent.<br>This is **OPTIONAL** but recommended for attribution.<br>See the [Provider Object](#provider-object) below for details. |
-| <a id="field-license"></a>[`license`](#field-license) | `string` | No | License under which the agent definition is released.<br>This is **OPTIONAL** but recommended for clarity. |
+| `spec_version` | `string` | No | Version of the AFM specification this file conforms to (e.g., "0.3.0").<br>This is **OPTIONAL** but recommended for compatibility.<br>AFM implementations **MAY** use this field to validate compatibility and provide warnings for mismatched spec versions. |
+| `name` | `string` | No | Identifies the agent in human-readable form.<br>Default: inferred from the filename of the AFM file.<br>AFM implementations **SHALL** use this field to display the agent's name in user interfaces. |
+| `description` | `string` | No | Provides a concise summary of what the agent does.<br>Default: inferred from the markdown body `# Role` section.<br>AFM implementations **SHALL** use this field to display the agent's description in user interfaces. |
+| `version` | `string` | No | [Semantic version](https://semver.org/) of the agent definition (MAJOR.MINOR.PATCH).<br>Default: "0.0.0".<br>AFM implementations **SHALL** use this field to display the agent's version in user interfaces. |
+| `author` | `string` | No | Single author in format `Name <Email>`.<br>Credits the creator of the agent definition. If both `author` and `authors` fields are provided, `authors` takes precedence. |
+| `authors` | `string[]` | No | Multiple authors, each in format `Name <Email>`.<br>Credits the creators of the agent definition. Takes precedence over `author` if both exist. |
+| `icon_url` | `string` | No | URL to an icon representing the agent.<br>This is **OPTIONAL** but recommended for visual representation in user interfaces.<br>AFM implementations **SHALL** use this field to display the agent's icon in user interfaces. |
+| `provider` | `object` | No | Information about the organization providing the agent.<br>This is **OPTIONAL** but recommended for attribution.<br>See the Provider Object below for details. |
+| `license` | `string` | No | License under which the agent definition is released.<br>This is **OPTIONAL** but recommended for clarity. |
 
 **<a id="provider-object"></a>Provider Object:**
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| <a id="field-provider-name"></a>[`name`](#field-provider-name) | `string` | No | Name of the organization providing the agent. |
-| <a id="field-provider-url"></a>[`url`](#field-provider-url) | `string` | No | URL to the organization's website. |
+| `name` | `string` | No | Name of the organization providing the agent. |
+| `url` | `string` | No | URL to the organization's website. |
 
 #### 5.1.3. Example Usage
 
@@ -529,7 +535,7 @@ max_iterations: int    # Maximum number of iterations per agent run
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| <a id="field-max-iterations"></a>[`max_iterations`](#field-max-iterations) | `integer` | No | Maximum number of iterations the agent can perform in a single run.<br>This helps prevent infinite loops or runaway execution.<br>Default: Implementation-specific (typically unlimited or a high value like 100).<br>AFM implementations **SHOULD** respect this limit and gracefully terminate agent execution when the limit is reached. |
+| max_iterations | `integer` | No | Maximum number of iterations the agent can perform in a single run.<br>This helps prevent infinite loops or runaway execution.<br>Default: Implementation-specific (typically unlimited or a high value like 100).<br>AFM implementations **SHOULD** respect this limit and gracefully terminate agent execution when the limit is reached. |
 
 #### 5.5.3. Example Usage
 
