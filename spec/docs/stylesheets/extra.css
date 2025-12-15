@@ -1,20 +1,59 @@
-/* Header, nav, and tabs: light mode (default) */
+/* Color Variables */
+:root {
+  --afm-black: #000;
+  --afm-white: #fff;
+  --afm-grey: #888;
+  --hero-bg-light: #fff;
+  --hero-text-light: var(--afm-black);
+  --hero-subtitle-light: var(--afm-grey);
+  --section-bg-light: #fff;
+  --section-alt-bg-light: #fff;
+  --card-bg-light: #fff;
+  --card-border-light: #ccc;
+  --card-hover-shadow-light: rgba(0,0,0,0.08);
+  --badge-bg-light: #eee;
+  --badge-text-light: var(--afm-black);
+  --code-bg-light: #f5f5f5;
+  --button-primary-bg-light: var(--afm-black);
+  --button-primary-text-light: var(--afm-white);
+  --button-secondary-border-light: #ccc;
+  --button-secondary-text-light: var(--afm-black);
+}
+
+[data-md-color-scheme="slate"] {
+  --hero-bg-dark: #111;
+  --hero-text-dark: var(--afm-white);
+  --hero-subtitle-dark: #bbb;
+  --section-bg-dark: #111;
+  --section-alt-bg-dark: #222;
+  --card-bg-dark: #222;
+  --card-border-dark: #444;
+  --card-hover-shadow-dark: rgba(0,0,0,0.2);
+  --badge-bg-dark: #333;
+  --badge-text-dark: var(--afm-white);
+  --code-bg-dark: #222;
+  --button-primary-bg-dark: var(--afm-white);
+  --button-primary-text-dark: var(--afm-black);
+  --button-secondary-border-dark: #444;
+  --button-secondary-text-dark: #bbb;
+}
+
+/* Header, Nav, Tabs */
 .md-header, .md-header__inner, .md-header-nav, .md-tabs {
-  background: #fff !important;
-  color: #111 !important;
+  background: var(--afm-white) !important;
+  color: var(--afm-black) !important;
   border-bottom: 1px solid #ececec !important;
   box-shadow: none !important;
 }
 .md-header__title, .md-header__topic, .md-header__ellipsis, .md-header__title .md-ellipsis,
 .md-tabs__item, .md-tabs__link, .md-header-nav__item, .md-header-nav__link {
-  color: #111 !important;
+  color: var(--afm-black) !important;
 }
 .md-header__button.md-icon, .md-header__button.md-icon > svg,
 .md-header__source, .md-header__source a, .md-header__source svg, .md-header__source .md-source, .md-header__source .md-source__icon, .md-header__source .md-source__repository, .md-header__source .md-source__stars {
-  color: #111 !important;
-  fill: #111 !important;
+  color: var(--afm-black) !important;
+  fill: var(--afm-black) !important;
 }
-/* Header, nav, and tabs: dark mode */
 [data-md-color-scheme="slate"] .md-header, [data-md-color-scheme="slate"] .md-header__inner, [data-md-color-scheme="slate"] .md-header-nav, [data-md-color-scheme="slate"] .md-tabs {
   background: #111 !important;
   color: #fff !important;
@@ -29,27 +68,37 @@
   color: #fff !important;
   fill: #fff !important;
 }
+
+/* Admonition (Note/Warning/Example) Boxes */
 .md-typeset .admonition, .md-typeset details {
-  border-top: 1px solid #eee !important;
-  border-right: 1px solid #eee !important;
-  border-bottom: 1px solid #eee !important;
+  background: var(--afm-white) !important;
+  border-left: 3px solid #bbb !important;
+  border: 1px solid #bbb !important;
+  border-radius: 8px !important;
+  color: var(--afm-black) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 1.1em 1.5em 1.1em 1.2em !important;
+  margin: 1.5em 0 !important;
 }
-/* AFM: Override MkDocs Material admonition/example block colors for black/white/grey only */
-.md-typeset .admonition, .md-typeset details {
-  background: #fff !important;
-  border-left: 4px solid #bbb !important;
-  color: #111 !important;
-  box-shadow: none !important;
+[data-md-color-scheme="slate"] .md-typeset .admonition, [data-md-color-scheme="slate"] .md-typeset details {
+  background: #222 !important;
+  border-left: 3px solid #888 !important;
+  border: 1px solid #444 !important;
+  border-radius: 8px !important;
+  color: #eee !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  padding: 1.1em 1.5em 1.1em 1.2em !important;
+  margin: 1.5em 0 !important;
 }
 .md-typeset .admonition-title, .md-typeset summary {
   background: #f5f5f5 !important;
-  color: #111 !important;
+  color: var(--afm-black) !important;
   border-bottom: 1px solid #eee !important;
 }
 .md-typeset .admonition.example, .md-typeset .admonition.example .admonition-title {
   background: #fff !important;
   border-left: 4px solid #888 !important;
-  color: #111 !important;
+  color: var(--afm-black) !important;
 }
 .md-typeset .admonition-title:before, .md-typeset .admonition.example .admonition-title:before {
   color: #888 !important;

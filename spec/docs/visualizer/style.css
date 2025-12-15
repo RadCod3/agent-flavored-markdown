@@ -16,6 +16,71 @@
  * under the License.
  */
 
+/* === Spec Label Dark Mode === */
+body.dark-mode .spec-version-badge {
+    background: #23272b !important;
+    color: #fff !important;
+    border-color: #444 !important;
+}
+/* === Visualizer Header/Footer Dark Mode === */
+body.dark-mode header.navbar.bg-white {
+    background: #18191a !important;
+    color: #fff !important;
+    border-bottom: 1px solid #222 !important;
+}
+body.dark-mode header.navbar.bg-white .navbar-brand,
+body.dark-mode header.navbar.bg-white .text-dark,
+body.dark-mode header.navbar.bg-white .btn-outline-dark,
+body.dark-mode header.navbar.bg-white .badge {
+    color: #fff !important;
+    border-color: #444 !important;
+}
+body.dark-mode header.navbar.bg-white .btn-outline-dark {
+    border-color: #888 !important;
+}
+body.dark-mode header.navbar.bg-white .btn-outline-dark:hover {
+    color: #fff !important;
+    border-color: #fff !important;
+}
+
+body.dark-mode footer.bg-white {
+    background: #18191a !important;
+    color: #fff !important;
+    border-top: 1px solid #222 !important;
+}
+body.dark-mode footer.bg-white p,
+body.dark-mode footer.bg-white a,
+body.dark-mode footer.bg-white .text-muted {
+    color: #eee !important;
+}
+/* === AFM Visualizer Header/Footer White Theme Overrides === */
+header.navbar.bg-white, footer.bg-white {
+    background: #fff !important;
+    color: #222 !important;
+    border-bottom: 1px solid #ececec !important;
+}
+header.navbar.bg-white .navbar-brand,
+header.navbar.bg-white .text-dark,
+header.navbar.bg-white .btn-outline-dark,
+header.navbar.bg-white .badge,
+footer.bg-white, footer.bg-white a {
+    color: #222 !important;
+}
+header.navbar.bg-white .btn-outline-dark {
+    border-color: #bbb !important;
+}
+header.navbar.bg-white .btn-outline-dark:hover,
+footer.bg-white a:hover {
+    color: #000 !important;
+    border-color: #888 !important;
+}
+footer.bg-white {
+    border-top: 1px solid #ececec !important;
+}
+footer.bg-white .text-muted {
+    color: #888 !important;
+}
+
 /* Lighter yellow for variable interpolation badges */
 .badge-var-interp {
     background-color: #fff9c4 !important; /* pale yellow */
