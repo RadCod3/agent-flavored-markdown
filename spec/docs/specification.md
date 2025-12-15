@@ -43,9 +43,9 @@ AFM is built around several core concepts that define how agents are structured 
     The mechanism by which an agent can retain information across turns or invocations is referred to as "memory." The AFM specification does not prescribe a standard for agent memory. The design, scope, and persistence of memory are left up to individual implementations, which MAY provide memory features as appropriate for their platform or use case.
 
 
-## 3. File Format and Content
+## 3. File Extension
 
-An agent definition file must use the `*.afm.md` or `.afm` extension. 
+An agent definition file must use the `.afm.md` or `.afm` extension. 
 
 ## 4. Syntax Overview
 
