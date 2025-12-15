@@ -693,11 +693,6 @@ tools:
           - "drop_table"
 ```
 
-### 6.2. Agent-to-Agent (A2A)
-
-!!! warning "Coming Soon"
-    The Agent-to-Agent Protocol (A2A) specification for exposing agents as discoverable services is under development and will be available in a future version of AFM.
-
 ## 7. Variable Substitution
 
 AFM files MAY use `${...}` syntax for variable substitution.
