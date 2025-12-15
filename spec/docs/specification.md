@@ -28,14 +28,20 @@ AFM addresses the current fragmentation in the AI agent ecosystem by providing a
 
 ## 2. Core Concepts
 
+
 AFM is built around several core concepts that define how agents are structured and can be interacted with:
 
 - **Agent**: The primary entity defined in AFM, representing an AI agent with specific capabilities and behaviors.
 - **Role**: The responsibilities or tasks an agent is designed to perform, defining its purpose within a given context.
 - **Instructions**: Explicit directives that shape the agent's behavior and guide its actions, typically forming the core of the system prompt.
 - **Details**: Programmatic metadata describing the agent, including name, version, author, and other identifying information.
+- **Model**: The underlying AI or language model that powers the agent. The model determines the agent's core reasoning and generation capabilities.
 - **Tools**: External tools and services available to the agent (e.g., via MCP).
 - **Interface**: The specification for how an agent exposes itself to the outside world, defining its callable signature and endpoints.
+
+!!! note "Agent Memory"
+    The mechanism by which an agent can retain information across turns or invocations is referred to as "memory." The AFM specification does not prescribe a standard for agent memory. The design, scope, and persistence of memory are left up to individual implementations, which MAY provide memory features as appropriate for their platform or use case.
+
 
 ## 3. File Format and Content
 
@@ -578,11 +584,11 @@ authentication:
     
     The exact set of fields and their semantics are implementation-specific, but implementations **SHOULD** follow common authentication patterns for each type. -->
 
-!!! warning "Security Best Practices"
+<!-- !!! warning "Security Best Practices"
     Sensitive credentials (e.g., tokens, passwords, secrets, keys) **SHOULD NOT** be hardcoded in AFM files. Instead:
     
     - Use [variable substitution](#7-variable-substitution) to reference credentials from secure sources
-    - Let the agent's host environment manage actual credential storage and retrieval
+    - Let the agent's host environment manage actual credential storage and retrieval -->
 
 #### 5.6.3. Example Usage
 
