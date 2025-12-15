@@ -7,26 +7,27 @@ hide:
 <div class="hero-section">
   <div class="hero-content">
     <h1 class="hero-title">Agent Flavored Markdown</h1>
-    <p class="hero-subtitle">A simple, markdown-based format for defining AI agents. Write agents in plain text that any platform can understand and deploy.</p>
+    <p class="hero-subtitle">No-code, portable agents</p>
     <div class="hero-buttons">
-      <a href="why-afm/" class="hero-button hero-button-secondary">
-        <svg class="button-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-        </svg>
-        <span>Why AFM?</span>
-      </a>
       <a href="specification" class="hero-button hero-button-secondary">
         <svg class="button-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
         </svg>
         <span>Read the Specification</span>
       </a>
+      <a href="https://hub.docker.com/r/maryamzi/afm-interpreter" class="hero-button hero-button-secondary" target="_blank" rel="noopener">
+        <svg class="button-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m4 0h-1v-4h-1m-4 0h-1v-4h-1" />
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" />
+        </svg>
+        <span>Try the Reference Implementation</span>
+      </a>
       <a href="visualizer/" class="hero-button hero-button-secondary">
         <svg class="button-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
         </svg>
-        <span>Try the Visualizer</span>
+        <span>Visualize an AFM File</span>
       </a>
     </div>
   </div>
@@ -41,7 +42,7 @@ hide:
           <span class="control control-minimize"></span>
           <span class="control control-maximize"></span>
         </div>
-        <span class="demo-file-name">code-review-assistant.md</span>
+        <span class="demo-file-name">code-review-assistant.afm.md</span>
       </div>
       <div class="demo-code-content">
 
@@ -98,7 +99,7 @@ examples. Acknowledge good practices.
 <div class="section-container section-alt section-why">
   <div class="section-header">
     <h2 class="section-title">Why AFM?</h2>
-    <p class="section-description">Agent Flavored Markdown provides a standardized way to define agents that is both human-readable and machine-parseable.</p>
+    <p class="section-description">A simple, markdown-based format for defining AI agents that is both human-readable and machine-parseable.<br/> Write agents in plain text that any platform can understand and deploy.</p>
   </div>
 
   <div class="feature-grid">
@@ -135,7 +136,7 @@ examples. Acknowledge good practices.
 <div class="cta-section">
   <div class="cta-content">
     <h2 class="section-title">Ready to get started?</h2>
-    <p class="section-description">Read the specification to learn how to write your own agents, or try the visualizer to visualize an agent defined in AFM.</p>
+    <p class="section-description">Read the specification to learn how to write your own agents, try out the reference implementation to see agents in action, or use the visualizer to visualize an agent defined in AFM.</p>
     <div class="cta-buttons">
       <a href="specification" class="cta-button-secondary">
         <svg class="button-icon-left" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -143,12 +144,19 @@ examples. Acknowledge good practices.
         </svg>
         <span>Read the Specification</span>
       </a>
+      <a href="https://hub.docker.com/r/maryamzi/afm-interpreter" class="cta-button-secondary" target="_blank" rel="noopener">
+        <svg class="button-icon-left" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m4 0h-1v-4h-1m-4 0h-1v-4h-1" />
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" />
+        </svg>
+        <span>Try the Reference Implementation</span>
+      </a>
       <a href="visualizer/" class="cta-button-secondary">
         <svg class="button-icon-left" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
         </svg>
-        <span>Try the Visualizer</span>
+        <span>Visualize an AFM File</span>
       </a>
     </div>
   </div>

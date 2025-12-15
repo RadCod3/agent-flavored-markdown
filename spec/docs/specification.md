@@ -535,7 +535,7 @@ max_iterations: int    # Maximum number of iterations per agent run
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| max_iterations | `integer` | No | Maximum number of iterations the agent can perform in a single run.<br>This helps prevent infinite loops or runaway execution.<br>Default: Implementation-specific (typically unlimited or a high value like 100).<br>AFM implementations **SHOULD** respect this limit and gracefully terminate agent execution when the limit is reached. |
+| `max_iterations` | `integer` | No | Maximum number of iterations the agent can perform in a single run.<br>This helps prevent infinite loops or runaway execution.<br>Default: Implementation-specific (typically unlimited or a high value like 100).<br>AFM implementations **SHOULD** respect this limit and gracefully terminate agent execution when the limit is reached. |
 
 #### 5.5.3. Example Usage
 
