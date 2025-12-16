@@ -106,7 +106,6 @@ nav:
     - Friendly Assistant: examples/friendly_assistant.afm.md
     - Math Tutor: examples/math_tutor.afm.md
     - GitHub Pull Request Analyzer: examples/pull_request_analyzer.afm.md
-  - Visualizer: visualizer/index.html
 
 # Include images in documentation
 docs_dir: docs

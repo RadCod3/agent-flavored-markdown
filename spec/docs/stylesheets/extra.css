@@ -345,16 +345,13 @@
 .code-demo-container {
   max-width: 1400px;
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3rem;
-  align-items: center;
+  display: flex;
+  justify-content: center;
 }
 
 @media (max-width: 960px) {
   .code-demo-container {
-    grid-template-columns: 1fr;
-    gap: 2rem;
+    padding: 0 1rem;
   }
 }
 
@@ -364,6 +361,8 @@
   border-radius: 0.75rem;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  max-width: 800px;
+  width: 100%;
 }
 
 [data-md-color-scheme="slate"] .demo-code {
@@ -447,20 +446,6 @@
 .demo-code-content pre code {
   font-size: 0.6rem !important;
   line-height: 1.5 !important;
-}
-
-.demo-visual {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  align-items: center;
-  justify-content: center;
-}
-
-.demo-visualization-image {
-  width: auto;
-  height: auto;
-  display: block;
 }
 
 .demo-card {

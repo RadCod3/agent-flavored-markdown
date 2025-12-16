@@ -8,7 +8,6 @@ This repository contains the **AFM Specification** and its documentation website
 
 **Repository Structure:**
 - `spec/docs/specification.md` - **The AFM Specification** (core document)
-- `spec/docs/visualizer/` - Interactive AFM file visualizer
 - `spec/docs/` - Additional documentation and guides
 - `spec/mkdocs.yml` - Documentation site configuration
 - `spec/requirements.txt` - Python dependencies

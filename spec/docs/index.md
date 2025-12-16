@@ -9,7 +9,7 @@ hide:
     <h1 class="hero-title">Agent Flavored Markdown</h1>
     <p class="hero-subtitle">No-code, portable agents</p>
     <div class="hero-buttons">
-      <a href="specification" class="hero-button hero-button-secondary">
+      <a href="specification" class="hero-button hero-button-secondary" target="_blank" rel="noopener">
         <svg class="button-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
         </svg>
@@ -22,13 +22,6 @@ hide:
         </svg>
         <span>Try the Reference Implementation</span>
       </a>
-      <a href="visualizer/" class="hero-button hero-button-secondary">
-        <svg class="button-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-        </svg>
-        <span>Visualize an AFM File</span>
-      </a>
     </div>
   </div>
 </div>
@@ -37,16 +30,11 @@ hide:
   <div class="code-demo-container">
     <div class="demo-code">
       <div class="demo-code-header">
-        <div class="window-controls">
-          <span class="control control-close"></span>
-          <span class="control control-minimize"></span>
-          <span class="control control-maximize"></span>
-        </div>
         <span class="demo-file-name">code-review-assistant.afm.md</span>
       </div>
       <div class="demo-code-content">
 
-```markdown
+```md
 ---
 spec_version: "0.3.0"
 name: "Code Review Assistant"
@@ -69,8 +57,7 @@ tools:
 
 # Role
 
-You are a code review assistant focused on security,
-correctness, and best practices.
+You are a code review assistant focused on security, correctness, and best practices.
 
 # Instructions
 
@@ -82,15 +69,11 @@ Review code systematically:
 4. **Maintainability**: Flag unclear patterns
 5. **Testing**: Verify test coverage
 
-For each issue, explain why it matters and suggest improvements with
-examples. Acknowledge good practices.
+For each issue, explain why it matters and suggest improvements with examples. 
+Acknowledge good practices.
 ```
 
 </div>
-    </div>
-
-    <div class="demo-visual">
-      <img src="assets/afm-visualization.png" alt="AFM Visualization" class="demo-visualization-image">
     </div>
 
   </div>
@@ -129,35 +112,6 @@ examples. Acknowledge good practices.
       </div>
       <h3 class="feature-title">Unified</h3>
       <p class="feature-description">A single, declarative format for both code and visual tools — one file, many experiences.</p>
-    </div>
-  </div>
-</div>
-
-<div class="cta-section">
-  <div class="cta-content">
-    <h2 class="section-title">Ready to get started?</h2>
-    <p class="section-description">Read the specification to learn how to write your own agents, try out the reference implementation to see agents in action, or use the visualizer to visualize an agent defined in AFM.</p>
-    <div class="cta-buttons">
-      <a href="specification" class="cta-button-secondary">
-        <svg class="button-icon-left" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-        </svg>
-        <span>Read the Specification</span>
-      </a>
-      <a href="https://hub.docker.com/r/maryamzi/afm-interpreter" class="cta-button-secondary" target="_blank" rel="noopener">
-        <svg class="button-icon-left" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m4 0h-1v-4h-1m-4 0h-1v-4h-1" />
-          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" />
-        </svg>
-        <span>Try the Reference Implementation</span>
-      </a>
-      <a href="visualizer/" class="cta-button-secondary">
-        <svg class="button-icon-left" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-        </svg>
-        <span>Visualize an AFM File</span>
-      </a>
     </div>
   </div>
 </div>
