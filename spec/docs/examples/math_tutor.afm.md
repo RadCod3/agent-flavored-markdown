@@ -8,7 +8,7 @@ This example demonstrates a Math Tutor agent defined in AFM format.
       <span class="demo-file-name">math_tutor.afm.md</span>
     </div>
     <div class="demo-code-content">
-```yaml
+```md
 ---
 spec_version: "0.3.0"
 name: "Math Tutor"
@@ -16,7 +16,7 @@ description: "An AI assistant that helps with math problems"
 version: "1.0.0"
 max_iterations: 20
 interfaces:
-  - type: consolechat
+  - type: "consolechat"
 tools:
   mcp:
     - name: "math_operations"

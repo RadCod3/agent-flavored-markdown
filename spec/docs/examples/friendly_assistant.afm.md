@@ -8,14 +8,14 @@ This example demonstrates a Friendly Assistant agent defined in AFM format.
       <span class="demo-file-name">friendly_assistant.afm.md</span>
     </div>
     <div class="demo-code-content">
-```yaml
+```md
 ---
 name: "Friendly Assistant"
 description: "A friendly conversational assistant that helps users with various tasks."
 version: "0.1.0"
 license: "Apache-2.0"
 interfaces:
-  - type: webchat
+  - type: "webchat"
 max_iterations: 5
 ---
 

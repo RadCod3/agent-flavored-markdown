@@ -8,7 +8,7 @@ This example demonstrates a GitHub Pull Request Analyzer agent defined in AFM fo
       <span class="demo-file-name">pull_request_analyzer.afm.md</span>
     </div>
     <div class="demo-code-content">
-```yaml
+````md
 ---
 spec_version: "0.3.0"
 name: "GitHub PR Code-Documentation Drift Checker"
@@ -466,7 +466,7 @@ Follow these steps in order:
    
    **Suggestion:** Update docs to reflect the new parameter.
    ```
+````
     </div>
   </div>
 </div>
-```
