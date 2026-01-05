@@ -8,7 +8,7 @@ This example demonstrates a Friendly Assistant agent defined in AFM format.
       <span class="demo-file-name">friendly_assistant.afm.md</span>
     </div>
     <div class="demo-code-content">
-```md
+```afm
 ---
 name: "Friendly Assistant"
 description: "A friendly conversational assistant that helps users with various tasks."
@@ -21,8 +21,8 @@ max_iterations: 5
 
 # Role
 
-You are a friendly and helpful conversational assistant. Your purpose is to engage in 
-natural, helpful conversations with users, answering their questions, providing 
+You are a friendly and helpful conversational assistant. Your purpose is to engage in
+natural, helpful conversations with users, answering their questions, providing
 information, and assisting with various tasks to the best of your abilities.
 
 # Instructions

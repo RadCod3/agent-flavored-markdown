@@ -907,3 +907,37 @@
   padding-left: 1.5rem !important;
   padding-right: 1.5rem !important;
 }
+
+/* AFM highlighting - YAML keys and values with different colors */
+.demo-code-content code.hljs .hljs-attr {
+  color: #0550ae;
+  font-weight: 600;
+}
+
+.demo-code-content code.hljs .hljs-string {
+  color: #0a3069;
+}
+
+.demo-code-content code.hljs .hljs-number,
+.demo-code-content code.hljs .hljs-literal {
+  color: #0550ae;
+}
+
+/* Dark mode */
+[data-md-color-scheme="slate"] .demo-code-content code.hljs {
+  background: transparent !important;
+}
+
+[data-md-color-scheme="slate"] .demo-code-content code.hljs .hljs-attr {
+  color: #79c0ff;
+  font-weight: 600;
+}
+
+[data-md-color-scheme="slate"] .demo-code-content code.hljs .hljs-string {
+  color: #a5d6ff;
+}
+
+[data-md-color-scheme="slate"] .demo-code-content code.hljs .hljs-number,
+[data-md-color-scheme="slate"] .demo-code-content code.hljs .hljs-literal {
+  color: #79c0ff;
+}

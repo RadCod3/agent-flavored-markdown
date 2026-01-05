@@ -8,11 +8,13 @@ This example demonstrates a GitHub Pull Request Analyzer agent defined in AFM fo
       <span class="demo-file-name">pull_request_analyzer.afm.md</span>
     </div>
     <div class="demo-code-content">
-````md
+````afm
 ---
 spec_version: "0.3.0"
 name: "GitHub PR Code-Documentation Drift Checker"
-description: "An AI Agent that automatically analyzes GitHub pull requests and posts comments identifying drift between code, requirements, and documentation."
+description: >
+  "An AI Agent that automatically analyzes GitHub pull requests and posts comments
+  identifying drift between code, requirements, and documentation."
 version: "0.1.0"
 max_iterations: 30
 interfaces:

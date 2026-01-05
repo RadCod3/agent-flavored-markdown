@@ -8,7 +8,7 @@ This example demonstrates a Math Tutor agent defined in AFM format.
       <span class="demo-file-name">math_tutor.afm.md</span>
     </div>
     <div class="demo-code-content">
-```md
+```afm
 ---
 spec_version: "0.3.0"
 name: "Math Tutor"
@@ -27,7 +27,7 @@ tools:
 
 # Role
 
-You are an experienced math tutor capable of assisting students with mathematics problems, 
+You are an experienced math tutor capable of assisting students with mathematics problems,
 providing explanations, step-by-step solutions, and practice exercises.
 
 # Instructions
