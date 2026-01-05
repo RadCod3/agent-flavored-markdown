@@ -18,29 +18,30 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ### 1.1. Key Goals of AFM
 
-AFM addresses the current fragmentation in the AI agent ecosystem by providing a unified, text-based standard for agent definition:
+AFM unifies agent definition through a text-based standard:
 
-- **Simple Syntax**: AFM allows developers to *declare* an agent's instructions, tools, and configuration in a simple, no-code, text-based format, moving away from complex, imperative code.
-- **Human-Readability**: AFM uses a simple markdown-based syntax that is intuitive for both developers and non-technical stakeholders to read, write, and understand.
+- **No Code**: AFM enables defining an agent's instructions, tools, and configuration in a simple, declarative, text-based format, moving away from complex, imperative code. The markdown-based syntax is intuitive for both developers and non-technical stakeholders to read, write, and understand.
+
+- **Portable**: By defining agents declaratively in text rather than code, AFM enables the same agent definition to be interpreted and deployed across diverse platforms and tools.
+
+- **Unified**: AFM provides a clean, declarative model that works seamlessly for both developers writing code and those using visual, low-code interfaces. The same AFM file can power both experiences.
+
 - **Adaptable**: AFM is designed to be flexible and extensible, allowing the standard to evolve as AI technologies and requirements change.
-- **Unified Experience**: AFM provides a clean, declarative model that works seamlessly for both developers writing code and those using visual, low-code interfaces. The same AFM file can power both experiences.
-- **Interoperability**: AFM provides a standard, unambiguous syntax for agent definition, ensuring that diverse platforms and tools can consistently use the same agent blueprint.
 
 ## 2. Core Concepts
 
+AFM defines the following core concepts:
 
-AFM is built around several core concepts that define how agents are structured and can be interacted with:
-
-- **Agent**: The primary entity defined in AFM, representing an AI agent with specific capabilities and behaviors.
-- **Role**: The responsibilities or tasks an agent is designed to perform, defining its purpose within a given context.
-- **Instructions**: Explicit directives that shape the agent's behavior and guide its actions, typically forming the core of the system prompt.
-- **Details**: Programmatic metadata describing the agent, including name, version, author, and other identifying information.
-- **Model**: The underlying AI or language model that powers the agent. The model determines the agent's core reasoning and generation capabilities.
-- **Tools**: External tools and services available to the agent (e.g., via MCP).
-- **Interface**: The specification for how an agent exposes itself to the outside world, defining its callable signature and endpoints.
+- **Agent**: The primary entity defined by an AFM file, representing an AI agent.
+- **Role**: The agent's purpose and responsibilities.
+- **Instructions**: Directives governing the agent's behavior.
+- **Details**: Metadata describing the agent (name, version, author, etc.).
+- **Model**: The AI model powering the agent.
+- **Tools**: External tools and services available to the agent.
+- **Interface**: How the agent is invoked and its input/output contract.
 
 !!! note "Agent Memory"
-    The mechanism by which an agent can retain information across turns or invocations is referred to as "memory." The AFM specification does not prescribe a standard for agent memory. The design, scope, and persistence of memory are left up to individual implementations, which MAY provide memory features as appropriate for their platform or use case.
+    AFM does not prescribe a standard for agent memory yet. Implementations MAY provide memory features as appropriate for their platform.
 
 
 ## 3. File Extension
@@ -176,7 +177,7 @@ Each field serves a specific purpose in defining and organizing the agent:
 
 #### 5.1.3. Example Usage
 
-The following example demonstrates a valid agent metadata section as specified in [Section 5.1.1](#51-agent-details). This YAML front matter illustrates the use of recommended and optional fields for agent definition:
+The following example demonstrates a valid agent metadata section as specified in [Section 5.1](#51-agent-details). This YAML front matter illustrates the use of recommended and optional fields for agent definition:
 
 ```yaml
 ---
@@ -254,7 +255,7 @@ Each interface type defines how the agent is triggered and interacted with. Impl
 
 ```yaml
 interfaces:
-  - type: webchat | consolechat | webhook
+  - type: consolechat | webchat | webhook
     prompt: string       # For webhook type: template string for constructing the user prompt for the agent run
     signature:
       input: object      # JSON Schema object defining input parameters
@@ -282,7 +283,7 @@ The `interfaces` field is an array where each element represents an interface de
 |---------------|----------|----------|---------------------------------------------------------------------------------------------------------|
 | `type`        | `string` | Yes      | The agent's interface type. Must be one of:<br>- `webchat`: Web-based chat interface<br>- `consolechat`: Command-line/terminal chat interface<br>- `webhook`: Webhook endpoint with subscription support |
 | `prompt`      | `string` | No       | (webhook only) A template string for constructing the user prompt for an agent run from webhook data.<br>Supports [variable substitution](#7-variable-substitution) with HTTP context prefixes:<br>- `${http:payload.fieldname}` to access webhook payload fields<br>- `${http:header.headername}` to access HTTP headers<br>When provided, this templated prompt is used as the user prompt to the agent instead of passing the raw payload.<br>When omitted, the implementation determines how to construct the agent prompt from the webhook payload. |
-| `signature`   | `object` | Yes      | Defines the agent's input and output parameters. See [Signature Object](#signature-object).                  |
+| `signature`   | `object` | No       | Defines the agent's input and output parameters. If omitted, defaults to string input and string output for `consolechat` and `webchat` types. See [Signature Object](#signature-object). |
 | `exposure`    | `object` | No       | Configuration for how a `webchat` or `webhook` agent is exposed via HTTP. Not applicable to `consolechat`. See [Exposure Object](#exposure-object).                |
 | `subscription`| `object` | No       | (webhook only) Subscription configuration. See [Subscription Object](#subscription-object). |
 
@@ -463,16 +464,6 @@ interfaces:
 
       Please analyze this webhook event and provide a summary of the action taken.
     signature:
-      input:
-        type: object
-        properties:
-          event:
-            type: string
-            description: "The event type received by the webhook"
-          payload:
-            type: object
-            description: "The event payload"
-        required: [event, payload]
       output:
         type: object
         properties:
@@ -647,6 +638,9 @@ The `mcp` field is an array where each element represents an MCP server connecti
 | `type`           | String | Yes      | Transport mechanism. Must be `http`.                                                                  |
 | `url`            | String | Yes      | The URL of the MCP server.                                                                   |
 | `authentication` | Object | No       | Authentication configuration for the connection. See [Section 5.6](#56-authentication) for the schema.|
+
+!!! note "HTTP Transport Only"
+    AFM currently supports only HTTP transport for MCP connections, but may support other transports in the future.
 
 **<a id="tool-filter-object"></a>Tool Filter Object:**
 
