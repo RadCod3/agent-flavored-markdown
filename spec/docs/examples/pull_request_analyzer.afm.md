@@ -31,8 +31,6 @@ interfaces:
                 - "summary"
     subscription:
       protocol: "websub"
-      hub: "https://api.github.com/hub"
-      topic: "https://github.com/MaryamZi/np-dev-time-projects/events/pull_request.json"
       callback: "${env:CALLBACK_URL}/github-drift-checker"
       secret: "${env:GITHUB_WEBHOOK_SECRET}"
     exposure:
