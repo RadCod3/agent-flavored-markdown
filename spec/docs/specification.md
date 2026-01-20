@@ -362,8 +362,8 @@ AFM implementations **SHALL** use this definition to generate the agent's callab
 | Field            | Type     | Required | Description |
 |------------------|----------|----------|-------------|
 | `protocol`       | `string` | Yes      | The subscription protocol (e.g., `websub`). |
-| `hub`            | `string` | Yes      | The hub to subscribe at. |
-| `topic`          | `string` | Yes      | The topic to subscribe to. |
+| `hub`            | `string` | No       | The hub to subscribe at (optional if subscription is registered manually). |
+| `topic`          | `string` | No       | The topic to subscribe to (optional if subscription is registered manually). |
 | `callback`       | `string` | No       | The callback URL where events should be delivered (optional, for dynamic or self-registration). |
 | `authentication` | `object` | No       | Optional authentication configuration for the webhook subscription. See [Section 5.6](#56-authentication) for the schema. |
 | `secret`         | `string` | No       | A secret used to sign or verify webhook payloads (optional, for security). |
