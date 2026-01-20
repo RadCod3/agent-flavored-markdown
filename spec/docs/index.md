@@ -6,7 +6,7 @@ hide:
 
 <div class="hero-section">
   <div class="hero-content">
-    <h1 class="hero-title">Agent Flavored Markdown</h1>
+    <h1 class="hero-title">Agent-Flavored Markdown</h1>
     <p class="hero-subtitle">No-code, portable agents</p>
     <div class="hero-buttons">
       <a href="specification" class="hero-button hero-button-secondary" target="_blank" rel="noopener">

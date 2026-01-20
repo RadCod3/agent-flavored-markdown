@@ -9,7 +9,7 @@ hide:
 
 ## 1. Introduction
 
-AFM (Agent Flavored Markdown) is a markdown-based format to define AI agents. It allows agents to be written in text once and reused across different platforms.
+AFM (Agent-Flavored Markdown) is a markdown-based format to define AI agents. It allows agents to be written in text once and reused across different platforms.
 
 This document details the AFM file format, its syntax, and the schema for defining an agent.
 

@@ -6,5 +6,5 @@ title: Why AFM?
 
 Explore in-depth articles about various aspects of AFM:
 
-- [Philosophy](./philosophy.md) - Learn about the philosophy and necessity behind Agent Flavored Markdown
+- [Philosophy](./philosophy.md) - Learn about the philosophy and necessity behind Agent-Flavored Markdown
 - [AFM: The Blueprint for a Connected Agent](./afm-connected-agent.md) - Discover how AFM serves as the connective tissue for MCP and A2A protocols

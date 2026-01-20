@@ -2,7 +2,7 @@
 
 The world of artificial intelligence is experiencing a Cambrian explosion. AI agents, designed to perform tasks autonomously, are being built by countless teams across the globe, using a vast array of different technologies and frameworks. This rapid innovation is exciting, but it has created a fragmented and chaotic landscape. How can an agent built by one team interact with an agent built by another? How can we define, manage, and scale these digital workers without getting locked into proprietary systems or drowning in boilerplate code?
 
-Agent Flavored Markdown (AFM) is an open standard designed to solve this problem. It provides a common language for describing what an agent is, what it can do, and how it behaves, paving the way for a truly interoperable ecosystem.
+Agent-Flavored Markdown (AFM) is an open standard designed to solve this problem. It provides a common language for describing what an agent is, what it can do, and how it behaves, paving the way for a truly interoperable ecosystem.
 
 ## The Developer's Dilemma
 

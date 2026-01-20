@@ -1,6 +1,6 @@
 # AFM: The Blueprint for a Connected Agent
 
-In the rapidly expanding universe of AI, building a powerful agent is only the beginning. The true challenge lies in making that agent a functional part of a larger ecosystem. This requires clear standards for what an agent is, what tools it can use, and how it collaborates. While protocols like the **Model Context Protocol (MCP)** provide a "toolbox" for agents and the **Agent-to-Agent (A2A) Protocol** provides the "communication channel," **Agent Flavored Markdown (AFM)** is the blueprint that connects the agent's definition to these powerful capabilities.
+In the rapidly expanding universe of AI, building a powerful agent is only the beginning. The true challenge lies in making that agent a functional part of a larger ecosystem. This requires clear standards for what an agent is, what tools it can use, and how it collaborates. While protocols like the **Model Context Protocol (MCP)** provide a "toolbox" for agents and the **Agent-to-Agent (A2A) Protocol** provides the "communication channel," **Agent-Flavored Markdown (AFM)** is the blueprint that connects the agent's definition to these powerful capabilities.
 
 An AFM file's role extends far beyond a simple description; it is the central configuration layer that activates an agent's ability to interact with the world. This is achieved through the `tools` block (for MCP tools) and the `interface` block (for A2A exposure) within the AFM front matter—simple yet powerful sections that transform a static definition into a dynamic, enabled entity.
 
