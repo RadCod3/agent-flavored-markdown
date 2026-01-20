@@ -1,18 +1,17 @@
+**Issue Type:**
+<!-- Select one: Bug / Enhancement / Clarification / Question -->
+
 **Description:**
-<!-- Give a brief description of the issue -->
+<!-- Describe the issue, proposed change, or question -->
 
-**Sugged Labels:**
-<!-- Optional comma separated list of suggested labels. Non committers canât assign labels to issues, so this will help issue creators who are not a committer to suggest possible labels-->
+**Affected Section(s):**
+<!-- Which section(s) of the specification does this relate to? (e.g., "5.3 Agent Interfaces", "7. Variable Substitution") -->
 
-**Suggested Assignees:**
-<!--Optional comma separated list of suggested team members who should attend the issue. Non committers canât assign issues to assignees, so this will help issue creators who are not a committer to suggest possible assignees-->
+**Proposed Solution (if applicable):**
+<!-- If suggesting a change, describe the proposed solution -->
 
-**Affected Product Version:**
-
-**OS, DB, other environment details and versions:**    
-
-**Steps to reproduce:**
-
+**Additional Context:**
+<!-- Any other context, examples, or references that would help -->
 
 **Related Issues:**
-<!-- Any related issues such as sub tasks, issues reported in other repositories (e.g component repositories), similar problems, etc. -->
+<!-- Any related issues or discussions -->
