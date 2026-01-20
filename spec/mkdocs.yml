@@ -1,7 +1,7 @@
 # Project information
 site_name: Agent-Flavored Markdown
 site_url: https://wso2.github.io/agent-flavored-markdown/
-site_author: wso2
+site_author: WSO2 LLC
 site_description: >-
   A specification for describing AI agents in a portable and interoperable way.
 
