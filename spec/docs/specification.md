@@ -104,7 +104,7 @@ The Markdown body **MUST** contain the following headings, with corresponding co
         - name: "math_operations"
           transport:
             type: "http"
-            url: "${MATH_MCP_SERVER}"
+            url: "${env:MATH_MCP_SERVER}"
     ---
 
     # Role

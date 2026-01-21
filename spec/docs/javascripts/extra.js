@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (target) {
           e.preventDefault();
           target.scrollIntoView({ behavior: 'smooth' });
+          history.pushState(null, '', targetId);
         }
       }
     });

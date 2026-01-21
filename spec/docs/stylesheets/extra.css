@@ -810,10 +810,6 @@
   border-top: 1px solid #222 !important;
 }
 
-[data-md-color-scheme="slate"] .md-footer-meta {
-  background-color: #000000;
-}
-
 .md-footer-copyright {
   flex: 1;
   padding: 0;
