@@ -15,7 +15,7 @@ hide:
         </svg>
         <span>Read the Specification</span>
       </a>
-      <a href="examples" class="hero-button hero-button-secondary">
+      <a href="examples/friendly_assistant.afm/" class="hero-button hero-button-secondary">
         <svg class="button-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
         </svg>

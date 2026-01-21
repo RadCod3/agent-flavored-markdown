@@ -21,14 +21,14 @@ interfaces:
   - type: "webhook"
     prompt: "Analyze the following pull request ${http:payload.pull_request.url}"
     signature:
-        output:
-            type: "object"
-            properties:
-                summary:
-                    type: "string"
-                    description: "A summary of the drift identified"
-            required:
-                - "summary"
+      output:
+        type: "object"
+        properties:
+          summary:
+            type: "string"
+            description: "A summary of the drift identified"
+        required:
+          - "summary"
     subscription:
       protocol: "websub"
       callback: "${env:CALLBACK_URL}/github-drift-checker"
@@ -40,13 +40,13 @@ tools:
   mcp:
     - name: "github"
       transport:
-          type: "http"
-          url: "https://api.githubcopilot.com/mcp/"
-          authentication:
-            type: "bearer"
-            token: "${GITHUB_TOKEN}"
+        type: "http"
+        url: "https://api.githubcopilot.com/mcp/"
+        authentication:
+          type: "bearer"
+          token: "${env:GITHUB_TOKEN}"
       tool_filter:
-          allow:
+        allow:
           - "list_pull_requests"
           - "pull_request_read"
           - "get_repository"

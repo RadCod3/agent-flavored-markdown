@@ -72,7 +72,6 @@
 /* Admonition (Note/Warning/Example) Boxes */
 .md-typeset .admonition, .md-typeset details {
   background: var(--afm-white) !important;
-  border-left: 3px solid #bbb !important;
   border: 1px solid #bbb !important;
   border-radius: 8px !important;
   color: var(--afm-black) !important;
@@ -82,7 +81,6 @@
 }
 [data-md-color-scheme="slate"] .md-typeset .admonition, [data-md-color-scheme="slate"] .md-typeset details {
   background: #222 !important;
-  border-left: 3px solid #888 !important;
   border: 1px solid #444 !important;
   border-radius: 8px !important;
   color: #eee !important;
@@ -103,53 +101,6 @@
 .md-typeset .admonition-title:before, .md-typeset .admonition.example .admonition-title:before {
   color: #888 !important;
 }
-/* ============================================
-   AFM Documentation Styles - React.dev Inspired
-   ============================================ */
-
-/* ============================================
-   Color Variables
-   ============================================ */
-
-:root {
-  --afm-black: #000;
-  --afm-white: #fff;
-  --afm-grey: #888;
-  --hero-bg-light: #fff;
-  --hero-text-light: var(--afm-black);
-  --hero-subtitle-light: var(--afm-grey);
-  --section-bg-light: #fff;
-  --section-alt-bg-light: #fff;
-  --card-bg-light: #fff;
-  --card-border-light: #ccc;
-  --card-hover-shadow-light: rgba(0,0,0,0.08);
-  --badge-bg-light: #eee;
-  --badge-text-light: var(--afm-black);
-  --code-bg-light: #f5f5f5;
-  --button-primary-bg-light: var(--afm-black);
-  --button-primary-text-light: var(--afm-white);
-  --button-secondary-border-light: #ccc;
-  --button-secondary-text-light: var(--afm-black);
-}
-
-[data-md-color-scheme="slate"] {
-  --hero-bg-dark: #111;
-  --hero-text-dark: var(--afm-white);
-  --hero-subtitle-dark: #bbb;
-  --section-bg-dark: #111;
-  --section-alt-bg-dark: #222;
-  --card-bg-dark: #222;
-  --card-border-dark: #444;
-  --card-hover-shadow-dark: rgba(0,0,0,0.2);
-  --badge-bg-dark: #333;
-  --badge-text-dark: var(--afm-white);
-  --code-bg-dark: #222;
-  --button-primary-bg-dark: var(--afm-white);
-  --button-primary-text-dark: var(--afm-black);
-  --button-secondary-border-dark: #444;
-  --button-secondary-text-dark: #bbb;
-}
-
 /* ============================================
    Override Material Theme Colors
    ============================================ */
