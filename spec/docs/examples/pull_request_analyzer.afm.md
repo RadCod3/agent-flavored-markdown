@@ -1,6 +1,6 @@
 # GitHub Pull Request Analyzer Example
 
-This example demonstrates a GitHub Pull Request Analyzer agent defined in AFM format that detects drift between code, requirements, and documentation.
+A GitHub pull request analyzer agent that detects drift between code, requirements, and documentation. It is triggered via a webhook and uses the GitHub MCP server for specific operations on pull requests.
 
 <div class="demo-code-container">
   <div class="demo-code">

@@ -1,6 +1,6 @@
 # Friendly Assistant Example
 
-This example demonstrates a Friendly Assistant agent defined in AFM format.
+A conversational assistant that is exposed via a web-based chat interface.
 
 <div class="demo-code-container">
   <div class="demo-code">

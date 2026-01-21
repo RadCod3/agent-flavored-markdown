@@ -1,6 +1,6 @@
 # Math Tutor Example
 
-This example demonstrates a Math Tutor agent defined in AFM format.
+A CLI-based math tutor agent that uses MCP tools for math operations.
 
 <div class="demo-code-container">
   <div class="demo-code">
