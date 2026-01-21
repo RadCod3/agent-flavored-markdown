@@ -15,7 +15,13 @@ hide:
         </svg>
         <span>Read the Specification</span>
       </a>
-      <a href="https://ghcr.io/wso2/afm-ballerina-interpreter" class="hero-button hero-button-secondary" target="_blank" rel="noopener">
+      <a href="examples" class="hero-button hero-button-secondary">
+        <svg class="button-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+        </svg>
+        <span>Browse Examples</span>
+      </a>
+      <a href="reference-implementation" class="hero-button hero-button-secondary">
         <svg class="button-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m4 0h-1v-4h-1m-4 0h-1v-4h-1" />
           <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" />
@@ -93,7 +99,7 @@ Acknowledge good practices.
         </svg>
       </div>
       <h3 class="feature-title">No code</h3>
-      <p class="feature-description">Define agents in plain markdown — no programming required.</p>
+      <p class="feature-description">Agent definitions in markdown with frontmatter — no programming required.</p>
     </div>
     <div class="feature-item">
       <div class="feature-icon-box">
@@ -102,7 +108,7 @@ Acknowledge good practices.
         </svg>
       </div>
       <h3 class="feature-title">Portable</h3>
-      <p class="feature-description">AFM agents work across different platforms and tools. Write once, deploy anywhere.</p>
+      <p class="feature-description">Agents that work across platforms and tools. Write once, deploy anywhere — secure and flexible across environments.</p>
     </div>
     <div class="feature-item">
       <div class="feature-icon-box">
@@ -112,6 +118,15 @@ Acknowledge good practices.
       </div>
       <h3 class="feature-title">Unified</h3>
       <p class="feature-description">A single, declarative format for both code and visual tools — one file, many experiences.</p>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon-box">
+        <svg class="feature-icon-svg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      </div>
+      <h3 class="feature-title">Flexible Interfaces</h3>
+      <p class="feature-description">Deploy as CLI chat, web chat, or webhooks — with typed input/output signatures for validation.</p>
     </div>
   </div>
 </div>
