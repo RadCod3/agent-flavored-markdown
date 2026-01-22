@@ -30,7 +30,7 @@ This repository contains the **AFM Specification** and its documentation website
    ```
 
 3. **Access the site:**
-   Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser
+   Open [http://localhost:8000](http://localhost:8000) in your browser
 
 The server will automatically reload when you make changes to the source files.
 
