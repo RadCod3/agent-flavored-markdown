@@ -76,3 +76,12 @@ docker run -p 8085:8085 \
   -v ./friendly_assistant.afm.md:/agent.afm.md \
   ghcr.io/wso2/afm-ballerina-interpreter:latest /agent.afm.md
 ```
+
+For console chat interfaces, include the `-it` options:
+
+```bash
+docker run -it -p 8085:8085 \
+  -e WSO2_MODEL_PROVIDER_TOKEN=<your-token> \
+  -v ./math_tutor.afm.md:/agent.afm.md \
+  ghcr.io/wso2/afm-ballerina-interpreter:latest /agent.afm.md
+```
