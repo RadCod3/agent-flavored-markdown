@@ -55,10 +55,14 @@ tools:
     - name: "github"
       transport:
         type: "http"
-        url: "${env:GITHUB_MCP_URL}"
+        url: "https://api.githubcopilot.com/mcp/"
         authentication:
           type: "bearer"
           token: "${env:GITHUB_TOKEN}"
+      tool_filter:
+        allow:
+          - "pull_request_read"
+          - "get_file_contents"
 ---
 
 # Role

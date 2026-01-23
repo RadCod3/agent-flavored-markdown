@@ -549,7 +549,7 @@ The authentication object is **OPTIONAL**.
 
 ```yaml
 authentication:
-  type: string         # Authentication scheme (bearer, jwt, oauth2, api_key, basic, etc.)
+  type: string         # Authentication scheme (bearer, jwt, oauth2, api-key, basic, etc.)
   # Additional fields depend on the type
   # Examples:
   # - For bearer: token

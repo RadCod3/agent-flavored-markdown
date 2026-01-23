@@ -758,19 +758,21 @@
    ============================================ */
 
 .md-typeset a {
-  color: var(--afm-black);
+  color: #0969da;
+  text-decoration: none;
 }
 
 .md-typeset a:hover {
-  color: #444;
+  text-decoration: underline;
 }
 
 [data-md-color-scheme="slate"] .md-typeset a {
-  color: var(--afm-white);
+  color: #58a6ff;
+  text-decoration: none;
 }
 
 [data-md-color-scheme="slate"] .md-typeset a:hover {
-  color: #bbb;
+  text-decoration: underline;
 }
 
 /* Navigation links */
