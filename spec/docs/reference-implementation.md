@@ -35,7 +35,7 @@ model:
 ```
 
 !!! Note
-    If the the default WSO2 model provider is used, the model does not have to be configured in the frontmatter. Just set the default model token as the `WSO2_MODEL_PROVIDER_TOKEN` environment variable. The token can be generated via the **Ballerina: Configure default WSO2 model provider** VS Code command with the Ballerina plugin installed.
+    If the default WSO2 model provider is used, the model does not have to be configured in the frontmatter. Just set the default model token as the `WSO2_MODEL_PROVIDER_TOKEN` environment variable. The token can be generated via the **Ballerina: Configure default WSO2 model provider** VS Code command with the Ballerina plugin installed.
 
 ## Example
 
