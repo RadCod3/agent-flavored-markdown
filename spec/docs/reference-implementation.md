@@ -1,6 +1,6 @@
 # Ballerina Interpreter for AFM
 
-A reference implementation that generates and runs AFM agents in [Ballerina](https://ballerina.io/). Available as a Docker image.
+A [reference implementation](https://github.com/wso2/reference-implementations-afm/tree/main/ballerina-interpreter) that dynamically generates and runs AFM agents in [Ballerina](https://ballerina.io/), made available as a [Docker image](https://github.com/wso2/reference-implementations-afm/pkgs/container/afm-ballerina-interpreter).
 
 ## Getting Started
 
@@ -10,22 +10,32 @@ Pull the image:
 docker pull ghcr.io/wso2/afm-ballerina-interpreter:latest
 ```
 
-Run an agent by mounting your `.afm.md` file and passing any required environment variables:
+Run an agent by mounting your `.afm.md` file and passing required environment variables:
 
-For example, where the `WSO2_MODEL_PROVIDER_TOKEN` is a required environment variable,
+For example, where `API_KEY` is a required environment variable,
 
 ```bash
 docker run -p 8085:8085 \
-  -e WSO2_MODEL_PROVIDER_TOKEN=<your-token> \
-  -v ./custom_agent.afm.md:/agent.afm.md \
-  ghcr.io/wso2/afm-ballerina-interpreter:latest /agent.afm.md
+  -e API_KEY=<YOUR-API-KEY> \
+  -v ./support_agent.afm.md:/support_agent.afm.md \
+  ghcr.io/wso2/afm-ballerina-interpreter:latest /support_agent.afm.md
 ```
 
 ## Supported Model Providers
 
 Currently supports OpenAI, Anthropic, and the default WSO2 Model Provider.
 
-To use the default WSO2 provider, set the `WSO2_MODEL_PROVIDER_TOKEN` environment variable — use the token generated via the **Ballerina: Configure default WSO2 model provider** VS Code command with the Ballerina plugin installed.
+```yaml
+model:
+  provider: "<PROVIDER-NAME>" # "openai" or "anthropic"
+  name: "<MODEL-NAME>"
+  authentication:
+    type: "api-key"
+    api_key: "${env:API_KEY}" # Will look up an environment variable named `API_KEY`
+```
+
+!!! Note
+    If the the default WSO2 model provider is used, the model does not have to be configured in the frontmatter. Just set the default model token as the `WSO2_MODEL_PROVIDER_TOKEN` environment variable. The token can be generated via the **Ballerina: Configure default WSO2 model provider** VS Code command with the Ballerina plugin installed.
 
 ## Example
 
@@ -45,7 +55,12 @@ version: "0.1.0"
 license: "Apache-2.0"
 interfaces:
   - type: webchat
-max_iterations: 5
+model:
+  provider: "openai"
+  name: "${env:OPENAI_MODEL}"
+  authentication:
+    type: "api-key"
+    api_key: "${env:OPENAI_API_KEY}"
 ---
 
 # Role
@@ -72,16 +87,20 @@ Then run it:
 
 ```bash
 docker run -p 8085:8085 \
-  -e WSO2_MODEL_PROVIDER_TOKEN=<your-token> \
-  -v ./friendly_assistant.afm.md:/agent.afm.md \
-  ghcr.io/wso2/afm-ballerina-interpreter:latest /agent.afm.md
+  -e OPENAI_MODEL=<YOUR-OPENAI-MODEL> \
+  -e OPENAI_API_KEY=<YOUR-OPENAI-API-KEY> \
+  -v ./friendly_assistant.afm.md:/friendly_assistant.afm.md \
+  ghcr.io/wso2/afm-ballerina-interpreter:latest /friendly_assistant.afm.md
 ```
 
-For console chat interfaces, include the `-it` options:
+Access the chat UI at [`http://localhost:8085/chat/ui`](http://localhost:8085/chat/ui).
 
-```bash
-docker run -it -p 8085:8085 \
-  -e WSO2_MODEL_PROVIDER_TOKEN=<your-token> \
-  -v ./math_tutor.afm.md:/agent.afm.md \
-  ghcr.io/wso2/afm-ballerina-interpreter:latest /agent.afm.md
-```
+!!! Note Console chat interface
+    For console chat interfaces, include the `-it` options. For example, with the [math tutor](../examples/math_tutor.afm/) file, use
+    ```bash
+    docker run -it -p 8085:8085 \
+      -e OPENAI_MODEL=<YOUR-OPENAI-MODEL> \
+      -e OPENAI_API_KEY=<YOUR-OPENAI-API-KEY> \
+      -v ./math_tutor.afm.md:/math_tutor.afm.md \
+      ghcr.io/wso2/afm-ballerina-interpreter:latest /math_tutor.afm.md
+    ```
