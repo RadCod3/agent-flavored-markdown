@@ -104,3 +104,6 @@ Access the chat UI at [`http://localhost:8085/chat/ui`](http://localhost:8085/ch
       -v ./math_tutor.afm.md:/math_tutor.afm.md \
       ghcr.io/wso2/afm-ballerina-interpreter:latest /math_tutor.afm.md
     ```
+
+!!! Note Getting Started Template
+    You can use the [Getting Started Template](https://github.com/wso2/reference-implementations-afm/blob/main/templates/agent_template.afm.md) to get started.
