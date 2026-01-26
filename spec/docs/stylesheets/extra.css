@@ -200,6 +200,7 @@
 }
 
 [data-md-color-scheme="slate"] .hero-button-primary:hover {
+  background: #f0f0f0;
   color: var(--afm-black) !important;
 }
 
@@ -225,6 +226,8 @@
 }
 
 [data-md-color-scheme="slate"] .hero-button-secondary:hover {
+  background: #333;
+  border-color: #555;
   color: var(--afm-white) !important;
 }
 
@@ -858,6 +861,13 @@
   background: #fff !important;
   box-shadow: none !important;
 }
+
+.md-search__input:hover,
+.md-search__input:focus {
+  background-color: #eee !important;
+  color: var(--afm-black) !important;
+}
+
 .md-tabs {
   max-width: 100%;
 }
@@ -884,7 +894,7 @@
   color: #0550ae;
 }
 
-/* Dark mode */
+/* Dark mode - highlight.js classes */
 [data-md-color-scheme="slate"] .demo-code-content code.hljs {
   background: transparent !important;
 }
@@ -901,4 +911,9 @@
 [data-md-color-scheme="slate"] .demo-code-content code.hljs .hljs-number,
 [data-md-color-scheme="slate"] .demo-code-content code.hljs .hljs-literal {
   color: #79c0ff;
+}
+
+/* Markdown headers in dark mode - use off-white instead of red */
+[data-md-color-scheme="slate"] .demo-code-content code.hljs .hljs-section {
+  color: #e6edf3;
 }
