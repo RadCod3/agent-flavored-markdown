@@ -155,7 +155,7 @@ license: string        # License under which the agent is released
 
 Each field serves a specific purpose in defining and organizing the agent:
 
-| Field | Type | Required | Description |
+| Key | Type | Required | Description |
 |-------|------|----------|-------------|
 | `spec_version` | `string` | No | Version of the AFM specification this file conforms to (e.g., "0.3.0").<br>This is **OPTIONAL** but recommended for compatibility.<br>AFM implementations **MAY** use this field to validate compatibility and provide warnings for mismatched spec versions. |
 | `name` | `string` | No | Identifies the agent in human-readable form.<br>Default: inferred from the filename of the AFM file.<br>AFM implementations **SHALL** use this field to display the agent's name in user interfaces. |
@@ -169,7 +169,7 @@ Each field serves a specific purpose in defining and organizing the agent:
 
 **<a id="provider-object"></a>Provider Object:**
 
-| Field | Type | Required | Description |
+| Key | Type | Required | Description |
 |-------|------|----------|-------------|
 | `name` | `string` | No | Name of the organization providing the agent. |
 | `url` | `string` | No | URL to the organization's website. |
@@ -201,7 +201,7 @@ This section specifies the AI model or language model that powers the agent. It 
 
 #### 5.2.1. Field Definitions
 
-| Field            | Type     | Required | Description                                                                 |
+| Key            | Type     | Required | Description                                                                 |
 |------------------|----------|----------|-----------------------------------------------------------------------------|
 | `name`           | `string` | No       | Model identifier or name. |
 | `provider`       | `string` | No       | The organization or service providing the model (e.g., "openai", "anthropic"). |
@@ -278,7 +278,7 @@ The `interfaces` field is an array where each element represents an interface de
 
 **Interface Object:**
 
-| Field         | Type     | Required | Description                                                                                             |
+| Key         | Type     | Required | Description                                                                                             |
 |---------------|----------|----------|---------------------------------------------------------------------------------------------------------|
 | `type`        | `string` | Yes      | The agent's interface type. Must be one of:<br>- `webchat`: Web-based chat interface<br>- `consolechat`: Command-line/terminal chat interface<br>- `webhook`: Webhook endpoint with subscription support |
 | `prompt`      | `string` | No       | (webhook only) A template string for constructing the user prompt for an agent run from webhook data.<br>Supports [variable substitution](#7-variable-substitution) with HTTP context prefixes:<br>- `${http:payload.fieldname}` to access webhook payload fields<br>- `${http:header.headername}` to access HTTP headers<br>When provided, this templated prompt is used as the user prompt to the agent instead of passing the raw payload.<br>When omitted, the implementation determines how to construct the agent prompt from the webhook payload. |
@@ -358,7 +358,7 @@ AFM implementations **SHALL** use this definition to generate the agent's callab
 <a id="subscription-object"></a>
 **Subscription Object (webhook only):**
 
-| Field            | Type     | Required | Description |
+| Key            | Type     | Required | Description |
 |------------------|----------|----------|-------------|
 | `protocol`       | `string` | Yes      | The subscription protocol (e.g., `websub`). |
 | `hub`            | `string` | No       | The hub to subscribe at (optional if subscription is registered manually). |
@@ -371,13 +371,13 @@ AFM implementations **SHALL** use this definition to generate the agent's callab
 
 Applies to agents of type `webchat` and `webhook`, and defines how the corresponding services are exposed.
 
-| Field  | Type     | Required | Description                                                          |
+| Key  | Type     | Required | Description                                                          |
 |--------|----------|----------|----------------------------------------------------------------------|
 | `http` | `object` | No | Defines how to expose the agent via a standard HTTP endpoint.        |
 
 **HTTP Object:**
 
-| Field            | Type     | Required | Description                                                                 |
+| Key            | Type     | Required | Description                                                                 |
 |------------------|----------|----------|-----------------------------------------------------------------------------|
 | `path`           | `string` | No       | The URL path segment for the agent's HTTP endpoint (e.g., `/math-tutor`). If not specified, implementations **SHOULD** use `/chat` for `webchat` interfaces and `/webhook` for `webhook` interfaces. |
 
@@ -496,7 +496,7 @@ tools:
 
 #### 5.4.2. Field Definitions
 
-| Field | Type | Required | Description |
+| Key | Type | Required | Description |
 |-------|------|----------|-------------|
 | `tools` | `object` | No | Container for protocol-specific tool connection configurations. |
 | `tools.mcp` | `array` | No | List of MCP servers to connect to. See [Section 6.1](#61-model-context-protocol-mcp) for detailed schema. |
@@ -529,7 +529,7 @@ max_iterations: int    # Maximum number of iterations per agent run
 
 #### 5.5.2. Field Definitions
 
-| Field | Type | Required | Description |
+| Key | Type | Required | Description |
 |-------|------|----------|-------------|
 | `max_iterations` | `integer` | No | Maximum number of iterations the agent can perform in a single run.<br>This helps prevent infinite loops or runaway execution.<br>Default: Implementation-specific (typically unlimited or a high value like 100).<br>AFM implementations **SHOULD** respect this limit and gracefully terminate agent execution when the limit is reached. |
 
