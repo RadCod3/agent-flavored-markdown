@@ -134,7 +134,7 @@ AFM implementations **SHALL** use this section to display the agent's metadata i
 
 #### 5.1.1. Schema Overview
 
-The agent metadata fields are specified in the YAML frontmatter of an AFM file:
+The agent metadata fields are specified in the YAML front matter of an AFM file:
 
 ```yaml
 spec_version: string   # AFM specification version (e.g., "0.3.0")
@@ -487,7 +487,7 @@ This section defines the tools the agent can access and use.
 
 #### 5.4.1. Schema Overview
 
-The tools fields are specified in the YAML frontmatter of an AFM file:
+The tools fields are specified in the YAML front matter of an AFM file:
 
 ```yaml
 tools:
