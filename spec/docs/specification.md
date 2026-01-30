@@ -562,7 +562,7 @@ authentication:
 
 | Key    | Type   | Required | Description                                                                                                                                                    |
 | ------ | ------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `type` | String | Yes      | Authentication scheme (e.g., `bearer`, `basic`, `jwt`, `oauth2`).<br>Determines which additional fields are required or supported. |
+| `type` | `string` | Yes      | Authentication scheme (e.g., `bearer`, `basic`, `jwt`, `oauth2`).<br>Determines which additional fields are required or supported. |
 | `*`    | Various | Varies   | Additional fields are authentication-type specific. See examples below for common patterns.<br>Values **SHOULD** use [variable substitution](#7-variable-substitution) to reference credentials securely. |
 
 <!-- !!! note "Authentication Field Structure"
@@ -626,17 +626,17 @@ The `mcp` field is an array where each element represents an MCP server connecti
 
 | Key              | Type   | Required | Description                                                                                                        |
 | ---------------- | ------ | -------- | ------------------------------------------------------------------------------------------------------------------ |
-| `name`           | String | Yes      | A unique, human-readable identifier for the connection.                                                            |
-| `transport`      | Object | Yes      | An object defining the transport mechanism. See [Transport Object](#transport-object) below.                   |
-| `tool_filter`    | Object | No       | Filter configuration for tools from this server. See [Tool Filter Object](#tool-filter-object) below.              |
+| `name`           | `string` | Yes      | A unique, human-readable identifier for the connection.                                                            |
+| `transport`      | `object` | Yes      | An object defining the transport mechanism. See [Transport Object](#transport-object) below.                   |
+| `tool_filter`    | `object` | No       | Filter configuration for tools from this server. See [Tool Filter Object](#tool-filter-object) below.              |
 
 **<a id="transport-object"></a>Transport Object:**
 
 | Key              | Type   | Required | Description                                                                                           |
 | ---------------- | ------ | -------- | ----------------------------------------------------------------------------------------------------- |
-| `type`           | String | Yes      | Transport mechanism. Must be `http`.                                                                  |
-| `url`            | String | Yes      | The URL of the MCP server.                                                                   |
-| `authentication` | Object | No       | Authentication configuration for the connection. See [Section 5.6](#56-authentication) for the schema.|
+| `type`           | `string` | Yes      | Transport mechanism. Must be `http`.                                                                  |
+| `url`            | `string` | Yes      | The URL of the MCP server.                                                                   |
+| `authentication` | `object` | No       | Authentication configuration for the connection. See [Section 5.6](#56-authentication) for the schema.|
 
 !!! note "HTTP Transport Only"
     AFM currently supports only the streamable HTTP transport for MCP connections, but may support other transports in the future.
@@ -645,8 +645,8 @@ The `mcp` field is an array where each element represents an MCP server connecti
 
 | Key     | Type         | Required | Description                                                        |
 | ------- | ------------ | -------- | ------------------------------------------------------------------ |
-| `allow` | String Array | No       | A whitelist of tools to expose from this server, using just the tool name (e.g., `create_issue`, `read_file`). If specified, only these tools are available. |
-| `deny`  | String Array | No       | A blacklist of tools to hide from this server, using just the tool name (e.g., `write_file`). Applied after `allow` filtering. |
+| `allow` | `string[]` | No       | A whitelist of tools to expose from this server, using just the tool name (e.g., `create_issue`, `read_file`). If specified, only these tools are available. |
+| `deny`  | `string[]` | No       | A blacklist of tools to hide from this server, using just the tool name (e.g., `write_file`). Applied after `allow` filtering. |
 
 !!! note "Filter Precedence"
     When both `allow` and `deny` are specified, the tools in the `allow` list are made available and then the `deny` list is applied to remove specific tools from that filtered set. If only `deny` is specified, all tools from the server are available except those in the deny list.
