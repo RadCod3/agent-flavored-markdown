@@ -226,8 +226,8 @@ model:
   provider: "openai"
   url: "https://api.openai.com/v1/chat/completions"
   authentication:
-    type: "bearer"
-    token: "${env:OPENAI_API_KEY}"
+    type: "api-key"
+    api_key: "${env:OPENAI_API_KEY}"
 ```
 
 ### 5.3. Agent Interfaces {#53-agent-interfaces}
