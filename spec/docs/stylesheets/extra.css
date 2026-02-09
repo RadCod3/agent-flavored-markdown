@@ -492,11 +492,26 @@
   }
 }
 
+.md-typeset a.feature-item,
+.md-typeset a.feature-item:hover {
+  text-decoration: none;
+}
+
+.hero-section--examples {
+  padding: 3rem 2rem 2rem;
+}
+
+.examples-container {
+  padding: 0 2rem 5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
 .feature-item {
   background: #f8f9fa;
   border: 1px solid var(--card-border-light);
-  border-radius: 0.75rem;
-  padding: 2rem;
+  border-radius: 0.5rem;
+  padding: 1rem;
   text-align: left;
   transition: all 0.2s ease;
 }
@@ -518,14 +533,14 @@
 }
 
 .feature-icon-box {
-  width: 48px;
-  height: 48px;
+  width: 32px;
+  height: 32px;
   background: rgba(0, 0, 0, 0.08);
-  border-radius: 0.5rem;
+  border-radius: 0.375rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1.25rem;
+  margin-bottom: 0.5rem;
 }
 
 [data-md-color-scheme="slate"] .feature-icon-box {
@@ -533,8 +548,8 @@
 }
 
 .feature-icon-svg {
-  width: 24px;
-  height: 24px;
+  width: 16px;
+  height: 16px;
   color: #333;
 }
 
@@ -548,10 +563,10 @@
 }
 
 .feature-title {
-  font-size: 1rem !important;
-  font-weight: 700 !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
   color: var(--hero-text-light);
-  margin: 0 0 0.75rem;
+  margin: 0 0 0.4rem;
 }
 
 [data-md-color-scheme="slate"] .feature-title {
@@ -559,8 +574,8 @@
 }
 
 .feature-description {
-  font-size: 0.875rem;
-  line-height: 1.6;
+  font-size: 0.8rem;
+  line-height: 1.5;
   color: var(--hero-subtitle-light);
   margin: 0;
 }
@@ -928,4 +943,30 @@
 /* Markdown headers in dark mode - use off-white instead of red */
 [data-md-color-scheme="slate"] .demo-code-content code.hljs .hljs-section {
   color: #e6edf3;
+}
+
+/* ============================================
+   Example Cards
+   ============================================ */
+
+.example-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+}
+
+.example-label {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  background: var(--badge-bg-light);
+  border-radius: 0.25rem;
+  font-size: 0.65rem;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  color: var(--hero-subtitle-light);
+}
+
+[data-md-color-scheme="slate"] .example-label {
+  background: var(--badge-bg-dark);
+  color: var(--hero-subtitle-dark);
 }
