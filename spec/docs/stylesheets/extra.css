@@ -964,6 +964,7 @@
   font-size: 0.65rem;
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
   color: var(--hero-subtitle-light);
+  text-decoration: none;
 }
 
 [data-md-color-scheme="slate"] .example-label {
