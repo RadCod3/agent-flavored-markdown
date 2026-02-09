@@ -73,6 +73,16 @@ markdown_extensions:
   - pymdownx.mark
   - pymdownx.smartsymbols
 
+# Plugins
+plugins:
+  - search
+  - redirects:
+      redirect_maps:
+        'examples/friendly_assistant.afm.md': 'examples/friendly_assistant.md'
+        'examples/math_tutor.afm.md': 'examples/math_tutor.md'
+        'examples/pull_request_analyzer.afm.md': 'examples/pull_request_analyzer.md'
+        'reference-implementation.md': 'reference-implementations.md'
+
 # Extra CSS for custom styling
 extra_css:
   - stylesheets/extra.css
@@ -103,9 +113,11 @@ nav:
   - Home: index.md
   - Specification: specification.md
   - Examples:
-    - Friendly Assistant: examples/friendly_assistant.afm.md
-    - Math Tutor: examples/math_tutor.afm.md
-    - GitHub Pull Request Analyzer: examples/pull_request_analyzer.afm.md
+    - examples/index.md
+    - Friendly Assistant: examples/friendly_assistant.md
+    - Math Tutor: examples/math_tutor.md
+    - GitHub Pull Request Analyzer: examples/pull_request_analyzer.md
+  - Reference Implementations: reference-implementations.md
 
 # Include images in documentation
 docs_dir: docs

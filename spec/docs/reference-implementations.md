@@ -1,10 +1,23 @@
-# Ballerina Interpreter for AFM
+---
+hide:
+  - navigation
+---
 
-A [reference implementation](https://github.com/wso2/reference-implementations-afm/tree/main/ballerina-interpreter) that dynamically generates and runs AFM agents in [Ballerina](https://ballerina.io/), made available as a [Docker image](https://github.com/wso2/reference-implementations-afm/pkgs/container/afm-ballerina-interpreter).
+# Reference Implementations
+
+The following implementations can be used to run agents from AFM files. They are both interpreters that dynamically generate and run agents based on AFM files.
+
+- Ballerina Interpreter for AFM - generates and runs [Ballerina](https://ballerina.io/) agents.
+    - [Docker Image](https://github.com/wso2/reference-implementations-afm/pkgs/container/afm-ballerina-interpreter)
+    - [Source](https://github.com/wso2/reference-implementations-afm/tree/main/ballerina-interpreter)
+
+- LangChain-based Interpreter for AFM - generates and runs [LangChain](https://docs.langchain.com/oss/python/langchain/overview) agents.
+    - [Docker Image](https://github.com/wso2/reference-implementations-afm/pkgs/container/afm-langchain-interpreter)
+    - [Source](https://github.com/wso2/reference-implementations-afm/tree/main/langchain-interpreter)
 
 ## Getting Started
 
-Pull the image:
+Pull an image to get started. For example,
 
 ```bash
 docker pull ghcr.io/wso2/afm-ballerina-interpreter:latest
@@ -23,7 +36,7 @@ docker run -p 8085:8085 \
 
 ## Supported Model Providers
 
-Currently supports OpenAI, Anthropic, and the default WSO2 Model Provider.
+OpenAI, Anthropic, and the WSO2 provider (with the Ballerina Interpreter) are currently supported.
 
 ```yaml
 model:
@@ -35,7 +48,7 @@ model:
 ```
 
 !!! Note
-    If the default WSO2 model provider is used, the model does not have to be configured in the frontmatter. Just set the default model token as the `WSO2_MODEL_PROVIDER_TOKEN` environment variable. The token can be generated via the **Ballerina: Configure default WSO2 model provider** VS Code command with the Ballerina plugin installed.
+    If the WSO2 model provider is used (with the Ballerina interpreter), the model does not have to be configured in the front matter. Just set the default model token as the `WSO2_MODEL_PROVIDER_TOKEN` environment variable. The token can be generated via the **Ballerina: Configure default WSO2 model provider** VS Code command with the Ballerina plugin installed.
 
 ## Example
 
@@ -96,7 +109,7 @@ docker run -p 8085:8085 \
 Access the chat UI at [`http://localhost:8085/chat/ui`](http://localhost:8085/chat/ui).
 
 !!! Note Console chat interface
-    For console chat interfaces, include the `-it` options. For example, with the [math tutor](../examples/math_tutor.afm/) file, use
+    For console chat interfaces, include the `-it` options. For example, with the [math tutor](../examples/math_tutor/) file, use
     ```bash
     docker run -it -p 8085:8085 \
       -e OPENAI_MODEL=<YOUR-OPENAI-MODEL> \
