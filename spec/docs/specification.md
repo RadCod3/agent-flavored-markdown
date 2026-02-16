@@ -91,7 +91,7 @@ The Markdown body **MUST** contain the following headings, with corresponding co
 
     ```yaml
     ---
-    spec_version: "0.3.0"
+    spec_version: "0.4.0"
     name: "Math Tutor"
     description: "An AI assistant that helps with math problems"
     version: "1.0.0"
@@ -137,7 +137,7 @@ AFM implementations **SHALL** use this section to display the agent's metadata i
 The agent metadata fields are specified in the YAML front matter of an AFM file:
 
 ```yaml
-spec_version: string   # AFM specification version (e.g., "0.3.0")
+spec_version: string   # AFM specification version (e.g., "0.4.0")
 name: string           # The name of the agent
 description: string    # Brief description of the agent's purpose and functionality
 version: string        # Semantic version (e.g., "1.0.0")
@@ -157,7 +157,7 @@ Each field serves a specific purpose in defining and organizing the agent:
 
 | Key | Type | Required | Description |
 | ------- | ------ | ---------- | ------------- |
-| `spec_version` | `string` | No | Version of the AFM specification this file conforms to (e.g., "0.3.0").<br>This is **OPTIONAL** but recommended for compatibility.<br>AFM implementations **MAY** use this field to validate compatibility and provide warnings for mismatched spec versions. |
+| `spec_version` | `string` | No | Version of the AFM specification this file conforms to (e.g., "0.4.0").<br>This is **OPTIONAL** but recommended for compatibility.<br>AFM implementations **MAY** use this field to validate compatibility and provide warnings for mismatched spec versions. |
 | `name` | `string` | No | Identifies the agent in human-readable form.<br>Default: inferred from the filename of the AFM file.<br>AFM implementations **SHALL** use this field to display the agent's name in user interfaces. |
 | `description` | `string` | No | Provides a concise summary of what the agent does.<br>Default: inferred from the markdown body `# Role` section.<br>AFM implementations **SHALL** use this field to display the agent's description in user interfaces. |
 | `version` | `string` | No | [Semantic version](https://semver.org/) of the agent definition (MAJOR.MINOR.PATCH).<br>Default: "0.0.0".<br>AFM implementations **SHALL** use this field to display the agent's version in user interfaces. |
@@ -609,10 +609,15 @@ The Model Context Protocol (MCP) enables agents to connect to external tools and
 mcp:
   - name: string           # Unique identifier for the server connection
     transport:
-      type: string         # Transport mechanism (must be "http")
+      type: string         # Transport mechanism ("http" or "stdio")
+      # For HTTP transport:
       url: string          # URL for the MCP server
       authentication:      # Optional authentication configuration
         type: string       # Authentication scheme (bearer, jwt, oauth2, etc.)
+      # For STDIO transport:
+      command: string      # Executable command to run
+      args: [string]       # Optional arguments for the command
+      env: {string: string} # Optional environment variables
     tool_filter:           # Optional
       allow: [string]      # Whitelist of tools
       deny: [string]       # Blacklist of tools
@@ -632,14 +637,22 @@ The `mcp` field is an array where each element represents an MCP server connecti
 
 **<a id="transport-object"></a>Transport Object:**
 
+The transport object supports two transport mechanisms: `http` and `stdio`. The required fields depend on the transport type.
+
 | Key | Type | Required | Description |
 | ---------------- | ------ | -------- | ----------------------------------------------------------------------------------------------------- |
-| `type` | `string` | Yes | Transport mechanism. Must be `http`. |
-| `url` | `string` | Yes | The URL of the MCP server. |
-| `authentication` | `object` | No | Authentication configuration for the connection. See [Section 5.6](#56-authentication) for the schema. |
+| `type` | `string` | Yes | Transport mechanism. Must be `http` or `stdio`. |
+| `url` | `string` | If `type: http` | The URL of the MCP server. Required when using HTTP transport. |
+| `authentication` | `object` | No | Authentication configuration for HTTP transport. See [Section 5.6](#56-authentication) for the schema. Only applicable for `http` type. |
+| `command` | `string` | If `type: stdio` | The executable command to run (e.g., `python`, `node`, `npx`). Required when using STDIO transport. |
+| `args` | `string[]` | No | An array of arguments to pass to the command. Only applicable for `stdio` type. |
+| `env` | `map<string, string>` | No | A key-value map of environment variables to set for the process. Only applicable for `stdio` type. Values SHOULD use [variable substitution](#7-variable-substitution). |
 
-!!! note "HTTP Transport Only"
-    AFM currently supports only the streamable HTTP transport for MCP connections, but may support other transports in the future.
+!!! note "Transport Validation"
+    AFM implementations **MUST** validate that transport configuration matches the specified type:
+    - For `http` type: `url` field **MUST** be present
+    - For `stdio` type: `command` field **MUST** be present
+    - Fields specific to one transport type **MUST NOT** be used with the other type
 
 **<a id="tool-filter-object"></a>Tool Filter Object:**
 
@@ -653,7 +666,9 @@ The `mcp` field is an array where each element represents an MCP server connecti
 
 #### 6.1.3. Example Implementation
 
-This example defines tool connections to remote MCP servers with authentication and tool filtering. Note the use of [variable substitution](#7-variable-substitution) for sensitive and/or variable input.
+This example defines tool connections to MCP servers using both HTTP and STDIO transports with authentication and tool filtering. Note the use of [variable substitution](#7-variable-substitution) for sensitive and/or variable input.
+
+**HTTP Transport Examples:**
 
 ```yaml
 tools:
@@ -684,6 +699,33 @@ tools:
         deny:
           - "delete"
           - "drop_table"
+```
+
+**STDIO Transport Examples:**
+
+```yaml
+tools:
+  mcp:
+    # Node.js MCP server via NPX
+    - name: "filesystem_server"
+      transport:
+        type: "stdio"
+        command: "npx"
+        args:
+          - "-y"
+          - "@modelcontextprotocol/server-filesystem"
+          - "/path/to/desktop"
+
+    # Local Python MCP server with environment variables
+    - name: "local_database_tool"
+      transport:
+        type: "stdio"
+        command: "python"
+        args:
+          - "server.py"
+        env:
+          DB_PATH: "./data.db"
+          API_KEY: "${env:LOCAL_DB_API_KEY}"
 ```
 
 ## 7. Variable Substitution
@@ -772,7 +814,7 @@ Implementations **SHOULD** handle missing or invalid variable references gracefu
 
 This section outlines potential future enhancements to the AFM specification, including:
 
-- Extending tool support to include MCP tools with STDIO transport, OpenAPI-based tools for existing services, and functions as tools
+- Extending tool support to include OpenAPI-based tools for existing services, and functions as tools
 - First-class support for multi-agent interaction via the Agent-to-Agent (A2A) protocol
 - Support for an Agent memory abstraction covering common memory patterns
 - Support for Agent Identity
