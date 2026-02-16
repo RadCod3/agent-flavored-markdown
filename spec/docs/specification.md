@@ -255,36 +255,61 @@ Each interface type defines how the agent is triggered and interacted with. Impl
 ```yaml
 interfaces:
   - type: consolechat | webchat | webhook
-    prompt: string       # For webhook type: template string for constructing the user prompt for the agent run
+    prompt: string              # For webhook type: template string for constructing the user prompt for the agent run
     signature:
-      input: object      # JSON Schema object defining input parameters
-      output: object     # JSON Schema object defining output parameters
+      input: object             # JSON Schema object defining input parameters
+      output: object            # JSON Schema object defining output parameters
     # Optional, depending on type:
-    exposure:            # For webchat/webhook types only
-      http: object       # Configuration for exposing as an HTTP endpoint.
-    subscription:        # For webhook type
-      protocol: string   # e.g., "websub"
-      hub: string        # Subscription hub URL
-      topic: string      # Topic to subscribe to
-      callback: string   # Callback URL for receiving events (optional, for dynamic registration)
-      secret: string     # Secret for verifying webhook payloads (optional)
-      authentication: object   # Authentication configuration for the subscription  (optional)
+    exposure:                   # For webchat/webhook types only
+      http: object              # Configuration for exposing as an HTTP endpoint.
+    subscription:               # For webhook type
+      protocol: string          # e.g., "websub"
+      hub: string               # Subscription hub URL
+      topic: string             # Topic to subscribe to
+      callback: string          # Callback URL for receiving events (optional, for dynamic registration)
+      secret: string            # Secret for verifying webhook payloads (optional)
+      authentication: object    # Authentication configuration for the subscription  (optional)
 
 ```
 
 #### 5.3.3. Field Definitions
 
-The `interfaces` field is an array where each element represents an interface definition. Each interface object has the following fields:
+The `interfaces` field is an array where each element represents an interface definition.
 
 **Interface Object:**
 
+The interface object **MUST** be one of the following variants, discriminated by the `type` field.
+
+**Consolechat Interface:**
+
+Command-line/terminal chat interface for interactive console-based conversations.
+
 | Key | Type | Required | Description |
 | --------------- | ---------- | ---------- | --------------------------------------------------------------------------------------------------------- |
-| `type` | `string` | Yes | The agent's interface type. Must be one of:<br>- `webchat`: Web-based chat interface<br>- `consolechat`: Command-line/terminal chat interface<br>- `webhook`: Webhook endpoint with subscription support |
-| `prompt` | `string` | No | (webhook only) A template string for constructing the user prompt for an agent run from webhook data.<br>Supports [variable substitution](#7-variable-substitution) with HTTP context prefixes:<br>- `${http:payload.fieldname}` to access webhook payload fields<br>- `${http:header.headername}` to access HTTP headers<br>When provided, this templated prompt is used as the user prompt to the agent instead of passing the raw payload.<br>When omitted, the implementation determines how to construct the agent prompt from the webhook payload. |
-| `signature` | `object` | No | Defines the agent's input and output parameters. If omitted, defaults to string input and string output for `consolechat` and `webchat` types. See [Signature Object](#signature-object). |
-| `exposure` | `object` | No | Configuration for how a `webchat` or `webhook` agent is exposed via HTTP. Not applicable to `consolechat`. See [Exposure Object](#exposure-object). |
-| `subscription` | `object` | No | (webhook only) Subscription configuration. See [Subscription Object](#subscription-object). |
+| `type` | `string` | Yes | Must be `"consolechat"`. |
+| `signature` | `object` | No | Defines the agent's input and output parameters. Defaults to string input and string output. See [Signature Object](#signature-object). |
+
+**Webchat Interface:**
+
+Web-based chat interface accessible through browsers with a conversational UI.
+
+| Key | Type | Required | Description |
+| --------------- | ---------- | ---------- | --------------------------------------------------------------------------------------------------------- |
+| `type` | `string` | Yes | Must be `"webchat"`. |
+| `signature` | `object` | No | Defines the agent's input and output parameters. Defaults to string input and string output. See [Signature Object](#signature-object). |
+| `exposure` | `object` | No | Configuration for how the agent is exposed via HTTP. See [Exposure Object](#exposure-object). |
+
+**Webhook Interface:**
+
+Webhook endpoint with subscription support.
+
+| Key | Type | Required | Description |
+| --------------- | ---------- | ---------- | --------------------------------------------------------------------------------------------------------- |
+| `type` | `string` | Yes | Must be `"webhook"`. |
+| `prompt` | `string` | No | A template string for constructing the user prompt for an agent run from webhook data.<br>Supports [variable substitution](#7-variable-substitution) with HTTP context prefixes:<br>- `${http:payload.fieldname}` to access webhook payload fields<br>- `${http:header.headername}` to access HTTP headers<br>When provided, this templated prompt is used as the user prompt to the agent instead of passing the raw payload.<br>When omitted, the implementation determines how to construct the agent prompt from the webhook payload. |
+| `signature` | `object` | No | Defines the agent's output parameters. The `input` field MAY be omitted as the webhook provider determines the input payload structure. See [Signature Object](#signature-object). |
+| `exposure` | `object` | No | Configuration for how the agent is exposed via HTTP. See [Exposure Object](#exposure-object). |
+| `subscription` | `object` | No | Subscription configuration. See [Subscription Object](#subscription-object). |
 
 ##### Signature Object {#signature-object}
 
@@ -356,7 +381,7 @@ Default signature behavior:
 AFM implementations **SHALL** use this definition to generate the agent's callable interface and to ensure consistent behavior across different platforms.
 
 <a id="subscription-object"></a>
-**Subscription Object (webhook only):**
+**Subscription Object:**
 
 | Key | Type | Required | Description |
 | ------------------ | ---------- | ---------- | ------------- |
@@ -640,7 +665,7 @@ The `mcp` field is an array where each element represents an MCP server connecti
 
 **<a id="transport-object"></a>Transport Object:**
 
-The transport object **MUST** be one of the following variants, discriminated by the `type` field
+The transport object **MUST** be one of the following variants, discriminated by the `type` field.
 
 **HTTP Transport:**
 
