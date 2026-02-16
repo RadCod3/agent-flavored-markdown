@@ -814,7 +814,7 @@ Implementations **SHOULD** handle missing or invalid variable references gracefu
 
 This section outlines potential future enhancements to the AFM specification, including:
 
-- Extending tool support to include OpenAPI-based tools for existing services, and functions as tools
+- Extending tool support to include OpenAPI-based tools for existing services and functions as tools
 - First-class support for multi-agent interaction via the Agent-to-Agent (A2A) protocol
 - Support for an Agent memory abstraction covering common memory patterns
 - Support for Agent Identity
