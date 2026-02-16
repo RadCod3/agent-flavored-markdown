@@ -607,20 +607,20 @@ The Model Context Protocol (MCP) enables agents to connect to external tools and
 
 ```yaml
 mcp:
-  - name: string           # Unique identifier for the server connection
+  - name: string            # Unique identifier for the server connection
     transport:
-      type: string         # Transport mechanism ("http" or "stdio")
+      type: string          # Transport mechanism ("http" or "stdio")
       # For HTTP transport:
-      url: string          # URL for the MCP server
-      authentication:      # Optional authentication configuration
-        type: string       # Authentication scheme (bearer, jwt, oauth2, etc.)
+      url: string           # URL for the MCP server
+      authentication:       # Optional authentication configuration
+        type: string        # Authentication scheme (bearer, jwt, oauth2, etc.)
       # For STDIO transport:
-      command: string      # Executable command to run
-      args: [string]       # Optional arguments for the command
+      command: string       # Executable command to run
+      args: [string]        # Optional arguments for the command
       env: {string: string} # Optional environment variables
-    tool_filter:           # Optional
-      allow: [string]      # Whitelist of tools
-      deny: [string]       # Blacklist of tools
+    tool_filter:            # Optional
+      allow: [string]       # Whitelist of tools
+      deny: [string]        # Blacklist of tools
 ```
 
 #### 6.1.2. Field Definitions
@@ -650,6 +650,7 @@ The transport object supports two transport mechanisms: `http` and `stdio`. The 
 
 !!! note "Transport Validation"
     AFM implementations **MUST** validate that transport configuration matches the specified type:
+
     - For the `http` type: `url` field **MUST** be present
     - For `stdio` type: `command` field **MUST** be present
     - Fields relevant to one transport type **MUST NOT** be used with the other type
