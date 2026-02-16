@@ -645,12 +645,12 @@ The transport object supports two transport mechanisms: `http` and `stdio`. The 
 | `url` | `string` | If `type: http` | The URL of the MCP server. Required when using HTTP transport. |
 | `authentication` | `object` | No | Authentication configuration for HTTP transport. See [Section 5.6](#56-authentication) for the schema. Only applicable for `http` type. |
 | `command` | `string` | If `type: stdio` | The executable command to run (e.g., `python`, `node`, `npx`). Required when using STDIO transport. |
-| `args` | `string[]` | No | An array of arguments to pass to the command. Only applicable for `stdio` type. |
+| `args` | `string[]` | No | An array of arguments to pass to the command. Only applicable for the `stdio` type. |
 | `env` | `map<string, string>` | No | A key-value map of environment variables to set for the process. Only applicable for `stdio` type. Values SHOULD use [variable substitution](#7-variable-substitution). |
 
 !!! note "Transport Validation"
     AFM implementations **MUST** validate that transport configuration matches the specified type:
-    - For `http` type: `url` field **MUST** be present
+    - For the `http` type: `url` field **MUST** be present
     - For `stdio` type: `command` field **MUST** be present
     - Fields relevant to one transport type **MUST NOT** be used with the other type
 
