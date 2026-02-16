@@ -1,6 +1,6 @@
 # Agent-Flavored Markdown (AFM)
 
-A Markdown-based format for portable definitions of AI agents using natural language.
+A specification for no-code, portable AI Agents.
 
 ## What is AFM?
 
