@@ -652,7 +652,7 @@ The transport object supports two transport mechanisms: `http` and `stdio`. The 
     AFM implementations **MUST** validate that transport configuration matches the specified type:
     - For `http` type: `url` field **MUST** be present
     - For `stdio` type: `command` field **MUST** be present
-    - Fields specific to one transport type **MUST NOT** be used with the other type
+    - Fields relevant to one transport type **MUST NOT** be used with the other type
 
 **<a id="tool-filter-object"></a>Tool Filter Object:**
 
