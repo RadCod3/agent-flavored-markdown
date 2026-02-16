@@ -610,14 +610,17 @@ mcp:
   - name: string            # Unique identifier for the server connection
     transport:
       type: string          # Transport mechanism ("http" or "stdio")
+
       # For HTTP transport:
       url: string           # URL for the MCP server
       authentication:       # Optional authentication configuration
         type: string        # Authentication scheme (bearer, jwt, oauth2, etc.)
+
       # For STDIO transport:
       command: string       # Executable command to run
       args: [string]        # Optional arguments for the command
       env: {string: string} # Optional environment variables
+
     tool_filter:            # Optional
       allow: [string]       # Whitelist of tools
       deny: [string]        # Blacklist of tools
@@ -637,23 +640,28 @@ The `mcp` field is an array where each element represents an MCP server connecti
 
 **<a id="transport-object"></a>Transport Object:**
 
-The transport object supports two transport mechanisms: `http` and `stdio`. The required fields depend on the transport type.
+The transport object **MUST** be one of the following variants, discriminated by the `type` field
+
+**HTTP Transport:**
+
+Used for connecting to remote MCP servers over HTTP.
 
 | Key | Type | Required | Description |
 | ---------------- | ------ | -------- | ----------------------------------------------------------------------------------------------------- |
-| `type` | `string` | Yes | Transport mechanism. Must be `http` or `stdio`. |
-| `url` | `string` | If `type: http` | The URL of the MCP server. Required when using HTTP transport. |
-| `authentication` | `object` | No | Authentication configuration for HTTP transport. See [Section 5.6](#56-authentication) for the schema. Only applicable for `http` type. |
-| `command` | `string` | If `type: stdio` | The executable command to run (e.g., `python`, `node`, `npx`). Required when using STDIO transport. |
-| `args` | `string[]` | No | An array of arguments to pass to the command. Only applicable for the `stdio` type. |
-| `env` | `map<string, string>` | No | A key-value map of environment variables to set for the process. Only applicable for `stdio` type. Values SHOULD use [variable substitution](#7-variable-substitution). |
+| `type` | `string` | Yes | Must be `"http"`. |
+| `url` | `string` | Yes | The URL of the MCP server. |
+| `authentication` | `object` | No | Authentication configuration. See [Section 5.6](#56-authentication) for the schema. |
 
-!!! note "Transport Validation"
-    AFM implementations **MUST** validate that transport configuration matches the specified type:
+**STDIO Transport:**
 
-    - For the `http` type: `url` field **MUST** be present
-    - For `stdio` type: `command` field **MUST** be present
-    - Fields relevant to one transport type **MUST NOT** be used with the other type
+Used for running local MCP servers as subprocesses via standard input/output.
+
+| Key | Type | Required | Description |
+| ---------------- | ------ | -------- | ----------------------------------------------------------------------------------------------------- |
+| `type` | `string` | Yes | Must be `"stdio"`. |
+| `command` | `string` | Yes | The executable command to run (e.g., `python`, `node`, `npx`). |
+| `args` | `string[]` | No | An array of arguments to pass to the command. |
+| `env` | `map<string, string>` | No | A key-value map of environment variables to set for the process. Values MAY use [variable substitution](#7-variable-substitution). |
 
 **<a id="tool-filter-object"></a>Tool Filter Object:**
 
