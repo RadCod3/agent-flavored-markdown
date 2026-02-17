@@ -91,7 +91,7 @@ The Markdown body **MUST** contain the following headings, with corresponding co
 
     ```yaml
     ---
-    spec_version: "0.3.0"
+    spec_version: "0.4.0"
     name: "Math Tutor"
     description: "An AI assistant that helps with math problems"
     version: "1.0.0"
@@ -137,7 +137,7 @@ AFM implementations **SHALL** use this section to display the agent's metadata i
 The agent metadata fields are specified in the YAML front matter of an AFM file:
 
 ```yaml
-spec_version: string   # AFM specification version (e.g., "0.3.0")
+spec_version: string   # AFM specification version (e.g., "0.4.0")
 name: string           # The name of the agent
 description: string    # Brief description of the agent's purpose and functionality
 version: string        # Semantic version (e.g., "1.0.0")
@@ -157,7 +157,7 @@ Each field serves a specific purpose in defining and organizing the agent:
 
 | Key | Type | Required | Description |
 | ------- | ------ | ---------- | ------------- |
-| `spec_version` | `string` | No | Version of the AFM specification this file conforms to (e.g., "0.3.0").<br>This is **OPTIONAL** but recommended for compatibility.<br>AFM implementations **MAY** use this field to validate compatibility and provide warnings for mismatched spec versions. |
+| `spec_version` | `string` | No | Version of the AFM specification this file conforms to (e.g., "0.4.0").<br>This is **OPTIONAL** but recommended for compatibility.<br>AFM implementations **MAY** use this field to validate compatibility and provide warnings for mismatched spec versions. |
 | `name` | `string` | No | Identifies the agent in human-readable form.<br>Default: inferred from the filename of the AFM file.<br>AFM implementations **SHALL** use this field to display the agent's name in user interfaces. |
 | `description` | `string` | No | Provides a concise summary of what the agent does.<br>Default: inferred from the markdown body `# Role` section.<br>AFM implementations **SHALL** use this field to display the agent's description in user interfaces. |
 | `version` | `string` | No | [Semantic version](https://semver.org/) of the agent definition (MAJOR.MINOR.PATCH).<br>Default: "0.0.0".<br>AFM implementations **SHALL** use this field to display the agent's version in user interfaces. |
@@ -255,36 +255,61 @@ Each interface type defines how the agent is triggered and interacted with. Impl
 ```yaml
 interfaces:
   - type: consolechat | webchat | webhook
-    prompt: string       # For webhook type: template string for constructing the user prompt for the agent run
+    prompt: string              # For webhook type: template string for constructing the user prompt for the agent run
     signature:
-      input: object      # JSON Schema object defining input parameters
-      output: object     # JSON Schema object defining output parameters
+      input: object             # JSON Schema object defining input parameters
+      output: object            # JSON Schema object defining output parameters
     # Optional, depending on type:
-    exposure:            # For webchat/webhook types only
-      http: object       # Configuration for exposing as an HTTP endpoint.
-    subscription:        # For webhook type
-      protocol: string   # e.g., "websub"
-      hub: string        # Subscription hub URL
-      topic: string      # Topic to subscribe to
-      callback: string   # Callback URL for receiving events (optional, for dynamic registration)
-      secret: string     # Secret for verifying webhook payloads (optional)
-      authentication: object   # Authentication configuration for the subscription  (optional)
+    exposure:                   # For webchat/webhook types only
+      http: object              # Configuration for exposing as an HTTP endpoint.
+    subscription:               # For webhook type
+      protocol: string          # e.g., "websub"
+      hub: string               # Subscription hub URL
+      topic: string             # Topic to subscribe to
+      callback: string          # Callback URL for receiving events (optional, for dynamic registration)
+      secret: string            # Secret for verifying webhook payloads (optional)
+      authentication: object    # Authentication configuration for the subscription  (optional)
 
 ```
 
 #### 5.3.3. Field Definitions
 
-The `interfaces` field is an array where each element represents an interface definition. Each interface object has the following fields:
+The `interfaces` field is an array where each element represents an interface definition.
 
 **Interface Object:**
 
+The interface object **MUST** be one of the following variants, discriminated by the `type` field.
+
+**Consolechat Interface:**
+
+Command-line/terminal chat interface for interactive console-based conversations.
+
 | Key | Type | Required | Description |
 | --------------- | ---------- | ---------- | --------------------------------------------------------------------------------------------------------- |
-| `type` | `string` | Yes | The agent's interface type. Must be one of:<br>- `webchat`: Web-based chat interface<br>- `consolechat`: Command-line/terminal chat interface<br>- `webhook`: Webhook endpoint with subscription support |
-| `prompt` | `string` | No | (webhook only) A template string for constructing the user prompt for an agent run from webhook data.<br>Supports [variable substitution](#7-variable-substitution) with HTTP context prefixes:<br>- `${http:payload.fieldname}` to access webhook payload fields<br>- `${http:header.headername}` to access HTTP headers<br>When provided, this templated prompt is used as the user prompt to the agent instead of passing the raw payload.<br>When omitted, the implementation determines how to construct the agent prompt from the webhook payload. |
-| `signature` | `object` | No | Defines the agent's input and output parameters. If omitted, defaults to string input and string output for `consolechat` and `webchat` types. See [Signature Object](#signature-object). |
-| `exposure` | `object` | No | Configuration for how a `webchat` or `webhook` agent is exposed via HTTP. Not applicable to `consolechat`. See [Exposure Object](#exposure-object). |
-| `subscription` | `object` | No | (webhook only) Subscription configuration. See [Subscription Object](#subscription-object). |
+| `type` | `string` | Yes | Must be `"consolechat"`. |
+| `signature` | `object` | No | Defines the agent's input and output parameters. Defaults to string input and string output. See [Signature Object](#signature-object). |
+
+**Webchat Interface:**
+
+Web-based chat interface accessible through browsers with a conversational UI.
+
+| Key | Type | Required | Description |
+| --------------- | ---------- | ---------- | --------------------------------------------------------------------------------------------------------- |
+| `type` | `string` | Yes | Must be `"webchat"`. |
+| `signature` | `object` | No | Defines the agent's input and output parameters. Defaults to string input and string output. See [Signature Object](#signature-object). |
+| `exposure` | `object` | No | Configuration for how the agent is exposed via HTTP. See [Exposure Object](#exposure-object). |
+
+**Webhook Interface:**
+
+Webhook endpoint with subscription support.
+
+| Key | Type | Required | Description |
+| --------------- | ---------- | ---------- | --------------------------------------------------------------------------------------------------------- |
+| `type` | `string` | Yes | Must be `"webhook"`. |
+| `prompt` | `string` | No | A template string for constructing the user prompt for an agent run from webhook data.<br>Supports [variable substitution](#7-variable-substitution) with HTTP context prefixes:<br>- `${http:payload.fieldname}` to access webhook payload fields<br>- `${http:header.headername}` to access HTTP headers<br>When provided, this templated prompt is used as the user prompt to the agent instead of passing the raw payload.<br>When omitted, the implementation determines how to construct the agent prompt from the webhook payload. |
+| `signature` | `object` | No | Defines the agent's output parameters. The `input` field MAY be omitted as the webhook provider determines the input payload structure. See [Signature Object](#signature-object). |
+| `exposure` | `object` | No | Configuration for how the agent is exposed via HTTP. See [Exposure Object](#exposure-object). |
+| `subscription` | `object` | No | Subscription configuration. See [Subscription Object](#subscription-object). |
 
 ##### Signature Object {#signature-object}
 
@@ -356,7 +381,7 @@ Default signature behavior:
 AFM implementations **SHALL** use this definition to generate the agent's callable interface and to ensure consistent behavior across different platforms.
 
 <a id="subscription-object"></a>
-**Subscription Object (webhook only):**
+**Subscription Object:**
 
 | Key | Type | Required | Description |
 | ------------------ | ---------- | ---------- | ------------- |
@@ -607,15 +632,23 @@ The Model Context Protocol (MCP) enables agents to connect to external tools and
 
 ```yaml
 mcp:
-  - name: string           # Unique identifier for the server connection
+  - name: string            # Unique identifier for the server connection
     transport:
-      type: string         # Transport mechanism (must be "http")
-      url: string          # URL for the MCP server
-      authentication:      # Optional authentication configuration
-        type: string       # Authentication scheme (bearer, jwt, oauth2, etc.)
-    tool_filter:           # Optional
-      allow: [string]      # Whitelist of tools
-      deny: [string]       # Blacklist of tools
+      type: string          # Transport mechanism ("http" or "stdio")
+
+      # For HTTP transport:
+      url: string           # URL for the MCP server
+      authentication:       # Optional authentication configuration
+        type: string        # Authentication scheme (bearer, jwt, oauth2, etc.)
+
+      # For STDIO transport:
+      command: string       # Executable command to run
+      args: [string]        # Optional arguments for the command
+      env: {string: string} # Optional environment variables
+
+    tool_filter:            # Optional
+      allow: [string]       # Whitelist of tools
+      deny: [string]        # Blacklist of tools
 ```
 
 #### 6.1.2. Field Definitions
@@ -632,14 +665,28 @@ The `mcp` field is an array where each element represents an MCP server connecti
 
 **<a id="transport-object"></a>Transport Object:**
 
+The transport object **MUST** be one of the following variants, discriminated by the `type` field.
+
+**HTTP Transport:**
+
+Used for connecting to remote MCP servers over HTTP.
+
 | Key | Type | Required | Description |
 | ---------------- | ------ | -------- | ----------------------------------------------------------------------------------------------------- |
-| `type` | `string` | Yes | Transport mechanism. Must be `http`. |
+| `type` | `string` | Yes | Must be `"http"`. |
 | `url` | `string` | Yes | The URL of the MCP server. |
-| `authentication` | `object` | No | Authentication configuration for the connection. See [Section 5.6](#56-authentication) for the schema. |
+| `authentication` | `object` | No | Authentication configuration. See [Section 5.6](#56-authentication) for the schema. |
 
-!!! note "HTTP Transport Only"
-    AFM currently supports only the streamable HTTP transport for MCP connections, but may support other transports in the future.
+**STDIO Transport:**
+
+Used for running local MCP servers as subprocesses via standard input/output.
+
+| Key | Type | Required | Description |
+| ---------------- | ------ | -------- | ----------------------------------------------------------------------------------------------------- |
+| `type` | `string` | Yes | Must be `"stdio"`. |
+| `command` | `string` | Yes | The executable command to run (e.g., `python`, `node`, `npx`). |
+| `args` | `string[]` | No | An array of arguments to pass to the command. |
+| `env` | `map<string, string>` | No | A key-value map of environment variables to set for the process. Values MAY use [variable substitution](#7-variable-substitution). |
 
 **<a id="tool-filter-object"></a>Tool Filter Object:**
 
@@ -653,7 +700,9 @@ The `mcp` field is an array where each element represents an MCP server connecti
 
 #### 6.1.3. Example Implementation
 
-This example defines tool connections to remote MCP servers with authentication and tool filtering. Note the use of [variable substitution](#7-variable-substitution) for sensitive and/or variable input.
+This example defines tool connections to MCP servers using both HTTP and STDIO transports with authentication and tool filtering. Note the use of [variable substitution](#7-variable-substitution) for sensitive and/or variable input.
+
+**HTTP Transport Examples:**
 
 ```yaml
 tools:
@@ -684,6 +733,33 @@ tools:
         deny:
           - "delete"
           - "drop_table"
+```
+
+**STDIO Transport Examples:**
+
+```yaml
+tools:
+  mcp:
+    # Node.js MCP server via NPX
+    - name: "filesystem_server"
+      transport:
+        type: "stdio"
+        command: "npx"
+        args:
+          - "-y"
+          - "@modelcontextprotocol/server-filesystem"
+          - "/path/to/desktop"
+
+    # Local Python MCP server with environment variables
+    - name: "local_database_tool"
+      transport:
+        type: "stdio"
+        command: "python"
+        args:
+          - "server.py"
+        env:
+          DB_PATH: "./data.db"
+          API_KEY: "${env:LOCAL_DB_API_KEY}"
 ```
 
 ## 7. Variable Substitution
@@ -772,7 +848,7 @@ Implementations **SHOULD** handle missing or invalid variable references gracefu
 
 This section outlines potential future enhancements to the AFM specification, including:
 
-- Extending tool support to include MCP tools with STDIO transport, OpenAPI-based tools for existing services, and functions as tools
+- Extending tool support to include OpenAPI-based tools for existing services and functions as tools
 - First-class support for multi-agent interaction via the Agent-to-Agent (A2A) protocol
 - Support for an Agent memory abstraction covering common memory patterns
 - Support for Agent Identity
