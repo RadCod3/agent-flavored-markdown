@@ -91,7 +91,7 @@ The Markdown body **MUST** contain the following headings, with corresponding co
 
     ```yaml
     ---
-    spec_version: "0.4.0"
+    spec_version: "0.3.0"
     name: "Math Tutor"
     description: "An AI assistant that helps with math problems"
     version: "1.0.0"
@@ -137,7 +137,7 @@ AFM implementations **SHALL** use this section to display the agent's metadata i
 The agent metadata fields are specified in the YAML front matter of an AFM file:
 
 ```yaml
-spec_version: string   # AFM specification version (e.g., "0.4.0")
+spec_version: string   # AFM specification version (e.g., "0.3.0")
 name: string           # The name of the agent
 description: string    # Brief description of the agent's purpose and functionality
 version: string        # Semantic version (e.g., "1.0.0")
@@ -157,7 +157,7 @@ Each field serves a specific purpose in defining and organizing the agent:
 
 | Key | Type | Required | Description |
 | ------- | ------ | ---------- | ------------- |
-| `spec_version` | `string` | No | Version of the AFM specification this file conforms to (e.g., "0.4.0").<br>This is **OPTIONAL** but recommended for compatibility.<br>AFM implementations **MAY** use this field to validate compatibility and provide warnings for mismatched spec versions. |
+| `spec_version` | `string` | No | Version of the AFM specification this file conforms to (e.g., "0.3.0").<br>This is **OPTIONAL** but recommended for compatibility.<br>AFM implementations **MAY** use this field to validate compatibility and provide warnings for mismatched spec versions. |
 | `name` | `string` | No | Identifies the agent in human-readable form.<br>Default: inferred from the filename of the AFM file.<br>AFM implementations **SHALL** use this field to display the agent's name in user interfaces. |
 | `description` | `string` | No | Provides a concise summary of what the agent does.<br>Default: inferred from the markdown body `# Role` section.<br>AFM implementations **SHALL** use this field to display the agent's description in user interfaces. |
 | `version` | `string` | No | [Semantic version](https://semver.org/) of the agent definition (MAJOR.MINOR.PATCH).<br>Default: "0.0.0".<br>AFM implementations **SHALL** use this field to display the agent's version in user interfaces. |
@@ -306,7 +306,7 @@ Webhook endpoint with subscription support.
 | Key | Type | Required | Description |
 | --------------- | ---------- | ---------- | --------------------------------------------------------------------------------------------------------- |
 | `type` | `string` | Yes | Must be `"webhook"`. |
-| `prompt` | `string` | No | A template string for constructing the user prompt for an agent run from webhook data.<br>Supports [variable substitution](#7-variable-substitution) with HTTP context prefixes:<br>- `${http:payload.fieldname}` to access webhook payload fields<br>- `${http:header.headername}` to access HTTP headers<br>When provided, this templated prompt is used as the user prompt to the agent instead of passing the raw payload.<br>When omitted, the implementation determines how to construct the agent prompt from the webhook payload. |
+| `prompt` | `string` | No | A template string for constructing the user prompt for an agent run from webhook data.<br>Supports [variable substitution](#7-variable-substitution) with HTTP context prefixes:<br>- `${http:payload.fieldname}` to access webhook payload fields<br>- `${http:header.headername}` to access HTTP headers<br>When provided, this templated prompt is used as the user prompt to the agent.<br>When omitted, the implementation determines how to construct the agent prompt from the webhook payload. |
 | `signature` | `object` | No | Defines the agent's output parameters. The `input` field MAY be omitted as the webhook provider determines the input payload structure. See [Signature Object](#signature-object). |
 | `exposure` | `object` | No | Configuration for how the agent is exposed via HTTP. See [Exposure Object](#exposure-object). |
 | `subscription` | `object` | No | Subscription configuration. See [Subscription Object](#subscription-object). |
@@ -698,11 +698,11 @@ Used for running local MCP servers as subprocesses via standard input/output.
 !!! note "Filter Precedence"
     When both `allow` and `deny` are specified, the tools in the `allow` list are made available and then the `deny` list is applied to remove specific tools from that filtered set. If only `deny` is specified, all tools from the server are available except those in the deny list.
 
-#### 6.1.3. Example Implementation
-
-This example defines tool connections to MCP servers using both HTTP and STDIO transports with authentication and tool filtering. Note the use of [variable substitution](#7-variable-substitution) for sensitive and/or variable input.
+#### 6.1.3. Example Usage
 
 **HTTP Transport Examples:**
+
+These examples define tool connections to remote MCP servers, using the streamable HTTP transport, with authentication and tool filtering. Note the use of [variable substitution](#7-variable-substitution) for sensitive and/or variable input.
 
 ```yaml
 tools:
@@ -736,6 +736,8 @@ tools:
 ```
 
 **STDIO Transport Examples:**
+
+These examples demonstrate MCP tools over the STDIO transport.
 
 ```yaml
 tools:
