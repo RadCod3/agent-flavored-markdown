@@ -15,14 +15,20 @@ name: "Math Tutor"
 description: "An AI assistant that helps with math problems"
 version: "1.0.0"
 max_iterations: 20
-interfaces:
-  - type: "consolechat"
+model:
+  name: "gpt-4o"
+  provider: "openai"
+  authentication:
+    type: "api-key"
+    api_key: "${env:OPENAI_API_KEY}"
 tools:
   mcp:
     - name: "math_operations"
       transport:
         type: "http"
         url: "${env:MATH_MCP_SERVER}"
+interfaces:
+  - type: "consolechat"
 ---
 
 # Role

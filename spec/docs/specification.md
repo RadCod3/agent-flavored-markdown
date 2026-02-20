@@ -98,6 +98,12 @@ The Markdown body **MUST** contain the following headings, with corresponding co
     max_iterations: 20
     interfaces:
       - type: consolechat
+    model:
+      name: "gpt-4o"
+      provider: "openai"
+      authentication:
+        type: "api-key"
+        api_key: "${env:OPENAI_API_KEY}"
     tools:
       mcp:
         - name: "math_operations"
@@ -222,7 +228,7 @@ model:
 
 ```yaml
 model:
-  name: "gpt-4-turbo"
+  name: "gpt-4o"
   provider: "openai"
   url: "https://api.openai.com/v1/chat/completions"
   authentication:
