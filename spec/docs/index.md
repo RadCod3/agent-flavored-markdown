@@ -45,11 +45,12 @@ hide:
 spec_version: "0.3.0"
 name: "Code Review Assistant"
 description: "AI assistant for code review and improvements"
-interfaces:
-  - type: webchat
-    exposure:
-      http:
-        path: "/code-review"
+model:
+  name: "gpt-4o"
+  provider: "openai"
+  authentication:
+    type: "api-key"
+    api_key: "${env:OPENAI_API_KEY}"
 tools:
   mcp:
     - name: "github"
@@ -63,6 +64,11 @@ tools:
         allow:
           - "pull_request_read"
           - "get_file_contents"
+interfaces:
+  - type: webchat
+    exposure:
+      http:
+        path: "/code-review"
 ---
 
 # Role
