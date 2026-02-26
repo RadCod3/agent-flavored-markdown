@@ -12,10 +12,28 @@ The following implementations can be used to run agents from AFM files. They are
     - [Source](https://github.com/wso2/reference-implementations-afm/tree/main/ballerina-interpreter)
 
 - LangChain-based Interpreter for AFM - generates and runs [LangChain](https://docs.langchain.com/oss/python/langchain/overview) agents.
+    - [PyPI (afm-cli)](https://pypi.org/project/afm-cli/)
     - [Docker Image](https://github.com/wso2/reference-implementations-afm/pkgs/container/afm-langchain-interpreter)
     - [Source](https://github.com/wso2/reference-implementations-afm/tree/main/langchain-interpreter)
 
 ## Getting Started
+
+### Via pip (LangChain-based Interpreter)
+
+Install the AFM CLI using pip,
+
+```bash
+pip install afm-cli
+```
+
+Run an agent, setting any required environment variables beforehand:
+
+```bash
+export API_KEY=<YOUR-API-KEY>
+afm run path/to/agent.afm.md
+```
+
+### Via Docker
 
 Pull an image to get started. For example,
 
@@ -23,9 +41,9 @@ Pull an image to get started. For example,
 docker pull ghcr.io/wso2/afm-ballerina-interpreter:latest
 ```
 
-Run an agent by mounting your `.afm.md` file and passing required environment variables:
+Run an agent by mounting your `.afm.md` file and passing required environment variables. 
 
-For example, where `API_KEY` is a required environment variable,
+For example, where `API_KEY` is a required environment variable:
 
 ```bash
 docker run -p 8085:8085 \
@@ -98,18 +116,29 @@ information, and assisting with various tasks to the best of your abilities.
 
 Then run it:
 
-```bash
-docker run -p 8085:8085 \
-  -e OPENAI_MODEL=<YOUR-OPENAI-MODEL> \
-  -e OPENAI_API_KEY=<YOUR-OPENAI-API-KEY> \
-  -v ./friendly_assistant.afm.md:/friendly_assistant.afm.md \
-  ghcr.io/wso2/afm-ballerina-interpreter:latest /friendly_assistant.afm.md
-```
+=== "pip"
+
+    ```bash
+    export OPENAI_MODEL=<YOUR-OPENAI-MODEL>
+    export OPENAI_API_KEY=<YOUR-OPENAI-API-KEY>
+
+    afm run friendly_assistant.afm.md
+    ```
+
+=== "Docker"
+
+    ```bash
+    docker run -p 8085:8085 \
+      -e OPENAI_MODEL=<YOUR-OPENAI-MODEL> \
+      -e OPENAI_API_KEY=<YOUR-OPENAI-API-KEY> \
+      -v ./friendly_assistant.afm.md:/friendly_assistant.afm.md \
+      ghcr.io/wso2/afm-ballerina-interpreter:latest /friendly_assistant.afm.md
+    ```
 
 Access the chat UI at [`http://localhost:8085/chat/ui`](http://localhost:8085/chat/ui).
 
 !!! Note Console chat interface
-    For console chat interfaces, include the `-it` options. For example, with the [math tutor](../examples/math_tutor/) file, use
+    When using Docker for console chat interfaces, include the `-it` options. For example, with the [math tutor](../examples/math_tutor/) file, use
     ```bash
     docker run -it -p 8085:8085 \
       -e OPENAI_MODEL=<YOUR-OPENAI-MODEL> \
