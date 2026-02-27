@@ -46,7 +46,7 @@ pipx install afm-cli
 ```
 
 !!! Note
-    `pipx` installs CLI tools in isolated environments and is the recommended approach on modern systems (Ubuntu 23.04+, Debian 12+, macOS with Homebrew Python, etc.) where `pip install` to the system Python may be blocked. See [pipx.pypa.io](https://pipx.pypa.io/) for installation instructions.
+    `pipx` installs CLI tools in isolated environments and is the recommended approach on modern systems (Ubuntu 23.04+, Debian 12+, macOS with Homebrew Python, etc.), where `pip install` to the system Python may be blocked. See [pipx.pypa.io](https://pipx.pypa.io/) for installation instructions.
 
     If you are working inside an activated virtual environment, `pip install afm-cli` works as well.
 
