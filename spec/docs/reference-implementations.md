@@ -18,6 +18,25 @@ The following implementations can be used to run agents from AFM files. They are
 
 ## Getting Started
 
+### Via Docker
+
+Pull an image to get started. For example,
+
+```bash
+docker pull ghcr.io/wso2/afm-ballerina-interpreter:latest
+```
+
+Run an agent by mounting your `.afm.md` file and passing required environment variables. 
+
+For example, where `API_KEY` is a required environment variable:
+
+```bash
+docker run -p 8085:8085 \
+  -e API_KEY=<YOUR-API-KEY> \
+  -v ./support_agent.afm.md:/support_agent.afm.md \
+  ghcr.io/wso2/afm-ballerina-interpreter:latest /support_agent.afm.md
+```
+
 ### Via pipx (LangChain-based Interpreter)
 
 Install the AFM CLI using pipx:
@@ -36,25 +55,6 @@ Run an agent, setting any required environment variables beforehand:
 ```bash
 export API_KEY=<YOUR-API-KEY>
 afm run path/to/agent.afm.md
-```
-
-### Via Docker
-
-Pull an image to get started. For example,
-
-```bash
-docker pull ghcr.io/wso2/afm-ballerina-interpreter:latest
-```
-
-Run an agent by mounting your `.afm.md` file and passing required environment variables. 
-
-For example, where `API_KEY` is a required environment variable:
-
-```bash
-docker run -p 8085:8085 \
-  -e API_KEY=<YOUR-API-KEY> \
-  -v ./support_agent.afm.md:/support_agent.afm.md \
-  ghcr.io/wso2/afm-ballerina-interpreter:latest /support_agent.afm.md
 ```
 
 ## Supported Model Providers
@@ -121,15 +121,6 @@ information, and assisting with various tasks to the best of your abilities.
 
 Then run it:
 
-=== "Python / CLI"
-
-    ```bash
-    export OPENAI_MODEL=<YOUR-OPENAI-MODEL>
-    export OPENAI_API_KEY=<YOUR-OPENAI-API-KEY>
-
-    afm run friendly_assistant.afm.md
-    ```
-
 === "Docker"
 
     ```bash
@@ -138,6 +129,15 @@ Then run it:
       -e OPENAI_API_KEY=<YOUR-OPENAI-API-KEY> \
       -v ./friendly_assistant.afm.md:/friendly_assistant.afm.md \
       ghcr.io/wso2/afm-ballerina-interpreter:latest /friendly_assistant.afm.md
+    ```
+
+=== "Python / CLI"
+
+    ```bash
+    export OPENAI_MODEL=<YOUR-OPENAI-MODEL>
+    export OPENAI_API_KEY=<YOUR-OPENAI-API-KEY>
+
+    afm run friendly_assistant.afm.md
     ```
 
 Access the chat UI at [`http://localhost:8085/chat/ui`](http://localhost:8085/chat/ui).
