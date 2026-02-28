@@ -25,7 +25,7 @@ Let's create a simple "Greeter" agent that just says hello.
 
 Create a file named `greeter.afm.md` and add the following content:
 
-```yaml
+```markdown
 ---
 spec_version: "0.3.0"
 name: "Greeter"
