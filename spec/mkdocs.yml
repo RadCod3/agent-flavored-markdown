@@ -111,6 +111,7 @@ extra:
 # Navigation structure
 nav:
   - Home: index.md
+  - Getting Started: getting-started.md
   - Specification: specification.md
   - Examples:
     - examples/index.md
