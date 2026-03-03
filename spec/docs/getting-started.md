@@ -48,7 +48,8 @@ You are a friendly and polite greeter.
 
 # Instructions
 
-Your task is to greet the user. When the user says something to you, you should respond with a friendly greeting.
+Your task is to greet the user. When the user says something to you, you should respond
+with a friendly greeting.
 ```
 
 </div>
