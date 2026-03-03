@@ -23,7 +23,11 @@ An AFM file has two main parts:
 
 Let's create a simple "Greeter" agent that just says hello.
 
-Create a file named `greeter.afm.md` and add the following content:
+<div class="demo-code">
+  <div class="demo-code-header">
+    <span class="demo-file-name">greeter.afm.md</span>
+  </div>
+  <div class="demo-code-content">
 
 ```markdown
 ---
@@ -47,19 +51,27 @@ You are a friendly and polite greeter.
 Your task is to greet the user. When the user says something to you, you should respond with a friendly greeting.
 ```
 
+</div>
+</div>
+
 ## Understanding the "Greeter" Agent
 
 Let's break down the `greeter.afm.md` file:
+
+### Front Matter
 
 *   **`spec_version`**: Specifies the version of the AFM specification the file adheres to.
 *   **`name`**: The name of our agent.
 *   **`description`**: A short description of what the agent does.
 *   **`model`**:  This section specifies the AI model the agent will use. In this case, it's OpenAI's `gpt-4o`. It also specifies that the API key should be read from an environment variable named `OPENAI_API_KEY`.
+
+### Markdown Body
+
 *   **`# Role`**: This is a top-level heading in the Markdown body. It defines the agent's persona.
 *   **`# Instructions`**: This section tells the agent what to do.
 
 ## What's Next?
 
-Now that you have your first AFM file, you can use it with a compatible tool or platform that supports AFM. Such a tool would read your `greeter.afm.md` file and provide you with a running "Greeter" agent.
+Now that you have your first AFM file, you can use it with a compatible tool or platform that supports AFM. Such a tool would read your `greeter.afm.md` file and provide you with a running "Greeter" agent. See the [Reference Implementations](reference-implementations.md) for examples of tools you can use.
 
-You can now explore the rest of the documentation to learn more about the AFM specification, its features, and more complex examples.
+You can now explore the rest of the documentation to learn more about the [AFM specification](specification.md), its features, and more complex examples.
