@@ -58,7 +58,7 @@ An AFM file is structured into two main sections: the front matter and the agent
 
 ### 4.2. Front Matter
 
-The front matter is a YAML block at the top of the file, enclosed by `---` lines. Refer to the [YAML specification](https://yaml.org/spec/1.2/spec.html) for more details on YAML syntax.
+The front matter is a YAML block at the top of the file, enclosed by `---`. Refer to the [YAML specification](https://yaml.org/spec/1.2/spec.html) for more details on YAML syntax.
 
 This section contains metadata about the agent. These metadata fields are **OPTIONAL** and can be used to provide additional context or configuration for the agent.
 

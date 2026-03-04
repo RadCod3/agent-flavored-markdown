@@ -111,8 +111,8 @@ extra:
 # Navigation structure
 nav:
   - Home: index.md
-  - Getting Started: getting-started.md
   - Specification: specification.md
+  - Getting Started: getting-started.md
   - Examples:
     - examples/index.md
     - Friendly Assistant: examples/friendly_assistant.md
