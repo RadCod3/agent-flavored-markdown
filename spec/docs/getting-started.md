@@ -103,4 +103,4 @@ with a friendly greeting.
 
 ## What's Next?
 
-Use the AFM file with a tool or platform that supports AFM. See [Reference Implementations](reference-implementations.md) for options.
+Use the AFM file with a tool or platform that supports AFM. See [Reference Implementations](reference-implementations.md) for options. For a complete overview of all AFM features, see the [Specification](specification.md).
