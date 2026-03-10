@@ -39,6 +39,7 @@ AFM defines the following core concepts:
 - **Model**: The AI model powering the agent.
 - **Tools**: External tools and services available to the agent.
 - **Interface**: How the agent is invoked and its input/output contract.
+- **Skills**: Additional capabilities the agent can load and use on demand (in [Agent Skills](https://agentskills.io) format).
 
 !!! note "Agent Memory"
     Given the lack of standardization, AFM does not prescribe a standard for agent memory yet.
@@ -69,6 +70,7 @@ This section contains metadata about the agent. These metadata fields are **OPTI
 | [Agent Interfaces](#53-agent-interfaces) | Defines how the agent is invoked and its input/output signature. |
 | [Agent Tools](#54-tools) | Defines external tools available to the agent (e.g., via MCP). |
 | [Agent Execution](#55-agent-execution) | Runtime execution configuration like iteration limits. |
+| [Agent Skills](#57-agent-skills) | Configures skills the agent can use if required. |
 
 Refer to the [AFM Schema](#5-schema-definitions) for a complete list of fields and their meanings.
 
@@ -624,6 +626,63 @@ authentication:
   type: basic
   username: "${env:API_USERNAME}"
   password: "${env:API_PASSWORD}"
+```
+
+### 5.7. Agent Skills {#57-agent-skills}
+
+This section defines making skills available to the agent to load and use on demand. Skills follow the [Agent Skills](https://agentskills.io) open standard, which provides agents with discoverable capabilities via `SKILL.md` files. It is **OPTIONAL**.
+
+#### 5.7.1. Schema Overview
+
+```yaml
+skills:
+  - type: "local"           # Local filesystem path
+    path: "./skills"
+  - type: "remote"          # Remote URL to a skill or skill directory
+    url: "https://example.com/skills/pdf-processing"
+    authentication: object  # Optional, reuses Section 5.6
+```
+
+#### 5.7.2. Field Definitions
+
+The `skills` field is an array where each element represents a skill source configuration, discriminated by the `type` field.
+
+**Local Source:**
+
+| Key | Type | Required | Description |
+| ------- | ------ | ---------- | ------------- |
+| `type` | `string` | Yes | Must be `"local"`. |
+| `path` | `string` | Yes | Filesystem path (absolute or relative to the current working directory) to a skill directory or parent directory containing multiple skills. |
+
+**Remote Source:**
+
+| Key | Type | Required | Description |
+| ------- | ------ | ---------- | ------------- |
+| `type` | `string` | Yes | Must be `"remote"`. |
+| `url` | `string` | Yes | URL to a skill directory (must contain a `SKILL.md`). |
+| `authentication` | `object` | No | Authentication configuration. See [Section 5.6](#56-authentication) for the schema. |
+
+#### 5.7.3. Behavior
+
+- Implementations **SHOULD** follow the Agent Skills progressive disclosure model: load only skill `name` and `description` at startup, and load full instructions on demand when a skill matches the task.
+- Implementations **SHOULD** support the `SKILL.md` format as defined by the [Agent Skills specification](https://agentskills.io/specification).
+- For local sources, the `path` **MAY** point to a single skill directory (containing `SKILL.md`) or a parent directory containing multiple skill subdirectories.
+- For remote sources, implementations **SHOULD** fetch and cache skill content. Caching strategy is implementation-defined.
+#### 5.7.4. Example Usage
+
+```yaml
+skills:
+  # Local skills directory
+  - type: "local"
+    path: "./my-skills"
+
+  # A specific remote skill
+  - type: "remote"
+    url: "https://github.com/anthropics/skills/tree/main/pdf"
+    authentication:
+      type: "bearer"
+      token: "${env:GITHUB_TOKEN}"
+
 ```
 
 ## 6. Protocol Specifications
