@@ -1,0 +1,20 @@
+Subject: Your Acme Commerce Refund - Order #{ORDER_ID}
+
+Dear {CUSTOMER_NAME},
+
+We've processed your refund for order #{ORDER_ID}.
+
+Refund details:
+- Amount: {REFUND_AMOUNT}
+- Method: {REFUND_METHOD}
+- Expected arrival: {REFUND_TIMELINE}
+
+Items refunded:
+{ITEM_LIST}
+
+If you have any questions, reply to this email or contact us at support@acme.example.com.
+
+Thank you for shopping with Acme Commerce.
+
+Best regards,
+Acme Commerce Support Team
