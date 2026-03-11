@@ -44,8 +44,6 @@ tools:
 skills:
   - type: "local"
     path: "./skills"
-  # - type: "remote"
-  #   url: "https://github.com/acme-commerce/skills/tree/main/loyalty-program"
 ---
 
 # Role
