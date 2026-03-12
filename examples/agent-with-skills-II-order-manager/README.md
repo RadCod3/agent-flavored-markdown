@@ -181,12 +181,12 @@ No skill is activated — the agent uses MCP tools directly.
 ## Use with an AFM interpreter Docker image
 
 ```bash
-docker run -v ./order_management_agent.afm.md:/app/agent.afm.md \
+docker run -v ./order_management_agent.afm.md:/app/order_management_agent.afm.md \
     -v ./skills:/app/skills \
     -e ANTHROPIC_API_KEY=<YOUR_API_KEY> \
     -e ORDER_SERVICE_USERNAME=<YOUR_ORDERS_USERNAME> \
     -e ORDER_SERVICE_PASSWORD=<YOUR_ORDERS_PASSWORD> \
     -e ORDER_MCP_URL=<YOUR_ORDERS_MCP_URL> \
     -p 8085:8085 \
-    ghcr.io/wso2/afm-ballerina-interpreter:latest /app/agent.afm.md
+    ghcr.io/wso2/afm-ballerina-interpreter:latest /app/order_management_agent.afm.md
 ```
