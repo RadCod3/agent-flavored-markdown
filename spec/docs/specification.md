@@ -649,7 +649,7 @@ The `skills` field is an array where each element represents a skill source conf
 | Key | Type | Required | Description |
 | ------- | ------ | ---------- | ------------- |
 | `type` | `string` | Yes | Must be `"local"`. |
-| `path` | `string` | Yes | Filesystem path (absolute or relative to the AFM file's location) to a skill directory or parent directory containing multiple skills. |
+| `path` | `string` | Yes | Filesystem path (absolute or relative) to a skill directory or parent directory containing multiple skills.<br>Relative paths **SHOULD** be resolved relative to the AFM file's location.<br>Implementations **MAY** support additional resolution strategies but **SHOULD** document their path resolution behavior. |
 
 #### 5.7.3. Behavior
 
