@@ -8,11 +8,11 @@ hide:
 
 # Getting Started with Agent-Flavored Markdown
 
-This guide walks through the implementation of a simple Greeter Agent, introducing AFM concepts.
+This guide walks through the implementation of a simple Friendly Assistant agent, introducing AFM concepts.
 
 ## Agent File Structure
 
-AFM is a simple, text-based format for defining AI agents. It uses a combination of a YAML front matter for configuration and a Markdown body for instructions. This makes it easy for both humans and machines to read and write.
+AFM is a simple, Markdown-based format for defining AI agents. It uses Markdown for instructions with YAML front matter for configuration and metadata. This improves authoring and readability of AI Agents for both humans and machines.
 
 An AFM file has two main parts:
 
@@ -21,22 +21,30 @@ An AFM file has two main parts:
 
 ## Your First AFM Agent
 
-Let's create a simple "Greeter" agent. We'll start by defining what the agent does, and then we'll add the necessary metadata and configuration.
+Let's create a simple "Friendly Assistant" agent. We'll start by defining what the agent does, and then we'll add the necessary metadata and configuration.
 
 ### 1. Defining the Role and Instructions
 
 The core of any AFM agent is its **Role** and **Instructions**. This is where you define the agent's persona and the tasks it should perform.
 
-For our Greeter agent, we'll keep it simple:
+For our Friendly Assistant, we'll keep it simple:
 
 ```markdown
 # Role
 
-You are a friendly and polite greeter.
+You are a friendly and helpful conversational assistant. Your purpose is to engage in
+natural, helpful conversations with users, answering their questions, providing
+information, and assisting with various tasks to the best of your abilities.
 
 # Instructions
 
-Your task is to greet the user. When the user says something to you, you should respond with a friendly greeting.
+- Always respond in a friendly and conversational tone
+- Keep your responses clear, concise, and easy to understand
+- If you don't know something, be honest about it
+- Ask clarifying questions when the user's request is ambiguous
+- Be helpful and try to provide practical, actionable advice
+- Maintain context throughout the conversation
+- Show empathy and understanding in your responses
 ```
 
 *   **`# Role`**: Defines the agent's purpose and responsibilities (its persona).
@@ -49,53 +57,73 @@ Next, we add the **Front Matter**. This is the YAML block at the top of the file
 ```yaml
 ---
 spec_version: "0.3.0"
-name: "Greeter"
-description: "A simple agent that greets the user."
+name: "Friendly Assistant"
+description: "A friendly conversational assistant that helps users with various tasks."
+version: "0.1.0"
+license: "Apache-2.0"
 model:
   name: "gpt-4o"
   provider: "openai"
   authentication:
     type: "api-key"
     api_key: "${env:OPENAI_API_KEY}"
+interfaces:
+  - type: "consolechat"
+max_iterations: 5
 ---
 ```
 
 *   **`spec_version`**: Specifies the version of the AFM specification the file adheres to.
 *   **`name`**: The name of our agent.
 *   **`description`**: A short description of what the agent does.
+*   **`version`**: The version of our agent.
 *   **`model`**: This section specifies the AI model the agent will use (OpenAI's `gpt-4o`) and how to authenticate using an environment variable.
+*   **`interfaces`**: This section defines how the agent can be interacted with. In this case, we're exposing it as a command-line chat interface.
+*   **`max_iterations`**: The maximum number of iterations the agent can perform in a single run.
 
 ### 3. The Complete AFM File
 
-Putting it all together, our complete `greeter.afm.md` file looks like this:
+Putting it all together, our complete `friendly_assistant.afm.md` file looks like this:
 
 <div class="demo-code">
   <div class="demo-code-header">
-    <span class="demo-file-name">greeter.afm.md</span>
+    <span class="demo-file-name">friendly_assistant.afm.md</span>
   </div>
   <div class="demo-code-content">
 
 ```markdown
 ---
 spec_version: "0.3.0"
-name: "Greeter"
-description: "A simple agent that greets the user."
+name: "Friendly Assistant"
+description: "A friendly conversational assistant that helps users with various tasks."
+version: "0.1.0"
+license: "Apache-2.0"
 model:
   name: "gpt-4o"
   provider: "openai"
   authentication:
     type: "api-key"
     api_key: "${env:OPENAI_API_KEY}"
+interfaces:
+  - type: "consolechat"
+max_iterations: 5
 ---
 
 # Role
 
-You are a friendly and polite greeter.
+You are a friendly and helpful conversational assistant. Your purpose is to engage in
+natural, helpful conversations with users, answering their questions, providing
+information, and assisting with various tasks to the best of your abilities.
 
 # Instructions
 
-Your task is to greet the user. When the user says something to you, you should respond
-with a friendly greeting.
+- Always respond in a friendly and conversational tone
+- Keep your responses clear, concise, and easy to understand
+- If you don't know something, be honest about it
+- Ask clarifying questions when the user's request is ambiguous
+- Be helpful and try to provide practical, actionable advice
+- Maintain context throughout the conversation
+- Show empathy and understanding in your responses
 ```
 
 </div>
