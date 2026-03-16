@@ -669,7 +669,7 @@ skills:
 
   # A single specific skill
   - type: "local"
-    path: "./other-skills/pdf-processing"
+    path: "/app/skills/pdf-processing"
 ```
 
 ## 6. Protocol Specifications
