@@ -112,6 +112,7 @@ extra:
 nav:
   - Home: index.md
   - Specification: specification.md
+  - Getting Started: getting-started.md
   - Examples:
     - examples/index.md
     - Friendly Assistant: examples/friendly_assistant.md
