@@ -3,7 +3,6 @@ title: Getting Started
 description: A guide to creating your first AI agent using Agent-Flavored Markdown (AFM).
 hide:
   - navigation
-  - toc
 ---
 
 # Getting Started with Agent-Flavored Markdown
@@ -12,7 +11,7 @@ This guide walks through the implementation of a simple Friendly Assistant agent
 
 ## Agent File Structure
 
-AFM is a simple, Markdown-based format for defining AI agents. It uses Markdown for instructions with YAML front matter for configuration and metadata. This improves authoring and readability of AI Agents for both humans and machines.
+AFM is a simple, Markdown-based format for defining AI agents. It uses Markdown for instructions with YAML front matter for configuration and metadata. This improves authoring and readability of AI agents for both humans and machines.
 
 An AFM file has two main parts:
 
@@ -25,7 +24,7 @@ Let's create a simple "Friendly Assistant" agent. We'll start by defining what t
 
 ### 1. Defining the Role and Instructions
 
-The core of any AFM agent is its **Role** and **Instructions**. This is where you define the agent's persona and the tasks it should perform.
+The core of any agent is its **Role** and **Instructions**. This is where you define the agent's persona and the tasks it should perform.
 
 For our Friendly Assistant, we'll keep it simple:
 
@@ -69,17 +68,15 @@ model:
     api_key: "${env:OPENAI_API_KEY}"
 interfaces:
   - type: "consolechat"
-max_iterations: 5
 ---
 ```
 
 *   **`spec_version`**: Specifies the version of the AFM specification the file adheres to.
-*   **`name`**: The name of our agent.
+*   **`name`**: The name of the agent.
 *   **`description`**: A short description of what the agent does.
-*   **`version`**: The version of our agent.
-*   **`model`**: This section specifies the AI model the agent will use (OpenAI's `gpt-4o`) and how to authenticate using an environment variable.
+*   **`version`**: The version of the agent.
+*   **`model`**: This section specifies the AI model the agent will use. In this example, we use OpenAI's `gpt-4o` model. The variable substitution indicates that the API key should be retrieved from an environment variable named `OPENAI_API_KEY`.
 *   **`interfaces`**: This section defines how the agent can be interacted with. In this case, we're exposing it as a command-line chat interface.
-*   **`max_iterations`**: The maximum number of iterations the agent can perform in a single run.
 
 ### 3. The Complete AFM File
 
@@ -106,7 +103,6 @@ model:
     api_key: "${env:OPENAI_API_KEY}"
 interfaces:
   - type: "consolechat"
-max_iterations: 5
 ---
 
 # Role
