@@ -39,6 +39,7 @@ AFM defines the following core concepts:
 - **Model**: The AI model powering the agent.
 - **Tools**: External tools and services available to the agent.
 - **Interface**: How the agent is invoked and its input/output contract.
+- **Skills**: Additional capabilities the agent can load and use on demand (in [Agent Skills](https://agentskills.io) format).
 
 !!! note "Agent Memory"
     Given the lack of standardization, AFM does not prescribe a standard for agent memory yet.
@@ -69,6 +70,7 @@ This section contains metadata about the agent. These metadata fields are **OPTI
 | [Agent Interfaces](#53-agent-interfaces) | Defines how the agent is invoked and its input/output signature. |
 | [Agent Tools](#54-tools) | Defines external tools available to the agent (e.g., via MCP). |
 | [Agent Execution](#55-agent-execution) | Runtime execution configuration like iteration limits. |
+| [Agent Skills](#57-agent-skills) | Defines additional capabilities the agent can load and use on demand, following the [Agent Skills](https://agentskills.io) open standard. |
 
 Refer to the [AFM Schema](#5-schema-definitions) for a complete list of fields and their meanings.
 
@@ -626,6 +628,50 @@ authentication:
   password: "${env:API_PASSWORD}"
 ```
 
+### 5.7. Agent Skills {#57-agent-skills}
+
+This section defines how to make skills available to the agent to load and use on demand. Skills follow the [Agent Skills](https://agentskills.io) open standard to give agents new capabilities and expertise.
+
+The `skills` field is **OPTIONAL**.
+
+#### 5.7.1. Schema Overview
+
+```yaml
+skills:
+  - type: "local"           # Local filesystem path
+    path: "./skills"
+```
+
+#### 5.7.2. Field Definitions
+
+The `skills` field is an array where each element represents a skill source configuration, identified by the `type` field. This version of the specification defines the `local` source type.
+
+**Local Source:**
+
+| Key | Type | Required | Description |
+| ------- | ------ | ---------- | ------------- |
+| `type` | `string` | Yes | Must be `"local"`. |
+| `path` | `string` | Yes | Filesystem path (absolute or relative) to a single skill directory (containing `SKILL.md`) or a parent directory containing multiple skill subdirectories. |
+
+#### 5.7.3. Behavior
+
+- Implementations **SHOULD** follow the Agent Skills progressive disclosure model: load only skill `name` and `description` at startup, and load full instructions on demand when a skill matches the task.
+- Implementations **SHOULD** support the `SKILL.md` format as defined by the [Agent Skills specification](https://agentskills.io/specification).
+- Relative paths **SHOULD** be resolved relative to the AFM file's location. Implementations **MAY** support additional resolution strategies but **SHOULD** document their path resolution behavior.
+
+#### 5.7.4. Example Usage
+
+```yaml
+skills:
+  # A directory containing multiple skills
+  - type: "local"
+    path: "./my-skills"
+
+  # A single specific skill
+  - type: "local"
+    path: "/app/skills/pdf-processing"
+```
+
 ## 6. Protocol Specifications
 
 This section details the protocols that agents use to communicate with external systems and other agents, as referenced in the schema above.
@@ -861,3 +907,4 @@ This section outlines potential future enhancements to the AFM specification, in
 - Support for an Agent memory abstraction covering common memory patterns
 - Support for Agent Identity
 - Support for additional interface types (e.g., scheduled execution, REST API)
+- Support for remote Agent Skills from URLs and skill registries
