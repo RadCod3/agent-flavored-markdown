@@ -1,7 +1,7 @@
 """Demo MCP server with mock order and customer data.
 
 Equivalent to the Ballerina implementation — same tools, same mock data.
-Requires: pip install mcp[http] uvicorn
+Requires: pip install mcp uvicorn
 """
 
 import base64
