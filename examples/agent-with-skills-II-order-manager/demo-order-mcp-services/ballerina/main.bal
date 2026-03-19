@@ -3,160 +3,160 @@ import ballerina/mcp;
 import ballerina/time;
 
 type OrderItem record {|
-    string productId;
+    string product_id;
     string name;
     int quantity;
-    decimal unitPrice;
+    decimal unit_price;
 |};
 
 type Order record {|
-    string orderId;
-    string customerId;
+    string order_id;
+    string customer_id;
     string status;
     OrderItem[] items;
     decimal subtotal;
     decimal tax;
     decimal shipping;
     decimal total;
-    string shippingAddress;
-    string? trackingNumber;
-    string createdAt;
-    string? deliveredAt;
+    string shipping_address;
+    string? tracking_number;
+    string created_at;
+    string? delivered_at;
 |};
 
 type Customer record {|
-    string customerId;
+    string customer_id;
     string name;
     string email;
     string phone;
-    string defaultPaymentMethod;
-    int totalOrders;
-    int issuesLast30Days;
+    string default_payment_method;
+    int total_orders;
+    int issues_last_30_days;
 |};
 
 type RefundResult record {|
-    string refundId;
-    string orderId;
+    string refund_id;
+    string order_id;
     decimal amount;
     string method;
     string reason;
     string status;
-    string estimatedArrival;
+    string estimated_arrival;
 |};
 
 // In-memory mock data
-final map<Order> & readonly orders = {
+isolated map<Order> orders = {
     "ORD-1001": {
-        orderId: "ORD-1001",
-        customerId: "CUST-501",
+        order_id: "ORD-1001",
+        customer_id: "CUST-501",
         status: "delivered",
         items: [
-            {productId: "PROD-A1", name: "Wireless Headphones", quantity: 1, unitPrice: 79.99d},
-            {productId: "PROD-B2", name: "USB-C Cable", quantity: 2, unitPrice: 12.99d}
+            {product_id: "PROD-A1", name: "Wireless Headphones", quantity: 1, unit_price: 79.99d},
+            {product_id: "PROD-B2", name: "USB-C Cable", quantity: 2, unit_price: 12.99d}
         ],
         subtotal: 105.97d,
         tax: 8.48d,
         shipping: 5.99d,
         total: 120.44d,
-        shippingAddress: "123 Main St, Springfield, IL 62701",
-        trackingNumber: "1Z999AA10123456784",
-        createdAt: "2025-01-15T10:30:00Z",
-        deliveredAt: "2025-01-20T14:22:00Z"
+        shipping_address: "123 Main St, Springfield, IL 62701",
+        tracking_number: "1Z999AA10123456784",
+        created_at: "2025-01-15T10:30:00Z",
+        delivered_at: "2025-01-20T14:22:00Z"
     },
     "ORD-1002": {
-        orderId: "ORD-1002",
-        customerId: "CUST-502",
+        order_id: "ORD-1002",
+        customer_id: "CUST-502",
         status: "delivered",
         items: [
-            {productId: "PROD-C3", name: "Mechanical Keyboard", quantity: 1, unitPrice: 149.99d}
+            {product_id: "PROD-C3", name: "Mechanical Keyboard", quantity: 1, unit_price: 149.99d}
         ],
         subtotal: 149.99d,
         tax: 12.00d,
         shipping: 0.00d,
         total: 161.99d,
-        shippingAddress: "456 Oak Ave, Portland, OR 97201",
-        trackingNumber: "1Z999AA10987654321",
-        createdAt: "2025-02-01T08:15:00Z",
-        deliveredAt: "2025-02-05T11:30:00Z"
+        shipping_address: "456 Oak Ave, Portland, OR 97201",
+        tracking_number: "1Z999AA10987654321",
+        created_at: "2025-02-01T08:15:00Z",
+        delivered_at: "2025-02-05T11:30:00Z"
     },
     "ORD-1003": {
-        orderId: "ORD-1003",
-        customerId: "CUST-501",
+        order_id: "ORD-1003",
+        customer_id: "CUST-501",
         status: "pending",
         items: [
-            {productId: "PROD-D4", name: "Monitor Stand", quantity: 1, unitPrice: 45.00d},
-            {productId: "PROD-E5", name: "Desk Lamp", quantity: 1, unitPrice: 34.99d}
+            {product_id: "PROD-D4", name: "Monitor Stand", quantity: 1, unit_price: 45.00d},
+            {product_id: "PROD-E5", name: "Desk Lamp", quantity: 1, unit_price: 34.99d}
         ],
         subtotal: 79.99d,
         tax: 6.40d,
         shipping: 5.99d,
         total: 92.38d,
-        shippingAddress: "123 Main St, Springfield, IL 62701",
-        trackingNumber: (),
-        createdAt: "2025-02-10T16:45:00Z",
-        deliveredAt: ()
+        shipping_address: "123 Main St, Springfield, IL 62701",
+        tracking_number: (),
+        created_at: "2025-02-10T16:45:00Z",
+        delivered_at: ()
     },
     "ORD-1004": {
-        orderId: "ORD-1004",
-        customerId: "CUST-503",
+        order_id: "ORD-1004",
+        customer_id: "CUST-503",
         status: "payment_failed",
         items: [
-            {productId: "PROD-F6", name: "Ergonomic Chair", quantity: 1, unitPrice: 599.99d}
+            {product_id: "PROD-F6", name: "Ergonomic Chair", quantity: 1, unit_price: 599.99d}
         ],
         subtotal: 599.99d,
         tax: 48.00d,
         shipping: 0.00d,
         total: 647.99d,
-        shippingAddress: "789 Pine Rd, Austin, TX 78701",
-        trackingNumber: (),
-        createdAt: "2025-02-12T11:00:00Z",
-        deliveredAt: ()
+        shipping_address: "789 Pine Rd, Austin, TX 78701",
+        tracking_number: (),
+        created_at: "2025-02-12T11:00:00Z",
+        delivered_at: ()
     },
     "ORD-1005": {
-        orderId: "ORD-1005",
-        customerId: "CUST-502",
+        order_id: "ORD-1005",
+        customer_id: "CUST-502",
         status: "delivered",
         items: [
-            {productId: "PROD-G7", name: "Productivity Course (Digital Download)", quantity: 1, unitPrice: 49.99d}
+            {product_id: "PROD-G7", name: "Productivity Course (Digital Download)", quantity: 1, unit_price: 49.99d}
         ],
         subtotal: 49.99d,
         tax: 4.00d,
         shipping: 0.00d,
         total: 53.99d,
-        shippingAddress: "456 Oak Ave, Portland, OR 97201",
-        trackingNumber: (),
-        createdAt: "2025-02-15T09:20:00Z",
-        deliveredAt: "2025-02-15T09:21:00Z"
+        shipping_address: "456 Oak Ave, Portland, OR 97201",
+        tracking_number: (),
+        created_at: "2025-02-15T09:20:00Z",
+        delivered_at: "2025-02-15T09:21:00Z"
     }
 };
 
 final map<Customer> & readonly customers = {
     "CUST-501": {
-        customerId: "CUST-501",
+        customer_id: "CUST-501",
         name: "Alice Johnson",
         email: "alice@example.com",
         phone: "+1-555-0101",
-        defaultPaymentMethod: "Visa ending in 4242",
-        totalOrders: 12,
-        issuesLast30Days: 1
+        default_payment_method: "Visa ending in 4242",
+        total_orders: 12,
+        issues_last_30_days: 1
     },
     "CUST-502": {
-        customerId: "CUST-502",
+        customer_id: "CUST-502",
         name: "Bob Smith",
         email: "bob@example.com",
         phone: "+1-555-0102",
-        defaultPaymentMethod: "PayPal (bob@example.com)",
-        totalOrders: 3,
-        issuesLast30Days: 0
+        default_payment_method: "PayPal (bob@example.com)",
+        total_orders: 3,
+        issues_last_30_days: 0
     },
     "CUST-503": {
-        customerId: "CUST-503",
+        customer_id: "CUST-503",
         name: "Carol Davis",
         email: "carol@example.com",
         phone: "+1-555-0103",
-        defaultPaymentMethod: "Mastercard ending in 8888",
-        totalOrders: 27,
-        issuesLast30Days: 4
+        default_payment_method: "Mastercard ending in 8888",
+        total_orders: 27,
+        issues_last_30_days: 4
     }
 };
 
@@ -174,84 +174,91 @@ service mcp:Service /mcp on mcpListener {
 
     # Retrieve an order by its ID.
     #
-    # + orderId - the order ID (e.g., "ORD-1001")
+    # + order_id - the order ID (e.g., "ORD-1001")
     # + return - the order details, or an error if not found
-    remote function get_order(string orderId) returns Order|error {
-        Order? 'order = orders[orderId];
-        if 'order is () {
-            return error(string `Order '${orderId}' not found`);
+    isolated remote function get_order(string order_id) returns Order|error {
+        lock {
+            if !orders.hasKey(order_id) {
+                return error(string `Order '${order_id}' not found`);
+            }
+            return orders.get(order_id).clone();
         }
-        return 'order;
     }
 
     # List orders, optionally filtered by customer ID or status.
     #
-    # + customerId - filter by customer ID (optional)
+    # + customer_id - filter by customer ID (optional)
     # + status - filter by order status (optional, e.g., "pending", "shipped", "delivered")
     # + return - matching orders
-    remote function list_orders(string? customerId = (), string? status = ()) returns Order[] {
-        Order[] result = [];
-        foreach Order 'order in orders {
-            if customerId is string && 'order.customerId != customerId {
-                continue;
-            }
-            if status is string && 'order.status != status {
-                continue;
-            }
-            result.push('order);
+    remote function list_orders(string? customer_id = (), string? status = ()) returns Order[] {
+        lock {
+            return <readonly> from Order 'order in orders
+                     where (customer_id is () || 'order.customer_id == customer_id) &&
+                             (status is () || 'order.status == status)
+                     select 'order.cloneReadOnly();
         }
-        return result;
     }
 
     # Update the status of an order.
     #
-    # + orderId - the order ID
+    # + order_id - the order ID
     # + status - the new status (e.g., "refund_pending", "return_initiated", "cancelled")
     # + return - confirmation message, or an error if the order is not found
-    remote function update_order_status(string orderId, string status) returns string|error {
-        Order? 'order = orders[orderId];
-        if 'order is () {
-            return error(string `Order '${orderId}' not found`);
+    remote function update_order_status(string order_id, string status) returns error? {
+        lock {
+            if !orders.hasKey(order_id) {
+                return error(string `Order '${order_id}' not found`);
+            }
+            Order 'order = orders.get(order_id);
+            'order.status = status;
         }
-        // In a real implementation, this would persist the status change
-        return string `Order ${orderId} status updated to '${status}'`;
     }
 
     # Create a refund for an order.
     #
-    # + orderId - the order ID to refund
+    # + order_id - the order ID to refund
     # + amount - the refund amount
     # + reason - the reason for the refund (e.g., "defective", "wrong_item", "customer_request")
     # + return - the refund details, or an error if the order is not found
-    remote function create_refund(string orderId, decimal amount, string reason) returns RefundResult|error {
-        Order? 'order = orders[orderId];
-        if 'order is () {
-            return error(string `Order '${orderId}' not found`);
+    remote function create_refund(string order_id, decimal amount, string reason) returns RefundResult|error {
+        Order? 'order;
+
+        lock {
+            'order = orders[order_id].clone();
         }
+
+        if 'order is () {
+            return error(string `Order '${order_id}' not found`);
+        }
+
+        if amount <= 0d {
+            return error("Refund amount must be greater than zero");
+        }
+
         if amount > 'order.total {
             return error(string `Refund amount ${amount} exceeds order total ${'order.total}`);
         }
 
-        string refundId = string `REF-${time:utcNow()[0]}`;
+        string refund_id = string `REF-${time:utcNow()[0]}`;
         return {
-            refundId,
-            orderId,
+            refund_id,
+            order_id,
             amount,
             method: amount == 'order.total ? "original_payment" : "store_credit",
             reason,
             status: "processing",
-            estimatedArrival: "5-10 business days"
+            estimated_arrival: "5-10 business days"
         };
     }
 
     # Retrieve a customer by their ID.
     #
-    # + customerId - the customer ID (e.g., "CUST-501")
+    # + customer_id - the customer ID (e.g., "CUST-501")
     # + return - the customer details, or an error if not found
-    remote function get_customer(string customerId) returns Customer|error {
-        Customer? customer = customers[customerId];
+    remote function get_customer(string customer_id) returns Customer|error {
+        Customer? customer = customers[customer_id];
         if customer is () {
-            return error(string `Customer '${customerId}' not found`);
+            return error(string `Customer '${customer_id}' not found`);
         }
         return customer;
     }

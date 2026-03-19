@@ -1,4 +1,4 @@
-# Mock credentials for local development only
+# Rename this file to Config.toml before running.
 [[ballerina.auth.users]]
 username = "orderagent"
 password = "pw1234"

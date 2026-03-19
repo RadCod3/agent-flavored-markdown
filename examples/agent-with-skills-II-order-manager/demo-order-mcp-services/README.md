@@ -1,6 +1,6 @@
 # Demo Order MCP Services
 
-Mock MCP server for the order management agent. Two equivalent implementations are provided — pick whichever fits your stack.
+Mock MCP server for the order management agent. Two equivalent implementations are provided — pick whichever fits your stack. Both expose the same tools and mock data.
 
 ## Ballerina
 
@@ -9,7 +9,7 @@ cd ballerina
 bal run
 ```
 
-Starts an MCP server on port 9090 at `/mcp`. Uses basic authentication (credentials in `Config.toml` — these are for local development only, never commit real credentials to source control).
+Starts an MCP server on port 9090 at `/mcp`. Rename `Config.toml.example` to `Config.toml` before running. Uses basic authentication (credentials are for local development only).
 
 ## Python
 
@@ -32,8 +32,8 @@ Starts an MCP server on port 9090 at `/mcp`. Uses the same basic authentication 
 
 | Tool | Description |
 |---|---|
-| `get_order(orderId)` | Retrieve order details |
-| `list_orders(customerId?, status?)` | List orders with optional filters |
-| `update_order_status(orderId, status)` | Update an order's status |
-| `create_refund(orderId, amount, reason)` | Issue a refund |
-| `get_customer(customerId)` | Retrieve customer details |
+| `get_order(order_id)` | Retrieve order details |
+| `list_orders(customer_id?, status?)` | List orders with optional filters |
+| `update_order_status(order_id, status)` | Update an order's status |
+| `create_refund(order_id, amount, reason)` | Issue a refund |
+| `get_customer(customer_id)` | Retrieve customer details |
