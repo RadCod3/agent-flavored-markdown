@@ -52,6 +52,32 @@ hide:
         <span class="example-label">tools/mcp/http</span>
       </div>
     </a>
+    <a href="https://github.com/wso2/agent-flavored-markdown/tree/main/examples/research-assistant" target="_blank" class="feature-item">
+      <div class="feature-icon-box">
+        <svg class="feature-icon-svg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+      <h3 class="feature-title">Research Assistant</h3>
+      <p class="feature-description">A self-contained agent that fetches and summarizes web content.</p>
+      <div class="example-labels">
+        <span class="example-label">tools/mcp/stdio</span>
+        <span class="example-label">interface/webchat</span>
+      </div>
+    </a>
+    <a href="https://github.com/wso2/agent-flavored-markdown/tree/main/examples/code-explainer" target="_blank" class="feature-item">
+      <div class="feature-icon-box">
+        <svg class="feature-icon-svg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+        </svg>
+      </div>
+      <h3 class="feature-title">Code Explainer</h3>
+      <p class="feature-description">A web-based agent that explores and explains code in any project directory.</p>
+      <div class="example-labels">
+        <span class="example-label">tools/mcp/stdio</span>
+        <span class="example-label">interface/consolechat</span>
+      </div>
+    </a>
     <a href="https://github.com/wso2/agent-flavored-markdown/tree/main/examples/agent-with-skills-I-support-agent" target="_blank" class="feature-item">
       <div class="feature-icon-box">
         <svg class="feature-icon-svg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
