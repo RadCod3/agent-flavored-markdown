@@ -1,0 +1,5 @@
+# Rename this file to Config.toml before running.
+[[ballerina.auth.users]]
+username = "orderagent"
+password = "pw1234"
+scopes = ["admin"]

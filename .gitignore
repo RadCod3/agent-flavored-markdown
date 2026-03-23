@@ -25,3 +25,6 @@ replay_pid*
 
 # macOS system files
 .DS_Store
+
+target/
+Config.toml
