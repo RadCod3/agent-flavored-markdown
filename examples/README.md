@@ -9,6 +9,6 @@ Explore these example agents to see AFM in action. Each example includes an agen
 | [GitHub PR Analyzer](pull-request-analyzer/) | A webhook-triggered agent that detects drift between code and documentation. | `interface/webhook`, `tools/mcp/http` |
 | [Research Assistant](research-assistant/) | A self-contained agent that fetches and summarizes web content. | `tools/mcp/stdio`, `interface/webchat` |
 | [Code Explainer](code-explainer/) | A web-based agent that explores and explains code in any project directory. | `tools/mcp/stdio`, `interface/consolechat` |
-| [Tech Support Agent](agent-with-skills-I-support-agent/) | A support agent that uses skills for structured troubleshooting workflows. | `skills`, `interface/consolechat` |
-| [Order Management Agent](agent-with-skills-II-order-manager/) | A customer service agent with MCP tools and skills for refunds and order troubleshooting. | `skills`, `tools/mcp/http`, `interface/webchat` |
+| [Tech Support Agent](tech-support-agent-with-skills/) | A support agent that uses skills for structured troubleshooting workflows. | `skills`, `interface/consolechat` |
+| [Order Management Agent](order-management-agent-with-skills/) | A customer service agent with MCP tools and skills for refunds and order troubleshooting. | `skills`, `tools/mcp/http`, `interface/webchat` |
 | [HR Agent with RAG](hr-agent-with-rag/) | An HR support agent that answers employee questions using RAG over company policy documents. | `RAG`, `tools/mcp/stdio`, `interface/webchat` |

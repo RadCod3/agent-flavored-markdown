@@ -5,7 +5,7 @@ A sample AFM agent that demonstrates [Agent Skills](https://agentskills.io) inte
 ## Structure
 
 ```
-agent-with-skills-II-order-manager/
+order-management-agent-with-skills/
 ├── order_management_agent.afm.md       # Agent definition
 ├── demo-order-mcp-services/
 │   ├── ballerina/                      # Ballerina MCP server
