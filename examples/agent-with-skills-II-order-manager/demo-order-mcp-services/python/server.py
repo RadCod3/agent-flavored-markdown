@@ -71,11 +71,9 @@ class TrustedHostMiddleware:
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         if scope["type"] == "http":
             # Rewrite the host header to localhost to pass Starlette's validation
-            headers = dict(scope.get("headers", []))
             modified_headers = []
-            for name, value in headers.items():
+            for name, value in scope.get("headers", []):
                 if name == b"host":
-                    # Replace any host with localhost:9090
                     modified_headers.append((name, b"localhost:9090"))
                 else:
                     modified_headers.append((name, value))
