@@ -143,7 +143,7 @@ Then run it:
 Access the chat UI at [`http://localhost:8085/chat/ui`](http://localhost:8085/chat/ui).
 
 !!! Note Console chat interface
-    When using Docker for console chat interfaces, include the `-it` options. For example, with the [math tutor](../examples/math_tutor/) file, use
+    When using Docker for console chat interfaces, include the `-it` options. For example, with the [math tutor](examples/math_tutor.md) file, use
     ```bash
     docker run -it -p 8085:8085 \
       -e OPENAI_MODEL=<YOUR-OPENAI-MODEL> \

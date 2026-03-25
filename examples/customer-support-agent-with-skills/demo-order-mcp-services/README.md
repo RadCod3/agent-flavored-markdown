@@ -1,6 +1,6 @@
 # Demo Order MCP Services
 
-Mock MCP server for the order management agent. Two equivalent implementations are provided — pick whichever fits your stack. Both expose the same tools and mock data.
+Mock MCP server for the customer support agent. Two equivalent implementations are provided — pick whichever fits your stack. Both expose the same tools and mock data.
 
 ## Ballerina
 

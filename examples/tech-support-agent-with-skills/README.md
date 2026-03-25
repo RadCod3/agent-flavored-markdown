@@ -5,7 +5,7 @@ A simple AFM agent that demonstrates [Agent Skills](https://agentskills.io) inte
 ## Structure
 
 ```
-agent-with-skills-I-support-agent/
+tech-support-agent-with-skills/
 ├── support_agent.afm.md          # Agent definition
 └── skills/
     └── troubleshooting/
