@@ -1,4 +1,4 @@
-# HR Agent with RAG — Sample
+# HR Agent — Sample
 
 An AFM agent that acts as an internal HR support assistant for a fictional telecommunications company (ConnectWave), using Retrieval-Augmented Generation (RAG) to answer employee questions grounded in company policy documents.
 
@@ -32,7 +32,7 @@ hr-agent-with-rag/
 
 | Server | Tool | Description |
 |---|---|---|
-| `hr_rag_retrieval` | `retrieve` | Searches ConnectWave company policy documents and returns relevant text chunks |
+| `hr_policy_rag_retrieval` | `retrieve` | Searches ConnectWave company policy documents and returns relevant text chunks |
 
 ## Test scenarios
 

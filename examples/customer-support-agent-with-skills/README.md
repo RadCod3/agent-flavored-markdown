@@ -1,12 +1,12 @@
-# Order Management Agent — Sample
+# Customer Support Agent — Sample
 
 A sample AFM agent that demonstrates [Agent Skills](https://agentskills.io) integration. The agent acts as a customer service assistant for an e-commerce platform, using MCP tools to manage orders and skills to follow structured workflows.
 
 ## Structure
 
 ```
-order-management-agent-with-skills/
-├── order_management_agent.afm.md       # Agent definition
+customer-support-agent-with-skills/
+├── customer_support_agent.afm.md       # Agent definition
 ├── demo-order-mcp-services/
 │   ├── ballerina/                      # Ballerina MCP server
 │   │   ├── Ballerina.toml
@@ -181,12 +181,12 @@ No skill is activated — the agent uses MCP tools directly.
 ## Use with an AFM interpreter Docker image
 
 ```bash
-docker run -v ./order_management_agent.afm.md:/app/order_management_agent.afm.md \
+docker run -v ./customer_support_agent.afm.md:/app/customer_support_agent.afm.md \
     -v ./skills:/app/skills \
     -e ANTHROPIC_API_KEY=<YOUR_API_KEY> \
     -e ORDER_SERVICE_USERNAME=<YOUR_ORDERS_USERNAME> \
     -e ORDER_SERVICE_PASSWORD=<YOUR_ORDERS_PASSWORD> \
     -e ORDER_MCP_URL=<YOUR_ORDERS_MCP_URL> \
     -p 8085:8085 \
-    ghcr.io/wso2/afm-ballerina-interpreter:latest /app/order_management_agent.afm.md
+    ghcr.io/wso2/afm-ballerina-interpreter:latest /app/customer_support_agent.afm.md
 ```

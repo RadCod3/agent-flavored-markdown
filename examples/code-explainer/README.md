@@ -1,6 +1,6 @@
 # Code Explainer — Sample
 
-An AFM agent that helps users understand codebases. Point it at any project directory and ask questions about the code via a web chat interface. It reads source files, traces execution flows, and provides clear explanations grounded in the actual code.
+An AFM agent that helps users understand codebases. Point it at any project directory and ask questions about the code via the console chat interface (`consolechat`). It reads source files, traces execution flows, and provides clear explanations grounded in the actual code.
 
 ## Structure
 

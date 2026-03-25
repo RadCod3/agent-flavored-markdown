@@ -1,7 +1,7 @@
 ---
 spec_version: "0.3.0"
 name: "Research Assistant"
-description: "A console-based research assistant that fetches web content, reasons through complex questions, and synthesizes clear answers."
+description: "A web-based research assistant that fetches web content, reasons through complex questions, and synthesizes clear answers."
 version: "0.1.0"
 model:
   provider: "anthropic"

@@ -118,6 +118,11 @@ nav:
     - Friendly Assistant: examples/friendly_assistant.md
     - Math Tutor: examples/math_tutor.md
     - GitHub Pull Request Analyzer: examples/pull_request_analyzer.md
+    - Research Assistant: examples/research_assistant.md
+    - Code Explainer: examples/code_explainer.md
+    - Tech Support Agent: examples/tech_support_agent.md
+    - Customer Support Agent: examples/customer_support_agent.md
+    - HR Agent: examples/hr_agent_with_rag.md
   - Reference Implementations: reference-implementations.md
 
 # Include images in documentation
